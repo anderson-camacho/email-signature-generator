@@ -1,0 +1,124 @@
+---
+import { dictionary, type Locale } from "../i18n/dictionaries";
+const { locale } = Astro.props as { locale: Locale };
+const t = dictionary(locale);
+const personalFields = [
+  ["fullName", "Full name"],
+  ["jobTitle", "Job title"],
+  ["company", "Company"],
+  ["department", "Area or department"],
+  ["email", "Email"],
+  ["phone", "Phone"],
+  ["website", "Website HTTPS"],
+  ["address", "Address"],
+  ["pronouns", "Pronouns"],
+  ["legalText", "Legal note"],
+] as const;
+---
+
+<section
+  class="editor"
+  data-editor
+  data-copied={t.copied}
+  data-invalid={t.invalid}
+  data-cleared={t.cleared}
+>
+  <form id="signature-form">
+    <div class="form-heading">
+      <div>
+        <span class="eyebrow">Editor</span>
+        <h2>{t.form}</h2>
+      </div>
+      <span class="autosave">{t.saved}</span>
+    </div>
+
+    <details class="config-section" open>
+      <summary><span>1</span> Template</summary>
+      <div class="config-body">
+        <label
+          >Template<select name="template"
+            ><option value="minimal">Minimal</option
+            ><option value="professional-logo">Professional logo</option
+            ><option value="professional-photo">Professional photo</option
+            ><option value="administrative-area">Administrative area</option
+            ></select
+          ></label
+        >
+      </div>
+    </details>
+
+    <details class="config-section" open>
+      <summary><span>2</span> Personal and company data</summary>
+      <div class="config-body field-grid">
+        {
+          personalFields.map(([name, label]) => (
+            <label class:list={{ wide: name === "legalText" || name === "address" }}>
+              {label}
+              <input
+                name={name}
+                type={name === "email" ? "email" : name === "website" ? "url" : "text"}
+              />
+            </label>
+          ))
+        }
+      </div>
+    </details>
+
+    <details class="config-section">
+      <summary><span>3</span> Photo and logo</summary>
+      <div class="config-body">
+        <label>Public logo URL HTTPS<input name="logoUrl" type="url" /></label>
+        <label>Public photo URL HTTPS<input name="photoUrl" type="url" /></label>
+        <label
+          >Local logo/photo preview<input id="local-image" type="file" accept="image/*"
+        /></label>
+        <p id="local-warning" class="warning" hidden>{t.localWarning}</p>
+      </div>
+    </details>
+
+    <details class="config-section">
+      <summary><span>4</span> Colors and appearance</summary>
+      <div class="config-body appearance-grid">
+        <label>Primary color<input name="primaryColor" type="color" /></label>
+        <label>Secondary color<input name="secondaryColor" type="color" /></label>
+        <label
+          >Size<select name="size"
+            ><option>compact</option><option selected>normal</option><option>wide</option
+            ></select
+          ></label
+        >
+      </div>
+    </details>
+
+    <details class="config-section" open>
+      <summary><span>5</span> Social media buttons</summary>
+      <div class="config-body">
+        <p class="section-help">
+          Add as many buttons as needed, including multiple buttons for the same platform.
+        </p>
+        <div id="social-list" class="social-list"></div>
+        <button id="add-social" class="add-social" type="button">+ Add social network</button>
+      </div>
+    </details>
+  </form>
+
+  <section class="preview-panel">
+    <div class="preview-heading">
+      <div><span class="eyebrow">Live</span><h2>{t.preview}</h2></div>
+      <span class="preview-dot">Updated</span>
+    </div>
+    <div id="preview" class="preview"></div>
+    <p>{t.about}</p>
+    <div class="actions">
+      <button id="copy">{t.copy}</button>
+      <button id="download">{t.download}</button>
+      <button id="export">{t.export}</button>
+      <label class="button">{t.import}<input id="import" type="file" accept=".json,application/json" /></label>
+      <button id="clear" class="secondary">{t.clear}</button>
+    </div>
+    <p id="status" role="status" aria-live="polite">{t.saved}</p>
+  </section>
+</section>
+<script>
+  import "../scripts/editor";
+</script>
