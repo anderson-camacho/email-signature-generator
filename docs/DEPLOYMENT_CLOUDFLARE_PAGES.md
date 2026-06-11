@@ -1,5 +1,18 @@
 # Cloudflare Pages Deployment
 
+The current Cloudflare dashboard may create this project through **Workers
+Builds with Static Assets** instead of the older Pages setup. This repository
+supports that flow through `wrangler.jsonc`; it still deploys only the static
+contents of `dist` and does not add a backend Worker.
+
+For Workers Builds:
+
+- Build command: `npm run build`
+- Deploy command: `npx wrangler deploy`
+- Non-production branch deploy command: `npx wrangler versions upload`
+- Path: `/`
+- Build variable: `PUBLIC_SITE_URL` with the final public HTTPS origin
+
 Prerequisites: Node from `.nvmrc`, npm, and a reviewed public repository.
 
 1. Run `npm ci`, `npm run validate`, and `npm run build`.
