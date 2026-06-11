@@ -1,7 +1,15 @@
 export const locales = ["es", "en", "pt-BR", "fr", "de"] as const;
 export type Locale = (typeof locales)[number];
+export const localeNames: Record<Locale, string> = {
+  es: "Español",
+  en: "English",
+  "pt-BR": "Português (Brasil)",
+  fr: "Français",
+  de: "Deutsch",
+};
 
 const es = {
+  language: "Idioma",
   title: "Generador gratuito de firmas para Gmail",
   promise:
     "Crea una firma profesional para Gmail gratis, sin registrarte y directamente desde tu navegador.",
@@ -30,6 +38,7 @@ const es = {
 };
 type Dictionary = typeof es;
 const en: Dictionary = {
+  language: "Language",
   title: "Free Gmail signature generator",
   promise:
     "Create a professional Gmail signature for free, without signing up, directly in your browser.",
@@ -57,6 +66,7 @@ const en: Dictionary = {
 };
 const ptBR: Dictionary = {
   ...en,
+  language: "Idioma",
   title: "Gerador gratuito de assinaturas para Gmail",
   promise:
     "Crie uma assinatura profissional para Gmail grátis, sem cadastro e diretamente no navegador.",
@@ -77,6 +87,7 @@ const ptBR: Dictionary = {
 };
 const fr: Dictionary = {
   ...en,
+  language: "Langue",
   title: "Générateur gratuit de signatures Gmail",
   promise:
     "Créez gratuitement une signature Gmail professionnelle, sans inscription, directement dans votre navigateur.",
@@ -97,6 +108,7 @@ const fr: Dictionary = {
 };
 const de: Dictionary = {
   ...en,
+  language: "Sprache",
   title: "Kostenloser Gmail-Signaturgenerator",
   promise:
     "Erstellen Sie kostenlos und ohne Registrierung direkt im Browser eine professionelle Gmail-Signatur.",

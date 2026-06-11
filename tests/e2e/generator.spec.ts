@@ -22,7 +22,9 @@ test("edits, changes template, warns for local image, and navigates languages", 
     buffer: Buffer.from("fake"),
   });
   await expect(page.locator("#local-warning")).toBeVisible();
-  await page.getByLabel("Language").selectOption("en");
+  await expect(page.getByLabel("Idioma")).toContainText("Español");
+  await expect(page.getByLabel("Idioma")).toContainText("English");
+  await page.getByLabel("Idioma").selectOption("en");
   await expect(page).toHaveURL(/\/en\/generator\//);
 });
 test("exports, clears, rejects unsafe URL, and passes basic accessibility", async ({

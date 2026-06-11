@@ -1,5 +1,5 @@
 ---
-import { dictionary, locales, type Locale } from "../i18n/dictionaries";
+import { dictionary, localeNames, locales, type Locale } from "../i18n/dictionaries";
 import "../styles/global.css";
 interface Props { locale: Locale; title?: string; description?: string }
 const { locale, title, description } = Astro.props;
@@ -27,7 +27,7 @@ const canonical = new URL(Astro.url.pathname, site);
       <nav aria-label="Main navigation">
         <a href={`/${locale}/generator/`}>{t.generator}</a><a href={`/${locale}/gmail-installation-guide/`}>{t.guide}</a><a href={`/${locale}/email-signature-templates/`}>{t.templates}</a><a href={`/${locale}/faq/`}>{t.faq}</a>
       </nav>
-      <label class="language">Language <select id="language">{locales.map((item) => <option value={item} selected={item === locale}>{item}</option>)}</select></label>
+      <label class="language">{t.language} <select id="language">{locales.map((item) => <option value={item} selected={item === locale}>{localeNames[item]}</option>)}</select></label>
     </header>
     <main id="content"><slot /></main>
     <footer><a href={`/${locale}/privacy/`}>{t.privacyPage}</a> · <a href="https://github.com/anderson-camacho/email-signature-generator">Repository</a> · <a href="/LICENSE">MPL-2.0</a></footer>
