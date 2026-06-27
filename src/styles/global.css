@@ -621,6 +621,7 @@ button:focus,
   background: linear-gradient(180deg, #fff, #f8fbff);
   padding: 1rem;
 }
+.library-band,
 .support-band {
   margin-top: 1rem;
 }
@@ -774,7 +775,8 @@ footer {
   .preview-workspace,
   .editor-shell,
   .content-card,
-  .saved-page-head {
+  .saved-page-head,
+  .support-card {
     padding: 0.95rem;
   }
   .field-grid,

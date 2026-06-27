@@ -232,20 +232,23 @@ const personalFields = [
           ))
         }
       </div>
-
-      <section class="saved-library">
-        <div class="saved-library-heading">
-          <div>
-            <span class="eyebrow">Library</span>
-            <h3>{t.savedLibrary}</h3>
-          </div>
-          <a class="library-link" href={`/${locale}/saved-signatures/`}>{t.savedLibraryHint}</a>
-        </div>
-        <p class="support-copy">{t.savedPageCopy}</p>
-        <a class="support-pill" href={`/${locale}/saved-signatures/`}>{t.savedPageAction}</a>
-      </section>
-
     </aside>
+  </section>
+
+  <section class="library-band">
+    <div class="support-card support-card-wide">
+      <div class="saved-library-heading">
+        <div>
+          <span class="eyebrow">Library</span>
+          <h3>{t.savedLibrary}</h3>
+        </div>
+        <a class="library-link" href={`/${locale}/saved-signatures/`}>{t.savedLibraryHint}</a>
+      </div>
+      <p class="support-copy">{t.savedPageCopy}</p>
+      <div class="support-actions">
+        <a class="support-pill" href={`/${locale}/saved-signatures/`}>{t.savedPageAction}</a>
+      </div>
+    </div>
   </section>
 
   <section class="support-band">
@@ -261,7 +264,7 @@ const personalFields = [
       <div class="support-actions support-actions-inline">
         <a class="support-pill" href="https://github.com/sponsors" target="_blank" rel="noreferrer">GitHub Sponsors</a>
         <a class="support-pill" href="https://opencollective.com/" target="_blank" rel="noreferrer">Open Collective</a>
-        <a class="support-pill tertiary" href="mailto:anderson_camacho@outlook.com?subject=OpenSign%20support%20via%20PayPal">PayPal support</a>
+        <a class="support-pill tertiary" href={`/${locale}/donations/`}>Donaciones</a>
       </div>
     </div>
   </section>

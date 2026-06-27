@@ -25,7 +25,7 @@ const canonical = new URL(Astro.url.pathname, site);
     <header>
       <a class="brand" href={`/${locale}/`}>Email Signature Generator</a>
       <nav aria-label="Main navigation">
-        <a href={`/${locale}/email-installation-guide/`}>{t.guide}</a><a href={`/${locale}/email-signature-templates/`}>{t.templates}</a><a href={`/${locale}/faq/`}>{t.faq}</a>
+        <a href={`/${locale}/email-installation-guide/`}>{t.guide}</a><a href={`/${locale}/email-signature-templates/`}>{t.templates}</a><a href={`/${locale}/faq/`}>{t.faq}</a><a href={`/${locale}/saved-signatures/`}>{t.savedLibrary}</a>
       </nav>
       <label class="language">{t.language} <select id="language">{locales.map((item) => <option value={item} selected={item === locale}>{localeNames[item]}</option>)}</select></label>
     </header>
