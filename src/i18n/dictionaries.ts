@@ -35,6 +35,21 @@ const es = {
   cleared: "Datos locales eliminados.",
   about:
     "Optimizado para Gmail. La apariencia puede variar entre clientes de correo; envía siempre un mensaje de prueba.",
+  directStart:
+    "Empieza a construir tu firma de inmediato, con vista previa y guardado local.",
+  previewNote:
+    "Pensado para verse profesional, rapido y claro desde el primer minuto.",
+  mainFlowTitle: "Pagina principal",
+  mainFlowCopy:
+    "Entra directo al editor y evita una portada explicativa antes de crear.",
+  savedFlowTitle: "Firmas guardadas",
+  savedFlowCopy:
+    "Guarda versiones en este navegador para abrirlas, iterarlas y probar opciones.",
+  saveToLibrary: "Guardar version",
+  savedToLibrary: "Firma guardada en este navegador.",
+  savedLibrary: "Firmas guardadas",
+  savedLibraryHint: "Reabrir versiones locales",
+  libraryEmpty: "Todavia no guardas versiones en este navegador.",
 };
 type Dictionary = typeof es;
 const en: Dictionary = {
@@ -63,6 +78,21 @@ const en: Dictionary = {
   cleared: "Local data cleared.",
   about:
     "Optimized for Gmail. Appearance may vary across email clients; always send a test message.",
+  directStart:
+    "Start building immediately with live preview and local draft storage.",
+  previewNote:
+    "Made to feel professional, fast, and easy to scan from the start.",
+  mainFlowTitle: "Main flow",
+  mainFlowCopy:
+    "Open the site and begin editing immediately instead of landing on an explainer page.",
+  savedFlowTitle: "Saved signatures",
+  savedFlowCopy:
+    "Keep local versions in the browser so you can reopen and compare them quickly.",
+  saveToLibrary: "Save version",
+  savedToLibrary: "Signature saved in this browser.",
+  savedLibrary: "Saved signatures",
+  savedLibraryHint: "Reopen local versions",
+  libraryEmpty: "No saved versions in this browser yet.",
 };
 const ptBR: Dictionary = {
   ...en,
