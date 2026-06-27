@@ -25,12 +25,17 @@ const form = document.querySelector<HTMLFormElement>("#signature-form")!;
 const preview = document.querySelector<HTMLElement>("#preview")!;
 const status = document.querySelector<HTMLElement>("#status")!;
 const socialList = document.querySelector<HTMLElement>("#social-list")!;
-const savedList = document.querySelector<HTMLElement>("#saved-list")!;
 const saveLibraryButton =
   document.querySelector<HTMLButtonElement>("#save-library")!;
-const templateButtons = document.querySelectorAll<HTMLButtonElement>(
-  "[data-template]",
+const templateButtons =
+  document.querySelectorAll<HTMLButtonElement>("[data-template]");
+const templatePreviews = document.querySelectorAll<HTMLElement>(
+  "[data-template-preview]",
 );
+const previewModeButtons = document.querySelectorAll<HTMLButtonElement>(
+  "[data-preview-mode]",
+);
+const previewStage = document.querySelector<HTMLElement>("#preview-stage")!;
 const control = (name: string) =>
   form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
 let config: SignatureConfig = (() => {
@@ -64,64 +69,22 @@ function read() {
 }
 const render = () => {
   preview.innerHTML = renderSignature(config);
+  renderTemplatePreviews();
 };
 
-function renderSavedList() {
-  savedList.replaceChildren();
-  if (!savedSignatures.length) {
-    const empty = document.createElement("p");
-    empty.className = "social-empty";
-    empty.textContent =
-      editor.dataset.libraryEmpty ?? "No saved versions in this browser yet.";
-    savedList.append(empty);
-    return;
-  }
-
-  savedSignatures.forEach((entry) => {
-    const card = document.createElement("article");
-    card.className = "saved-card";
-
-    const heading = document.createElement("div");
-    heading.className = "saved-card-heading";
-    const title = document.createElement("strong");
-    title.textContent = entry.name;
-    const meta = document.createElement("span");
-    meta.textContent = new Date(entry.updatedAt).toLocaleDateString();
-    heading.append(title, meta);
-
-    const detail = document.createElement("p");
-    detail.textContent = `${entry.config.fullName} - ${entry.config.jobTitle}`;
-
-    const actions = document.createElement("div");
-    actions.className = "saved-card-actions";
-
-    const open = document.createElement("button");
-    open.type = "button";
-    open.className = "ghost-button";
-    open.textContent = "Open";
-    open.addEventListener("click", () => {
-      config = structuredClone(entry.config);
-      populate();
-      render();
-      scheduleSave();
-      status.textContent = `${entry.name} loaded.`;
-    });
-
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.className = "ghost-button danger";
-    remove.textContent = "Delete";
-    remove.addEventListener("click", () => {
-      savedSignatures = savedSignatures.filter((item) => item.id !== entry.id);
-      saveSavedSignatures(localStorage, savedSignatures);
-      renderSavedList();
-    });
-
-    actions.append(open, remove);
-    card.append(heading, detail, actions);
-    savedList.append(card);
+function renderTemplatePreviews() {
+  templatePreviews.forEach((node) => {
+    const template = node.dataset
+      .templatePreview as SignatureConfig["template"];
+    if (!template) return;
+    const previewConfig = {
+      ...config,
+      template,
+    };
+    node.innerHTML = renderSignature(previewConfig);
   });
 }
+
 const download = (content: string, name: string, type: string) => {
   const anchor = document.createElement("a");
   anchor.href = URL.createObjectURL(new Blob([content], { type }));
@@ -253,7 +216,6 @@ function scheduleSave() {
 
 populate();
 render();
-renderSavedList();
 form.addEventListener("input", () => {
   read();
   render();
@@ -292,7 +254,7 @@ document.querySelector<HTMLButtonElement>("#copy")!.onclick = async () => {
 };
 document.querySelector<HTMLButtonElement>("#download")!.onclick = () =>
   download(
-    `<!doctype html><meta charset="utf-8"><h1>Your email signature</h1><p>Copy the signature below and paste it into Gmail settings.</p>${renderSignature(config)}`,
+    `<!doctype html><meta charset="utf-8"><h1>Your email signature</h1><p>Copy the signature below and paste it into your email client's signature settings.</p>${renderSignature(config)}`,
     "email-signature.html",
     "text/html",
   );
@@ -341,7 +303,6 @@ saveLibraryButton.onclick = () => {
   };
   savedSignatures = [entry, ...savedSignatures].slice(0, 12);
   saveSavedSignatures(localStorage, savedSignatures);
-  renderSavedList();
   status.textContent =
     editor.dataset.savedToLibrary ?? "Signature saved in this browser.";
 };
@@ -359,8 +320,9 @@ document.querySelector<HTMLInputElement>("#local-image")!.onchange = (
   }
 };
 
-document.querySelectorAll<HTMLButtonElement>("[data-palette-primary]").forEach(
-  (button) => {
+document
+  .querySelectorAll<HTMLButtonElement>("[data-palette-primary]")
+  .forEach((button) => {
     button.addEventListener("click", () => {
       const primary = button.dataset.palettePrimary;
       const secondary = button.dataset.paletteSecondary;
@@ -375,8 +337,7 @@ document.querySelectorAll<HTMLButtonElement>("[data-palette-primary]").forEach(
         scheduleSave();
       }
     });
-  },
-);
+  });
 
 templateButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -387,5 +348,16 @@ templateButtons.forEach((button) => {
     read();
     render();
     scheduleSave();
+  });
+});
+
+previewModeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const mode = button.dataset.previewMode;
+    if (!mode) return;
+    previewStage.dataset.mode = mode;
+    previewModeButtons.forEach((item) => {
+      item.classList.toggle("active", item === button);
+    });
   });
 });

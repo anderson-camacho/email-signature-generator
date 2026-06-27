@@ -61,6 +61,7 @@ const personalFields = [
       <p class="panel-copy">{t.directStart}</p>
     </div>
     <div class="workspace-meta">
+      <a class="workspace-action" href={`/${locale}/saved-signatures/`}>{t.savedPageAction}</a>
       <span class="autosave">{t.saved}</span>
       <span class="workspace-tag">Web first, mobile ready</span>
     </div>
@@ -70,15 +71,15 @@ const personalFields = [
     <aside class="editor-rail rail-config">
       <div class="rail-heading">
         <span class="eyebrow">Configuration</span>
-        <h3>Build your signature</h3>
+        <h3>Signature setup</h3>
       </div>
 
       <form id="signature-form">
         <details class="config-section" open>
-          <summary><span>1</span> Template</summary>
+          <summary><span>1</span> Signature style</summary>
           <div class="config-body">
             <label
-              >Template<select name="template"
+              >Choose style<select name="template"
                 ><option value="minimal">Minimal</option
                 ><option value="professional-logo">Professional logo</option
                 ><option value="professional-photo">Professional photo</option
@@ -171,7 +172,7 @@ const personalFields = [
       </form>
     </aside>
 
-    <main class="preview-workspace">
+    <section class="preview-workspace">
       <div class="preview-heading">
         <div>
           <span class="eyebrow">Live preview</span>
@@ -179,27 +180,27 @@ const personalFields = [
           <p class="panel-copy">{t.previewNote}</p>
         </div>
         <div class="preview-switch">
-          <button class="view-toggle active" type="button">Desktop</button>
-          <button class="view-toggle" type="button">Mobile</button>
+          <button class="view-toggle active" type="button" data-preview-mode="desktop">Desktop</button>
+          <button class="view-toggle" type="button" data-preview-mode="mobile">Mobile</button>
         </div>
       </div>
 
-      <div class="preview-stage">
-        <div class="preview-window">
+      <div class="preview-stage" id="preview-stage">
+        <div class="preview-window" id="preview-window">
           <div class="preview-window-bar"></div>
           <div id="preview" class="preview"></div>
         </div>
       </div>
 
       <div class="mini-plan">
-        <article>
+        <a class="mini-link-card" href={`/${locale}/`}>
           <strong>{t.mainFlowTitle}</strong>
           <p>{t.mainFlowCopy}</p>
-        </article>
-        <article>
+        </a>
+        <a class="mini-link-card" href="#saved-list">
           <strong>{t.savedFlowTitle}</strong>
           <p>{t.savedFlowCopy}</p>
-        </article>
+        </a>
       </div>
 
       <div class="actions">
@@ -211,7 +212,7 @@ const personalFields = [
         <button id="clear" class="secondary">{t.clear}</button>
       </div>
       <p id="status" role="status" aria-live="polite">{t.saved}</p>
-    </main>
+    </section>
 
     <aside class="editor-rail rail-library">
       <div class="rail-heading">
@@ -222,25 +223,50 @@ const personalFields = [
         {
           templateCards.map(([value, title, note]) => (
             <button class="template-card" type="button" data-template={value}>
-              <div class="template-thumb"></div>
+              <div class="template-thumb">
+                <div class="template-thumb-canvas" data-template-preview={value}></div>
+              </div>
               <strong>{title}</strong>
               <span>{note}</span>
             </button>
           ))
         }
       </div>
-
-      <section class="saved-library">
-        <div class="saved-library-heading">
-          <div>
-            <span class="eyebrow">Library</span>
-            <h3>{t.savedLibrary}</h3>
-          </div>
-          <a class="library-link" href="#saved-list">{t.savedLibraryHint}</a>
-        </div>
-        <div id="saved-list" class="saved-list"></div>
-      </section>
     </aside>
+  </section>
+
+  <section class="library-band">
+    <div class="support-card support-card-wide">
+      <div class="saved-library-heading">
+        <div>
+          <span class="eyebrow">Library</span>
+          <h3>{t.savedLibrary}</h3>
+        </div>
+        <a class="library-link" href={`/${locale}/saved-signatures/`}>{t.savedLibraryHint}</a>
+      </div>
+      <p class="support-copy">{t.savedPageCopy}</p>
+      <div class="support-actions">
+        <a class="support-pill" href={`/${locale}/saved-signatures/`}>{t.savedPageAction}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="support-band">
+    <div class="support-card support-card-wide">
+      <div class="saved-library-heading">
+        <div>
+          <span class="eyebrow">Support</span>
+          <h3>{t.supportTitle}</h3>
+        </div>
+        <a class="library-link" href={`/${locale}/support-open-source/`}>{t.supportLink}</a>
+      </div>
+      <p class="support-copy">{t.supportCopy}</p>
+      <div class="support-actions support-actions-inline">
+        <a class="support-pill" href="https://github.com/sponsors" target="_blank" rel="noreferrer">GitHub Sponsors</a>
+        <a class="support-pill" href="https://opencollective.com/" target="_blank" rel="noreferrer">Open Collective</a>
+        <a class="support-pill tertiary" href={`/${locale}/donations/`}>Donaciones</a>
+      </div>
+    </div>
   </section>
 </section>
 <script>

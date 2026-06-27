@@ -1,7 +1,7 @@
 ---
 import Layout from "../../components/Layout.astro"; import { dictionary, locales, type Locale } from "../../i18n/dictionaries";
 export function getStaticPaths() {
-  const pages = ["privacy", "gmail-installation-guide", "email-signature-templates", "faq"];
+  const pages = ["privacy", "email-installation-guide", "email-signature-templates", "faq", "support-open-source", "donations"];
   return locales.flatMap((locale) => pages.map((page) => ({ params: { locale, page }, props: { locale, page } })));
 }
 
@@ -9,9 +9,13 @@ const { locale, page } = Astro.props as { locale: Locale; page: string };
 const t = dictionary(locale);
 const contents: Record<string, { title: string; paragraphs: string[] }> = {
 privacy:{title:t.privacyPage,paragraphs:["The application works entirely in your browser.","Drafts are stored only in localStorage on your device.","Signature data is not sent to our servers.","You can erase local data from the generator.","There is no required account, remote storage, first-party cookies, or sale of personal data.","Avoid publishing private information. Public HTTPS images depend on your chosen hosting provider.","This privacy text must be reviewed before commercial launch or adding data collection."]},
-"gmail-installation-guide":{title:t.guide,paragraphs:["Generate your signature.","Copy the signature.","Open Gmail and go to Settings.","Open the signature section and create a new signature.","Paste the content and save changes.","Send a test email on desktop and mobile."]},
+"email-installation-guide":{title:t.guide,paragraphs:["Generate your signature.","Copy or download the signature.","Open your email client's settings.","Find the signature or account preferences section.","Paste the signature and save changes.","Send a test email on desktop and mobile.","If something looks off, adjust spacing, image hosting, or links and test again."]},
 "email-signature-templates":{title:t.templates,paragraphs:["Minimal: clean and focused on essentials.","Professional logo: brand-led layout with social links.","Professional photo: personal photo and contact details.","Administrative area: designed for support, billing, legal, and shared inboxes."]},
-faq:{title:t.faq,paragraphs:["Is it free? Yes, the static MVP is free and open source.","Where is my data stored? Only in your browser localStorage.","Does it work with every email client? It is optimized for Gmail; always send a test message.","Can I use local images? Only for preview. Final signatures require public HTTPS image URLs."]}
+faq:{title:t.faq,paragraphs:["Is it free? Yes, the static MVP is free and open source.","Where is my data stored? Only in your browser localStorage.","Does it work with every email client? It is designed for many email clients, but you should always send a test message.","Can I use local images? Only for preview. Final signatures require public HTTPS image URLs."]}
+,
+"support-open-source":{title:t.supportTitle,paragraphs:["OpenSign is being built as a practical open-source tool for professional signatures.","Community support can help fund maintenance, testing, documentation, and future template improvements.","You can support through GitHub Sponsors, Open Collective, one-time donations, or direct code contributions.","Before adding commercial flows, this support page keeps the project direction transparent and community-friendly."]}
+,
+"donations":{title:"Donations under construction",paragraphs:["This donation page is still being prepared.","The PayPal donation flow is not available yet.","For now, the project support options are being organized before enabling direct payments.","Once the donation setup is ready, this page will be updated with the final payment method."]}
 };
 const content = contents[page]!;
 ---

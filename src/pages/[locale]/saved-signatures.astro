@@ -1,0 +1,34 @@
+---
+import Layout from "../../components/Layout.astro";
+import { dictionary, locales, type Locale } from "../../i18n/dictionaries";
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const t = dictionary(locale);
+---
+
+<Layout {locale} title={t.savedLibrary}>
+  <section class="saved-page" data-saved-page data-locale={locale}>
+    <div class="saved-page-head">
+      <div>
+        <span class="eyebrow">Library</span>
+        <h1>{t.savedLibrary}</h1>
+        <p class="panel-copy">{t.savedPageCopy}</p>
+      </div>
+      <a class="support-pill" href={`/${locale}/`}>{t.savedBackAction}</a>
+    </div>
+
+    <section class="saved-page-grid" id="saved-page-grid"></section>
+    <section class="content-card saved-empty" id="saved-empty" hidden>
+      <h2>{t.savedLibrary}</h2>
+      <p>{t.libraryEmpty}</p>
+      <a class="support-pill" href={`/${locale}/`}>{t.savedBackAction}</a>
+    </section>
+  </section>
+  <script>
+    import "../../scripts/saved-signatures";
+  </script>
+</Layout>

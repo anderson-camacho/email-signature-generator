@@ -1,90 +1,125 @@
-# Email Signature Generator
+# OpenSign
 
-Email Signature Generator is an open-source engine for creating professional
-HTML email signatures. The project is currently in its initial development
-stage.
+OpenSign is an open-source web app for building professional HTML email
+signatures with a fast, direct editing workflow.
 
-Spanish documentation: [README.es.md](README.es.md)
+The current product is a static Astro + TypeScript application with no backend.
+Users land directly in the editor, preview signatures live, save versions in the
+browser, and export HTML or JSON without creating an account.
 
-## Open-source license
+Spanish notes: [README.es.md](README.es.md)
 
-The engine's covered source code is available under the
-[Mozilla Public License 2.0](LICENSE) (`MPL-2.0`). You may use and modify it in
-accordance with that license.
+## What the app currently includes
 
-When you redistribute modifications to files covered by MPL-2.0, you must
-preserve and comply with the applicable MPL-2.0 obligations. Review the complete
-license text before distributing modified versions.
+- Direct-to-editor experience instead of a marketing landing page
+- Multiple signature styles with live thumbnail previews
+- Real-time preview with desktop and mobile presentation modes
+- Local library page for saved signatures
+- JSON import and export for portable configurations
+- HTML export and clipboard copy for email clients
+- Public HTTPS logo and profile photo support
+- Local-only draft storage through browser `localStorage`
+- Localized routes for Spanish, English, Brazilian Portuguese, French, and German
+- Static public content for privacy, FAQ, templates, and installation guidance
 
-The official project may offer commercial support, implementations, add-ons,
-and related services. These commercial offerings do not change the license
-terms for covered open-source files.
+## Product scope
 
-## Trademarks and affiliation
+OpenSign is designed as a general email signature builder, not a Gmail-only
+tool. The exported HTML is meant to be copied into different email clients,
+although rendering rules still depend on the target platform.
 
-The source code license does not automatically authorize use of the project's
-official brand, definitive commercial name, logos, domain, or visual identity.
-It also does not authorize anyone to claim or imply affiliation with,
-endorsement by, or status as the official project.
+The current app is intentionally simple:
 
-See [TRADEMARKS.md](TRADEMARKS.md) for details.
+- no backend
+- no user accounts
+- no remote database
+- no analytics or trackers
+- no commercial billing flow inside the product
 
-## Source code license notice
+## Stack
 
-Until principal source files are added, this repository-level notice is the
-clearly visible license notice for the project:
-
-> This Source Code Form is subject to the terms of the Mozilla Public License,
-> v. 2.0. If a copy of the MPL was not distributed with this file, You can
-> obtain one at https://mozilla.org/MPL/2.0/.
-
-Principal source files added later should include this notice where practical,
-or otherwise remain covered through a clearly visible equivalent location.
-
-## Current MVP
-
-The repository contains a static Astro and TypeScript MVP with no backend. It
-provides four Gmail-oriented templates, live preview, rich clipboard copy, HTML
-download, safe JSON import/export, local draft storage, public HTTPS image
-support, local image preview warnings, localized public pages, SEO metadata,
-tests, and CI.
-
-Supported interface languages are Spanish, English, Brazilian Portuguese,
-French, and German.
-
-Screenshot: **pending final visual review and public deployment**.
+- [Astro](https://astro.build/) for static site generation
+- TypeScript for browser logic and core modules
+- Vitest for unit tests
+- Playwright for end-to-end coverage
+- GitHub Actions for CI
 
 ## Local development
+
+Use the Node version defined in `.nvmrc`.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Use Node from `.nvmrc`. Useful commands include `npm run check`,
-`npm run lint`, `npm run test:unit`, `npm run test:e2e`, `npm run build`, and
-`npm run validate`.
+Common commands:
+
+```sh
+npm run check
+npm run lint
+npm run format:check
+npm run test:unit
+npm run build
+npm run validate
+```
+
+## Project structure
+
+```text
+src/
+  components/   UI building blocks
+  core/         signature generation, sanitization, validation
+  export/       JSON export helpers
+  i18n/         localized strings
+  pages/        Astro routes
+  scripts/      browser-side editor behavior
+  storage/      local browser persistence
+  templates/    signature style registry
+tests/
+  unit/         core and storage tests
+  e2e/          browser workflow tests
+docs/           architecture, privacy, deployment, roadmap notes
+```
 
 ## Architecture and privacy
 
-Astro generates the localized static pages. Browser TypeScript runs the editor,
-while isolated core modules sanitize all user input and generate table-based
-HTML with inline styles. Drafts remain in browser localStorage and can be
-deleted from the generator. The application has no accounts, backend, remote
-storage, analytics, or trackers.
+Astro generates the static pages and route structure. Browser-side scripts run
+the editor and saved-signature experience. Core modules sanitize user input and
+produce table-based HTML with inline styles for email-client compatibility.
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md),
-[docs/PRIVACY_MODEL.md](docs/PRIVACY_MODEL.md), and
-[docs/DEPLOYMENT_CLOUDFLARE_PAGES.md](docs/DEPLOYMENT_CLOUDFLARE_PAGES.md).
+User data stays in the browser unless the user explicitly exports it. The app
+does not send signature data to a server.
 
-## Contributing, security, and roadmap
+More detail:
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing changes. Report
-vulnerabilities as described in [SECURITY.md](SECURITY.md). Future commercial
-and team features are documented separately in
-[docs/PHASE_2_BACKLOG.md](docs/PHASE_2_BACKLOG.md); they are not active in the
-static MVP.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/PRIVACY_MODEL.md](docs/PRIVACY_MODEL.md)
+- [docs/DEPLOYMENT_CLOUDFLARE_PAGES.md](docs/DEPLOYMENT_CLOUDFLARE_PAGES.md)
+
+## License
+
+The source code is available under the
+[Mozilla Public License 2.0](LICENSE) (`MPL-2.0`).
+
+If you redistribute modified MPL-covered files, keep the license notices and
+follow the obligations of MPL-2.0.
+
+## Trademarks and project identity
+
+The source code license does not automatically grant rights to use the
+project's official name, brand assets, logos, or domain as if they were your
+own official release.
+
+See [TRADEMARKS.md](TRADEMARKS.md) for details.
+
+## Contributing and security
+
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening substantial changes
+- Follow [SECURITY.md](SECURITY.md) for responsible disclosure
+- Review [docs/PHASE_2_BACKLOG.md](docs/PHASE_2_BACKLOG.md) for ideas that are
+  not part of the current shipped scope
 
 ## Notices
 
-Copyright and official-repository information is recorded in [NOTICE](NOTICE).
+Copyright and repository notice information is recorded in [NOTICE](NOTICE).
