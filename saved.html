@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenSign | Firmas guardadas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #eef4f8;
+      --panel: rgba(255, 255, 255, 0.9);
+      --line: #d5e1ea;
+      --text: #16202a;
+      --muted: #5f6f7f;
+      --primary: #1e3a5f;
+      --secondary: #2fbf9b;
+      --accent: #f4a261;
+      --danger: #d45a5a;
+      --shadow: 0 18px 60px rgba(30, 58, 95, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Manrope", sans-serif;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(47, 191, 155, 0.18), transparent 34%),
+        linear-gradient(180deg, #f8fbfd 0%, var(--bg) 100%);
+    }
+
+    .page {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .title h1,
+    .title p,
+    .empty h2,
+    .empty p { margin: 0; }
+
+    .title h1 { font-size: 1.26rem; }
+    .title p { margin-top: 6px; color: var(--muted); }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn, a.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 0;
+      text-decoration: none;
+      font: inherit;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 0.18s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn.primary { background: linear-gradient(135deg, var(--primary), #31598e); color: #fff; }
+    .btn.secondary { background: #fff; color: var(--primary); box-shadow: inset 0 0 0 1px var(--line); }
+    .btn.danger { background: #fff1f1; color: var(--danger); box-shadow: inset 0 0 0 1px rgba(212, 90, 90, 0.2); }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      background: var(--panel);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .summary-card strong {
+      display: block;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .summary-card span {
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview {
+      min-height: 180px;
+      padding: 18px;
+      background:
+        radial-gradient(circle at center, rgba(47, 191, 155, 0.1), transparent 42%),
+        linear-gradient(180deg, #fbfdff, #edf4f8);
+      border-bottom: 1px solid rgba(30, 58, 95, 0.08);
+    }
+
+    .preview-bar {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--p1), var(--p2), var(--p3));
+      margin-bottom: 14px;
+    }
+
+    .preview-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 12px;
+      border: 1px solid rgba(30, 58, 95, 0.08);
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--p1), #6081af);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .line {
+      height: 8px;
+      border-radius: 999px;
+      background: #e1e9ef;
+      margin-bottom: 8px;
+    }
+
+    .line.big { width: 72%; background: var(--p1); opacity: 0.85; }
+    .line.mid { width: 56%; background: var(--p2); opacity: 0.6; }
+    .line.small { width: 84%; }
+
+    .body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .meta h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+      color: var(--primary);
+    }
+
+    .meta p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.5;
+    }
+
+    .pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #f1f7fb;
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .empty {
+      display: none;
+      background: var(--panel);
+      border-radius: 28px;
+      padding: 48px 26px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .empty h2 {
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .empty p {
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 20px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1060px) {
+      .summary, .grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 14px; }
+      .top, .summary-card, .card, .empty { padding: 16px; }
+      .summary, .grid { grid-template-columns: 1fr; }
+      .preview-card { grid-template-columns: 44px 1fr; }
+      .avatar { width: 44px; height: 44px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <div class="title">
+        <h1>Firmas guardadas en este navegador</h1>
+        <p>Tu biblioteca local para abrir, duplicar o limpiar versiones sin complicar el flujo.</p>
+      </div>
+      <div class="actions">
+        <a class="btn secondary" href="index.html">Volver al editor</a>
+        <button class="btn primary" id="exportJsonBtn">Exportar JSON</button>
+        <button class="btn danger" id="clearAllBtn">Borrar todo</button>
+      </div>
+    </header>
+
+    <section class="summary" id="summary"></section>
+    <section class="grid" id="grid"></section>
+
+    <section class="empty" id="emptyState">
+      <h2>Aun no hay firmas guardadas</h2>
+      <p>La estructura ya esta lista. Cuando guardes una firma desde la pagina principal, aparecera aqui automaticamente para revisarla y seguir iterando.</p>
+      <a class="btn primary" href="index.html">Crear primera firma</a>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "opensign-signatures";
+    const EDIT_KEY = "opensign-current-edit";
+
+    const palettes = {
+      executive: ["#1E3A5F", "#2FBF9B", "#F4A261"],
+      growth: ["#214E48", "#57C4AD", "#E69A5E"],
+      consulting: ["#27364A", "#6DB7C9", "#D9A441"],
+      creator: ["#304C89", "#35B8A6", "#F28B73"]
+    };
+
+    const templateNames = {
+      executive: "Ejecutiva minimal",
+      founder: "Founder moderna",
+      compact: "Compacta",
+      personal: "Personal con CTA"
+    };
+
+    function getItems() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function setItems(items) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function initials(name) {
+      return (name || "")
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0].toUpperCase())
+        .join("") || "OS";
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+      return date.toLocaleDateString("es-CO", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(getItems(), null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "opensign-backup.json";
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function openItem(id) {
+      const item = getItems().find(entry => String(entry.id) === String(id));
+      if (!item) return;
+      localStorage.setItem(EDIT_KEY, JSON.stringify({
+        paletteId: item.paletteId,
+        templateId: item.templateId,
+        form: {
+          signatureName: item.signatureName,
+          fullName: item.fullName,
+          jobTitle: item.jobTitle,
+          company: item.company,
+          phone: item.phone,
+          email: item.email,
+          website: item.website,
+          description: item.description,
+          ctaText: item.ctaText,
+          socialText: item.socialText
+        }
+      }));
+      window.location.href = "index.html";
+    }
+
+    function duplicateItem(id) {
+      const items = getItems();
+      const original = items.find(entry => String(entry.id) === String(id));
+      if (!original) return;
+      items.unshift({
+        ...original,
+        id: Date.now(),
+        signatureName: `${original.signatureName} copia`,
+        updatedAt: new Date().toISOString()
+      });
+      setItems(items);
+      render();
+    }
+
+    function deleteItem(id) {
+      const items = getItems().filter(entry => String(entry.id) !== String(id));
+      setItems(items);
+      render();
+    }
+
+    function clearAll() {
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    }
+
+    function renderSummary(items) {
+      const summary = document.getElementById("summary");
+      const total = items.length;
+      const latest = items[0]?.updatedAt ? formatDate(items[0].updatedAt) : "Sin actividad";
+      summary.innerHTML = `
+        <article class="summary-card">
+          <strong>Total de firmas</strong>
+          <span>${total} guardadas en este navegador.</span>
+        </article>
+        <article class="summary-card">
+          <strong>Ultima edicion</strong>
+          <span>${latest}</span>
+        </article>
+        <article class="summary-card">
+          <strong>Formula de producto</strong>
+          <span>Editor directo, preview inmediato y biblioteca local liviana.</span>
+        </article>
+      `;
+    }
+
+    function renderGrid(items) {
+      const grid = document.getElementById("grid");
+      const empty = document.getElementById("emptyState");
+
+      if (!items.length) {
+        grid.innerHTML = "";
+        document.getElementById("summary").innerHTML = "";
+        empty.style.display = "block";
+        return;
+      }
+
+      empty.style.display = "none";
+      grid.innerHTML = items.map(item => {
+        const palette = palettes[item.paletteId] || palettes.executive;
+        return `
+          <article class="card" style="--p1:${palette[0]};--p2:${palette[1]};--p3:${palette[2]}">
+            <div class="preview">
+              <div class="preview-bar"></div>
+              <div class="preview-card">
+                <div class="avatar">${initials(item.fullName)}</div>
+                <div>
+                  <div class="line big"></div>
+                  <div class="line mid"></div>
+                  <div class="line small"></div>
+                </div>
+              </div>
+            </div>
+            <div class="body">
+              <div class="meta">
+                <h2>${item.signatureName}</h2>
+                <p>${item.fullName} · ${item.jobTitle}</p>
+                <p>${item.company}</p>
+                <p>Actualizada: ${formatDate(item.updatedAt)}</p>
+              </div>
+              <div class="pills">
+                <span class="pill">${templateNames[item.templateId] || "Plantilla"}</span>
+                <span class="pill">${item.paletteId}</span>
+              </div>
+              <div class="card-actions">
+                <button class="btn primary" data-open="${item.id}">Abrir</button>
+                <button class="btn secondary" data-duplicate="${item.id}">Duplicar</button>
+                <button class="btn danger" data-delete="${item.id}">Borrar</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function render() {
+      const items = getItems().sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      renderSummary(items);
+      renderGrid(items);
+    }
+
+    document.getElementById("exportJsonBtn").addEventListener("click", exportJson);
+    document.getElementById("clearAllBtn").addEventListener("click", clearAll);
+    document.addEventListener("click", event => {
+      const openId = event.target.dataset.open;
+      const duplicateId = event.target.dataset.duplicate;
+      const deleteId = event.target.dataset.delete;
+      if (openId) openItem(openId);
+      if (duplicateId) duplicateItem(duplicateId);
+      if (deleteId) deleteItem(deleteId);
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenSign | Editor de firmas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #eef4f8;
+      --panel: rgba(255, 255, 255, 0.86);
+      --panel-strong: #ffffff;
+      --line: #d5e1ea;
+      --text: #16202a;
+      --muted: #5f6f7f;
+      --primary: #1e3a5f;
+      --primary-soft: #dfe9f5;
+      --secondary: #2fbf9b;
+      --secondary-soft: #daf6ef;
+      --accent: #f4a261;
+      --danger: #d45a5a;
+      --shadow: 0 18px 60px rgba(30, 58, 95, 0.12);
+      --radius: 22px;
+      --radius-sm: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Manrope", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(47, 191, 155, 0.20), transparent 32%),
+        radial-gradient(circle at top right, rgba(244, 162, 97, 0.16), transparent 26%),
+        linear-gradient(180deg, #f7fafc 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+
+    .shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      border-radius: calc(var(--radius) + 4px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), #31598e);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.18rem;
+    }
+
+    .brand p,
+    .status-note,
+    .helper,
+    .field-note,
+    .card-meta,
+    .empty-note { color: var(--muted); }
+
+    .top-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 380px minmax(0, 1fr);
+      gap: 22px;
+    }
+
+    .panel {
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      box-shadow: var(--shadow);
+      border-radius: calc(var(--radius) + 2px);
+    }
+
+    .editor {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .section-head h2,
+    .canvas-head h2,
+    .quick-plan h3,
+    .modal-card h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .section-head p,
+    .canvas-head p,
+    .quick-plan p,
+    .modal-card p {
+      margin: 6px 0 0;
+      font-size: 0.94rem;
+      color: var(--muted);
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.83rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.02em;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 14px;
+      padding: 13px 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    textarea { min-height: 92px; resize: vertical; }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 4px rgba(47, 191, 155, 0.14);
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .swatch {
+      border: 0;
+      background: #fff;
+      border-radius: 16px;
+      padding: 10px;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px var(--line);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .swatch:hover,
+    .template-card:hover,
+    .action-btn:hover,
+    .ghost-btn:hover,
+    .save-btn:hover,
+    .secondary-btn:hover,
+    .utility-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .swatch.active,
+    .template-card.active {
+      box-shadow: inset 0 0 0 2px var(--primary), 0 12px 28px rgba(30, 58, 95, 0.12);
+    }
+
+    .swatch-top {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+    }
+
+    .swatch strong,
+    .template-card strong {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .swatch span,
+    .template-card span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .template-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .template-card {
+      border: 0;
+      background: #fff;
+      border-radius: 18px;
+      padding: 14px;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px var(--line);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .template-mini {
+      height: 76px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(30, 58, 95, 0.08);
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #fff, #eef4f8);
+    }
+
+    .template-mini::before,
+    .template-mini::after {
+      content: "";
+      position: absolute;
+      background: rgba(30, 58, 95, 0.16);
+      border-radius: 999px;
+    }
+
+    .template-mini::before {
+      width: 30px;
+      height: 30px;
+      left: 14px;
+      top: 22px;
+    }
+
+    .template-mini::after {
+      width: 72px;
+      height: 8px;
+      right: 14px;
+      top: 22px;
+      box-shadow: 0 16px 0 rgba(47, 191, 155, 0.28), -4px 32px 0 rgba(30, 58, 95, 0.11);
+    }
+
+    .actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .action-btn,
+    .ghost-btn,
+    .save-btn,
+    .secondary-btn,
+    .utility-btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .save-btn {
+      background: linear-gradient(135deg, var(--primary), #31598e);
+      color: #fff;
+      box-shadow: 0 12px 26px rgba(30, 58, 95, 0.2);
+    }
+
+    .secondary-btn {
+      background: var(--secondary);
+      color: #fff;
+      box-shadow: 0 12px 26px rgba(47, 191, 155, 0.22);
+    }
+
+    .ghost-btn,
+    .utility-btn {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+
+    .workspace {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-height: 780px;
+    }
+
+    .canvas-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      flex-wrap: wrap;
+    }
+
+    .preview-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+      flex: 1;
+    }
+
+    .preview-stage {
+      background:
+        radial-gradient(circle at center, rgba(47, 191, 155, 0.12), transparent 45%),
+        linear-gradient(180deg, #fbfdff, #edf4f8);
+      border-radius: 28px;
+      min-height: 420px;
+      border: 1px solid rgba(30, 58, 95, 0.07);
+      padding: 26px;
+      display: grid;
+      align-items: center;
+    }
+
+    .signature-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      width: 100%;
+      background: var(--panel-strong);
+      border-radius: 26px;
+      border: 1px solid rgba(30, 58, 95, 0.08);
+      box-shadow: 0 26px 70px rgba(26, 47, 76, 0.11);
+      overflow: hidden;
+    }
+
+    .signature-topbar {
+      height: 10px;
+      background: linear-gradient(90deg, var(--sig-primary), var(--sig-secondary), var(--sig-accent));
+    }
+
+    .signature-card {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 22px;
+      padding: 28px;
+      color: var(--text);
+    }
+
+    .avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, var(--sig-primary), #6081af);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .signature-main h3 {
+      margin: 0;
+      font-size: 1.7rem;
+      line-height: 1;
+      color: var(--sig-primary);
+    }
+
+    .role-line {
+      margin: 6px 0 16px;
+      color: var(--sig-secondary);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .description {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 18px;
+      margin-bottom: 20px;
+    }
+
+    .info-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.92rem;
+      color: var(--text);
+    }
+
+    .info-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: var(--primary-soft);
+      color: var(--sig-primary);
+      display: grid;
+      place-items: center;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .signature-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-top: 18px;
+      border-top: 1px solid rgba(30, 58, 95, 0.08);
+    }
+
+    .socials {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .social-tag,
+    .cta {
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .social-tag {
+      background: var(--secondary-soft);
+      color: #106d59;
+    }
+
+    .cta {
+      background: var(--sig-accent);
+      color: #fff;
+      box-shadow: 0 12px 26px rgba(244, 162, 97, 0.22);
+    }
+
+    .quick-plan {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .quick-card {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(30, 58, 95, 0.08);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .quick-card strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+
+    .status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 32, 42, 0.44);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-card {
+      width: min(920px, 100%);
+      background: #fff;
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 30px 80px rgba(20, 33, 49, 0.28);
+    }
+
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .close-btn {
+      border: 0;
+      background: #eff5f8;
+      color: var(--primary);
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .preview-html {
+      width: 100%;
+      min-height: 260px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      padding: 16px;
+      background: #f8fbfd;
+      overflow: auto;
+      margin-bottom: 18px;
+    }
+
+    .mobile-links {
+      display: none;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .notice {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #f5faf8;
+      border: 1px solid rgba(47, 191, 155, 0.22);
+      color: #1f5f50;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1120px) {
+      .layout { grid-template-columns: 1fr; }
+      .workspace { min-height: auto; }
+    }
+
+    @media (max-width: 760px) {
+      .shell { padding: 14px; }
+      .topbar, .editor, .workspace, .modal-card { padding: 16px; }
+      .field-grid, .template-list, .quick-plan, .info-grid { grid-template-columns: 1fr; }
+      .signature-card { grid-template-columns: 1fr; }
+      .avatar { width: 82px; height: 82px; border-radius: 24px; }
+      .mobile-links { display: flex; }
+      .top-actions { width: 100%; justify-content: stretch; }
+      .top-actions > * { flex: 1 1 auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">OS</div>
+        <div>
+          <h1>OpenSign Editor</h1>
+          <p>Entras directo a construir tu firma. Sin landing, sin rodeos.</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="chip" id="saveState">Listo para editar</span>
+        <a class="ghost-btn" href="saved.html">Ver firmas guardadas</a>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="panel editor">
+        <div class="section-head">
+          <div>
+            <h2>Datos principales</h2>
+            <p>Base ejecutiva, simple y rápida de personalizar.</p>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field full">
+            <label for="signatureName">Nombre del proyecto</label>
+            <input id="signatureName" value="Firma principal" />
+          </div>
+          <div class="field">
+            <label for="fullName">Nombre completo</label>
+            <input id="fullName" value="Andrea Molina" />
+          </div>
+          <div class="field">
+            <label for="jobTitle">Cargo</label>
+            <input id="jobTitle" value="Fundadora y Directora" />
+          </div>
+          <div class="field">
+            <label for="company">Empresa</label>
+            <input id="company" value="OpenSign Studio" />
+          </div>
+          <div class="field">
+            <label for="phone">Teléfono</label>
+            <input id="phone" value="+57 300 123 4567" />
+          </div>
+          <div class="field">
+            <label for="email">Correo</label>
+            <input id="email" value="hola@opensign.studio" />
+          </div>
+          <div class="field">
+            <label for="website">Web</label>
+            <input id="website" value="opensign.studio" />
+          </div>
+          <div class="field full">
+            <label for="description">Descripción corta</label>
+            <textarea id="description">Ayudo a crear firmas profesionales listas para Gmail, Outlook y equipos que necesitan una imagen más clara, confiable y ordenada.</textarea>
+          </div>
+          <div class="field">
+            <label for="ctaText">Botón principal</label>
+            <input id="ctaText" value="Agenda una reunión" />
+          </div>
+          <div class="field">
+            <label for="socialText">Red destacada</label>
+            <input id="socialText" value="LinkedIn / Instagram / WhatsApp" />
+          </div>
+        </div>
+
+        <div class="section-head">
+          <div>
+            <h2>Paletas psicológicas</h2>
+            <p>Elegidas para proyectar confianza, gestión clara y energía emprendedora.</p>
+          </div>
+        </div>
+
+        <div class="swatches" id="paletteGrid"></div>
+
+        <div class="section-head">
+          <div>
+            <h2>Plantillas iniciales</h2>
+            <p>Modelos gratuitos pensados para arrancar rápido.</p>
+          </div>
+        </div>
+
+        <div class="template-list" id="templateGrid"></div>
+
+        <div class="actions-row">
+          <button class="save-btn" id="saveBtn">Guardar en navegador</button>
+          <button class="secondary-btn" id="previewBtn">Abrir vista previa</button>
+          <button class="utility-btn" id="copyBtn">Copiar resumen</button>
+        </div>
+
+        <div class="notice">
+          La decisión de producto aquí es clara: primero web responsive. Luego PWA si vemos uso recurrente desde móvil.
+        </div>
+      </aside>
+
+      <main class="panel workspace">
+        <div class="canvas-head">
+          <div>
+            <h2>Vista previa en vivo</h2>
+            <p>Así se vería tu firma ya armada, con enfoque en lectura rápida y presencia profesional.</p>
+          </div>
+          <div class="mobile-links">
+            <a class="ghost-btn" href="saved.html">Guardadas</a>
+          </div>
+        </div>
+
+        <div class="status-line">
+          <div class="status-note" id="statusText">Editor listo. Cambia cualquier dato y la firma se actualiza al instante.</div>
+          <div class="helper" id="formulaText">Formula base: confianza + claridad + acción.</div>
+        </div>
+
+        <div class="preview-shell">
+          <section class="preview-stage">
+            <div class="signature-wrap" id="signaturePreviewWrap">
+              <div class="signature-topbar"></div>
+              <div class="signature-card" id="signaturePreview"></div>
+            </div>
+          </section>
+
+          <section class="quick-plan">
+            <article class="quick-card">
+              <strong>Página principal</strong>
+              <p>Debe empezar en el editor, con preview vivo y guardado local inmediato.</p>
+            </article>
+            <article class="quick-card">
+              <strong>Página secundaria</strong>
+              <p>Biblioteca de firmas guardadas en navegador, para abrir, duplicar o borrar.</p>
+            </article>
+            <article class="quick-card">
+              <strong>Optimización simple</strong>
+              <p>Vanilla JS, pocos estados, sin dependencias pesadas y con enfoque en velocidad.</p>
+            </article>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal" id="previewModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-top">
+        <div>
+          <h3>Vista previa para pruebas</h3>
+          <p>Puedes revisar el resultado final, copiar la estructura y validar si la dirección visual funciona.</p>
+        </div>
+        <button class="close-btn" id="closeModal">X</button>
+      </div>
+      <div class="preview-html" id="modalPreview"></div>
+      <div class="actions-row">
+        <button class="secondary-btn" id="copyHtmlBtn">Copiar HTML</button>
+        <button class="ghost-btn" id="downloadHtmlBtn">Descargar HTML</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "opensign-signatures";
+    const EDIT_KEY = "opensign-current-edit";
+
+    const palettes = [
+      {
+        id: "executive",
+        name: "Ejecutiva",
+        note: "Confianza, estabilidad y liderazgo claro.",
+        primary: "#1E3A5F",
+        secondary: "#2FBF9B",
+        accent: "#F4A261"
+      },
+      {
+        id: "growth",
+        name: "Crecimiento",
+        note: "Orden, facilidad de uso y sensación de avance.",
+        primary: "#214E48",
+        secondary: "#57C4AD",
+        accent: "#E69A5E"
+      },
+      {
+        id: "consulting",
+        name: "Consultiva",
+        note: "Más premium, sobria y estratégica.",
+        primary: "#27364A",
+        secondary: "#6DB7C9",
+        accent: "#D9A441"
+      },
+      {
+        id: "creator",
+        name: "Creadora",
+        note: "Profesional pero cercana y dinámica.",
+        primary: "#304C89",
+        secondary: "#35B8A6",
+        accent: "#F28B73"
+      }
+    ];
+
+    const templates = [
+      { id: "executive", name: "Ejecutiva minimal", note: "Fuerte, limpia y corporativa." },
+      { id: "founder", name: "Founder moderna", note: "Más humana y emprendedora." },
+      { id: "compact", name: "Compacta", note: "Hecha para lectura rápida." },
+      { id: "personal", name: "Personal con CTA", note: "Ideal para captar reuniones." }
+    ];
+
+    const state = {
+      palette: palettes[0],
+      template: templates[0],
+      form: {
+        signatureName: "Firma principal",
+        fullName: "Andrea Molina",
+        jobTitle: "Fundadora y Directora",
+        company: "OpenSign Studio",
+        phone: "+57 300 123 4567",
+        email: "hola@opensign.studio",
+        website: "opensign.studio",
+        description: "Ayudo a crear firmas profesionales listas para Gmail, Outlook y equipos que necesitan una imagen más clara, confiable y ordenada.",
+        ctaText: "Agenda una reunión",
+        socialText: "LinkedIn / Instagram / WhatsApp"
+      }
+    };
+
+    const fields = [
+      "signatureName",
+      "fullName",
+      "jobTitle",
+      "company",
+      "phone",
+      "email",
+      "website",
+      "description",
+      "ctaText",
+      "socialText"
+    ];
+
+    const paletteGrid = document.getElementById("paletteGrid");
+    const templateGrid = document.getElementById("templateGrid");
+    const preview = document.getElementById("signaturePreview");
+    const previewWrap = document.getElementById("signaturePreviewWrap");
+    const saveState = document.getElementById("saveState");
+    const statusText = document.getElementById("statusText");
+    const formulaText = document.getElementById("formulaText");
+    const modal = document.getElementById("previewModal");
+    const modalPreview = document.getElementById("modalPreview");
+
+    function initialsFromName(name) {
+      return (name || "")
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0].toUpperCase())
+        .join("") || "OS";
+    }
+
+    function getSignatures() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function setSignatures(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function buildSignatureHtml(data) {
+      return `
+        <div class="avatar">${initialsFromName(data.fullName)}</div>
+        <div class="signature-main">
+          <h3>${data.fullName}</h3>
+          <p class="role-line">${data.jobTitle} · ${data.company}</p>
+          <p class="description">${data.description}</p>
+          <div class="info-grid">
+            <div class="info-item"><span class="info-icon">T</span><span>${data.phone}</span></div>
+            <div class="info-item"><span class="info-icon">@</span><span>${data.email}</span></div>
+            <div class="info-item"><span class="info-icon">W</span><span>${data.website}</span></div>
+            <div class="info-item"><span class="info-icon">S</span><span>${data.socialText}</span></div>
+          </div>
+          <div class="signature-footer">
+            <div class="socials">
+              <span class="social-tag">${state.template.name}</span>
+              <span class="social-tag">${state.palette.name}</span>
+            </div>
+            <span class="cta">${data.ctaText}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPalettes() {
+      paletteGrid.innerHTML = palettes.map(palette => `
+        <button class="swatch ${state.palette.id === palette.id ? "active" : ""}" data-palette="${palette.id}">
+          <div class="swatch-top">
+            <span class="dot" style="background:${palette.primary}"></span>
+            <span class="dot" style="background:${palette.secondary}"></span>
+            <span class="dot" style="background:${palette.accent}"></span>
+          </div>
+          <strong>${palette.name}</strong>
+          <span>${palette.note}</span>
+        </button>
+      `).join("");
+    }
+
+    function renderTemplates() {
+      templateGrid.innerHTML = templates.map(template => `
+        <button class="template-card ${state.template.id === template.id ? "active" : ""}" data-template="${template.id}">
+          <div class="template-mini"></div>
+          <strong>${template.name}</strong>
+          <span>${template.note}</span>
+        </button>
+      `).join("");
+    }
+
+    function renderPreview() {
+      preview.innerHTML = buildSignatureHtml(state.form);
+      previewWrap.style.setProperty("--sig-primary", state.palette.primary);
+      previewWrap.style.setProperty("--sig-secondary", state.palette.secondary);
+      previewWrap.style.setProperty("--sig-accent", state.palette.accent);
+      formulaText.textContent = `Formula base: ${state.palette.note}`;
+      statusText.textContent = `Plantilla ${state.template.name} con paleta ${state.palette.name}.`;
+      localStorage.setItem(EDIT_KEY, JSON.stringify({
+        paletteId: state.palette.id,
+        templateId: state.template.id,
+        form: state.form
+      }));
+    }
+
+    function renderAll() {
+      renderPalettes();
+      renderTemplates();
+      renderPreview();
+    }
+
+    function hydrateInputs() {
+      fields.forEach(id => {
+        const node = document.getElementById(id);
+        node.value = state.form[id];
+        node.addEventListener("input", event => {
+          state.form[id] = event.target.value;
+          saveState.textContent = "Cambios sin guardar";
+          renderPreview();
+        });
+      });
+    }
+
+    function loadDraft() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(EDIT_KEY));
+        if (!raw) return;
+        const foundPalette = palettes.find(item => item.id === raw.paletteId);
+        const foundTemplate = templates.find(item => item.id === raw.templateId);
+        if (foundPalette) state.palette = foundPalette;
+        if (foundTemplate) state.template = foundTemplate;
+        state.form = { ...state.form, ...raw.form };
+      } catch {}
+    }
+
+    function saveCurrentSignature() {
+      const signatures = getSignatures();
+      const item = {
+        id: Date.now(),
+        updatedAt: new Date().toISOString(),
+        paletteId: state.palette.id,
+        templateId: state.template.id,
+        ...state.form
+      };
+      signatures.unshift(item);
+      setSignatures(signatures);
+      saveState.textContent = "Guardado en navegador";
+      statusText.textContent = `Se guardo "${state.form.signatureName}" y ya aparece en la biblioteca local.`;
+    }
+
+    function openPreviewModal() {
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+      modalPreview.innerHTML = `
+        <div style="max-width:720px;margin:0 auto;background:#fff;border-radius:24px;overflow:hidden;border:1px solid #d5e1ea">
+          <div style="height:10px;background:linear-gradient(90deg, ${state.palette.primary}, ${state.palette.secondary}, ${state.palette.accent})"></div>
+          <div style="padding:28px;font-family:Manrope, sans-serif;color:#16202a">${buildSignatureHtml(state.form)}</div>
+        </div>
+      `;
+    }
+
+    function closePreviewModal() {
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+    }
+
+    async function copySummary() {
+      const summary = [
+        `Proyecto: ${state.form.signatureName}`,
+        `Perfil: ${state.form.fullName} - ${state.form.jobTitle}`,
+        `Empresa: ${state.form.company}`,
+        `Paleta: ${state.palette.name}`,
+        `Plantilla: ${state.template.name}`,
+        `Formula UX: confianza, claridad, accion rapida`
+      ].join("\n");
+      await navigator.clipboard.writeText(summary);
+      statusText.textContent = "Resumen copiado para documentar el concepto o compartirlo.";
+    }
+
+    async function copyHtml() {
+      await navigator.clipboard.writeText(modalPreview.innerHTML);
+      statusText.textContent = "HTML de la vista previa copiado.";
+    }
+
+    function downloadHtml() {
+      const blob = new Blob([
+        `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${state.form.signatureName}</title></head><body style="margin:0;padding:24px;background:#f6fafc;">${modalPreview.innerHTML}</body></html>`
+      ], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${state.form.signatureName.toLowerCase().replace(/\s+/g, "-") || "firma"}.html`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", saveCurrentSignature);
+    document.getElementById("previewBtn").addEventListener("click", openPreviewModal);
+    document.getElementById("copyBtn").addEventListener("click", copySummary);
+    document.getElementById("closeModal").addEventListener("click", closePreviewModal);
+    document.getElementById("copyHtmlBtn").addEventListener("click", copyHtml);
+    document.getElementById("downloadHtmlBtn").addEventListener("click", downloadHtml);
+    modal.addEventListener("click", event => {
+      if (event.target === modal) closePreviewModal();
+    });
+
+    paletteGrid.addEventListener("click", event => {
+      const target = event.target.closest("[data-palette]");
+      if (!target) return;
+      state.palette = palettes.find(item => item.id === target.dataset.palette) || palettes[0];
+      saveState.textContent = "Cambios sin guardar";
+      renderAll();
+    });
+
+    templateGrid.addEventListener("click", event => {
+      const target = event.target.closest("[data-template]");
+      if (!target) return;
+      state.template = templates.find(item => item.id === target.dataset.template) || templates[0];
+      saveState.textContent = "Cambios sin guardar";
+      renderAll();
+    });
+
+    loadDraft();
+    hydrateInputs();
+    renderAll();
+  </script>
+</body>
+</html>
