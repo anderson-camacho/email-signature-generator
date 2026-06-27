@@ -1,6 +1,6 @@
-# OpenSign
+# Email Signature Generator
 
-OpenSign is an open-source web app for building professional HTML email
+Email Signature Generator is an open-source web app for building professional HTML email
 signatures with a fast, direct editing workflow.
 
 The current product is a static Astro + TypeScript application with no backend.
@@ -24,7 +24,7 @@ Spanish notes: [README.es.md](README.es.md)
 
 ## Product scope
 
-OpenSign is designed as a general email signature builder, not a Gmail-only
+This project is designed as a general email signature builder, not a Gmail-only
 tool. The exported HTML is meant to be copied into different email clients,
 although rendering rules still depend on the target platform.
 

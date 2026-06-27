@@ -54,7 +54,7 @@ const es = {
     "Revisa mejor tus versiones guardadas, abre una, duplicala o elimina las que no sirven.",
   savedPageAction: "Abrir biblioteca",
   savedBackAction: "Volver al editor",
-  supportTitle: "Apoya OpenSign",
+  supportTitle: "Apoya el proyecto",
   supportLink: "Ver apoyo",
   supportCopy:
     "Ayuda a mantener la herramienta libre, util y mejor cuidada para la comunidad.",
@@ -106,7 +106,7 @@ const en: Dictionary = {
     "Review saved versions more clearly, reopen one, duplicate it, or remove what you no longer need.",
   savedPageAction: "Open library",
   savedBackAction: "Back to editor",
-  supportTitle: "Support OpenSign",
+  supportTitle: "Support the project",
   supportLink: "View support",
   supportCopy:
     "Help keep the tool free, useful, and better maintained for the community.",

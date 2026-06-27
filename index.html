@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OpenSign | Editor de firmas</title>
+    <title>Email Signature Generator | Editor de firmas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -700,7 +700,7 @@
         <div class="brand">
           <div class="brand-mark">OS</div>
           <div>
-            <h1>OpenSign Editor</h1>
+            <h1>Email Signature Generator</h1>
             <p>Entras directo a construir tu firma. Sin landing, sin rodeos.</p>
           </div>
         </div>
@@ -734,7 +734,7 @@
             </div>
             <div class="field">
               <label for="company">Empresa</label>
-              <input id="company" value="OpenSign Studio" />
+              <input id="company" value="Example Studio" />
             </div>
             <div class="field">
               <label for="phone">Teléfono</label>
@@ -742,11 +742,11 @@
             </div>
             <div class="field">
               <label for="email">Correo</label>
-              <input id="email" value="hola@opensign.studio" />
+              <input id="email" value="hello@example.com" />
             </div>
             <div class="field">
               <label for="website">Web</label>
-              <input id="website" value="opensign.studio" />
+              <input id="website" value="example.com" />
             </div>
             <div class="field full">
               <label for="description">Descripción corta</label>
@@ -880,8 +880,8 @@ Ayudo a crear firmas profesionales listas para Gmail, Outlook y equipos que nece
     </div>
 
     <script>
-      const STORAGE_KEY = "opensign-signatures";
-      const EDIT_KEY = "opensign-current-edit";
+      const STORAGE_KEY = "email-signature-generator-signatures";
+      const EDIT_KEY = "email-signature-generator-current-edit";
 
       const palettes = [
         {
@@ -944,10 +944,10 @@ Ayudo a crear firmas profesionales listas para Gmail, Outlook y equipos que nece
           signatureName: "Firma principal",
           fullName: "Andrea Molina",
           jobTitle: "Fundadora y Directora",
-          company: "OpenSign Studio",
+          company: "Example Studio",
           phone: "+57 300 123 4567",
-          email: "hola@opensign.studio",
-          website: "opensign.studio",
+          email: "hello@example.com",
+          website: "example.com",
           description:
             "Ayudo a crear firmas profesionales listas para Gmail, Outlook y equipos que necesitan una imagen más clara, confiable y ordenada.",
           ctaText: "Agenda una reunión",
