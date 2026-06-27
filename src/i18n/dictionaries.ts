@@ -10,13 +10,13 @@ export const localeNames: Record<Locale, string> = {
 
 const es = {
   language: "Idioma",
-  title: "Generador gratuito de firmas para Gmail",
+  title: "Generador gratuito de firmas de correo",
   promise:
-    "Crea una firma profesional para Gmail gratis, sin registrarte y directamente desde tu navegador.",
+    "Crea una firma profesional de correo gratis, sin registrarte y directamente desde tu navegador.",
   privacy:
     "Tus datos permanecen en este dispositivo y no se envían a servidores.",
   generator: "Generador",
-  guide: "Guía de Gmail",
+  guide: "Guia de instalacion",
   templates: "Plantillas",
   faq: "Preguntas frecuentes",
   privacyPage: "Privacidad",
@@ -30,11 +30,11 @@ const es = {
   saved: "Borrador guardado localmente.",
   localWarning:
     "La imagen local solo sirve para previsualización. Usa una URL HTTPS pública antes de copiar la firma definitiva.",
-  copied: "Firma copiada. Pégala en Gmail y envía un correo de prueba.",
+  copied: "Firma copiada. Pegala en tu cliente de correo y envia una prueba.",
   invalid: "Revisa los campos marcados o el archivo importado.",
   cleared: "Datos locales eliminados.",
   about:
-    "Optimizado para Gmail. La apariencia puede variar entre clientes de correo; envía siempre un mensaje de prueba.",
+    "Pensado para distintos clientes de correo. La apariencia puede variar; envia siempre un mensaje de prueba.",
   directStart:
     "Empieza a construir tu firma de inmediato, con vista previa y guardado local.",
   previewNote:
@@ -50,16 +50,24 @@ const es = {
   savedLibrary: "Firmas guardadas",
   savedLibraryHint: "Reabrir versiones locales",
   libraryEmpty: "Todavia no guardas versiones en este navegador.",
+  savedPageCopy:
+    "Revisa mejor tus versiones guardadas, abre una, duplicala o elimina las que no sirven.",
+  savedPageAction: "Abrir biblioteca",
+  savedBackAction: "Volver al editor",
+  supportTitle: "Apoya OpenSign",
+  supportLink: "Ver apoyo",
+  supportCopy:
+    "Ayuda a mantener la herramienta libre, util y mejor cuidada para la comunidad.",
 };
 type Dictionary = typeof es;
 const en: Dictionary = {
   language: "Language",
-  title: "Free Gmail signature generator",
+  title: "Free email signature generator",
   promise:
-    "Create a professional Gmail signature for free, without signing up, directly in your browser.",
+    "Create a professional email signature for free, without signing up, directly in your browser.",
   privacy: "Your data stays on this device and is not sent to servers.",
   generator: "Generator",
-  guide: "Gmail guide",
+  guide: "Installation guide",
   templates: "Templates",
   faq: "FAQ",
   privacyPage: "Privacy",
@@ -73,11 +81,11 @@ const en: Dictionary = {
   saved: "Draft saved locally.",
   localWarning:
     "The local image is only for preview. Use a public HTTPS URL before copying the final signature.",
-  copied: "Signature copied. Paste it into Gmail and send a test email.",
+  copied: "Signature copied. Paste it into your email client and send a test message.",
   invalid: "Review marked fields or the imported file.",
   cleared: "Local data cleared.",
   about:
-    "Optimized for Gmail. Appearance may vary across email clients; always send a test message.",
+    "Designed for multiple email clients. Appearance may vary, so always send a test message.",
   directStart:
     "Start building immediately with live preview and local draft storage.",
   previewNote:
@@ -93,17 +101,25 @@ const en: Dictionary = {
   savedLibrary: "Saved signatures",
   savedLibraryHint: "Reopen local versions",
   libraryEmpty: "No saved versions in this browser yet.",
+  savedPageCopy:
+    "Review saved versions more clearly, reopen one, duplicate it, or remove what you no longer need.",
+  savedPageAction: "Open library",
+  savedBackAction: "Back to editor",
+  supportTitle: "Support OpenSign",
+  supportLink: "View support",
+  supportCopy:
+    "Help keep the tool free, useful, and better maintained for the community.",
 };
 const ptBR: Dictionary = {
   ...en,
   language: "Idioma",
-  title: "Gerador gratuito de assinaturas para Gmail",
+  title: "Gerador gratuito de assinaturas de email",
   promise:
     "Crie uma assinatura profissional para Gmail grátis, sem cadastro e diretamente no navegador.",
   privacy:
     "Seus dados permanecem neste dispositivo e não são enviados a servidores.",
   generator: "Gerador",
-  guide: "Guia do Gmail",
+  guide: "Guia de instalacao",
   templates: "Modelos",
   faq: "Perguntas frequentes",
   privacyPage: "Privacidade",
@@ -118,13 +134,13 @@ const ptBR: Dictionary = {
 const fr: Dictionary = {
   ...en,
   language: "Langue",
-  title: "Générateur gratuit de signatures Gmail",
+  title: "Generateur gratuit de signatures email",
   promise:
     "Créez gratuitement une signature Gmail professionnelle, sans inscription, directement dans votre navigateur.",
   privacy:
     "Vos données restent sur cet appareil et ne sont pas envoyées à des serveurs.",
   generator: "Générateur",
-  guide: "Guide Gmail",
+  guide: "Guide d'installation",
   templates: "Modèles",
   faq: "Questions fréquentes",
   privacyPage: "Confidentialité",
@@ -139,13 +155,13 @@ const fr: Dictionary = {
 const de: Dictionary = {
   ...en,
   language: "Sprache",
-  title: "Kostenloser Gmail-Signaturgenerator",
+  title: "Kostenloser E-Mail-Signaturgenerator",
   promise:
     "Erstellen Sie kostenlos und ohne Registrierung direkt im Browser eine professionelle Gmail-Signatur.",
   privacy:
     "Ihre Daten bleiben auf diesem Gerät und werden nicht an Server gesendet.",
   generator: "Generator",
-  guide: "Gmail-Anleitung",
+  guide: "Installationsanleitung",
   templates: "Vorlagen",
   faq: "Häufige Fragen",
   privacyPage: "Datenschutz",
