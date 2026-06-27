@@ -27,9 +27,8 @@ const status = document.querySelector<HTMLElement>("#status")!;
 const socialList = document.querySelector<HTMLElement>("#social-list")!;
 const saveLibraryButton =
   document.querySelector<HTMLButtonElement>("#save-library")!;
-const templateButtons = document.querySelectorAll<HTMLButtonElement>(
-  "[data-template]",
-);
+const templateButtons =
+  document.querySelectorAll<HTMLButtonElement>("[data-template]");
 const templatePreviews = document.querySelectorAll<HTMLElement>(
   "[data-template-preview]",
 );
@@ -75,7 +74,8 @@ const render = () => {
 
 function renderTemplatePreviews() {
   templatePreviews.forEach((node) => {
-    const template = node.dataset.templatePreview as SignatureConfig["template"];
+    const template = node.dataset
+      .templatePreview as SignatureConfig["template"];
     if (!template) return;
     const previewConfig = {
       ...config,
@@ -320,8 +320,9 @@ document.querySelector<HTMLInputElement>("#local-image")!.onchange = (
   }
 };
 
-document.querySelectorAll<HTMLButtonElement>("[data-palette-primary]").forEach(
-  (button) => {
+document
+  .querySelectorAll<HTMLButtonElement>("[data-palette-primary]")
+  .forEach((button) => {
     button.addEventListener("click", () => {
       const primary = button.dataset.palettePrimary;
       const secondary = button.dataset.paletteSecondary;
@@ -336,8 +337,7 @@ document.querySelectorAll<HTMLButtonElement>("[data-palette-primary]").forEach(
         scheduleSave();
       }
     });
-  },
-);
+  });
 
 templateButtons.forEach((button) => {
   button.addEventListener("click", () => {

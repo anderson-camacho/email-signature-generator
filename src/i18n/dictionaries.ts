@@ -81,7 +81,8 @@ const en: Dictionary = {
   saved: "Draft saved locally.",
   localWarning:
     "The local image is only for preview. Use a public HTTPS URL before copying the final signature.",
-  copied: "Signature copied. Paste it into your email client and send a test message.",
+  copied:
+    "Signature copied. Paste it into your email client and send a test message.",
   invalid: "Review marked fields or the imported file.",
   cleared: "Local data cleared.",
   about:

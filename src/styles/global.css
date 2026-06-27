@@ -10,8 +10,16 @@
   font-family: Manrope, Inter, system-ui, sans-serif;
   color: var(--ui-neutral);
   background:
-    radial-gradient(circle at top left, rgba(47, 191, 155, 0.16), transparent 25%),
-    radial-gradient(circle at top right, rgba(244, 162, 97, 0.12), transparent 18%),
+    radial-gradient(
+      circle at top left,
+      rgba(47, 191, 155, 0.16),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(244, 162, 97, 0.12),
+      transparent 18%
+    ),
     var(--ui-bg);
   line-height: 1.55;
 }
@@ -110,7 +118,9 @@ main {
   font-weight: 700;
   text-decoration: none;
   box-shadow: 0 10px 22px rgba(31, 41, 51, 0.12);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 .workspace-action:hover {
   transform: translateY(-1px);
@@ -126,7 +136,10 @@ main {
 }
 .editor {
   display: grid;
-  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr) minmax(240px, 270px);
+  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr) minmax(
+      240px,
+      270px
+    );
   gap: 1rem;
   align-items: start;
   min-width: 0;
@@ -394,12 +407,19 @@ main {
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 18px 54px rgba(31, 41, 51, 0.09);
-  transition: max-width 0.22s ease, border-radius 0.22s ease,
+  transition:
+    max-width 0.22s ease,
+    border-radius 0.22s ease,
     box-shadow 0.22s ease;
 }
 .preview-window-bar {
   height: 10px;
-  background: linear-gradient(90deg, var(--ui-primary), var(--ui-secondary), var(--ui-tertiary));
+  background: linear-gradient(
+    90deg,
+    var(--ui-primary),
+    var(--ui-secondary),
+    var(--ui-tertiary)
+  );
 }
 .preview-stage[data-mode="mobile"] .preview-window {
   max-width: 390px;
@@ -435,7 +455,9 @@ main {
   display: block;
   text-decoration: none;
   color: inherit;
-  transition: transform 0.18s ease, box-shadow 0.18s ease,
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
     border-color 0.18s ease;
 }
 .mini-link-card:hover {
