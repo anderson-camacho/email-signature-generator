@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OpenSign | Firmas guardadas</title>
+    <title>Email Signature Generator | Firmas guardadas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -348,8 +348,8 @@
     </div>
 
     <script>
-      const STORAGE_KEY = "opensign-signatures";
-      const EDIT_KEY = "opensign-current-edit";
+      const STORAGE_KEY = "email-signature-generator-signatures";
+      const EDIT_KEY = "email-signature-generator-current-edit";
 
       const palettes = {
         executive: ["#1E3A5F", "#2FBF9B", "#F4A261"],
@@ -404,7 +404,7 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "opensign-backup.json";
+        link.download = "email-signature-generator-backup.json";
         link.click();
         URL.revokeObjectURL(url);
       }
