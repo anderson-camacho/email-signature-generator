@@ -2,6 +2,35 @@
 import { dictionary, type Locale } from "../i18n/dictionaries";
 const { locale } = Astro.props as { locale: Locale };
 const t = dictionary(locale);
+const palettePresets = [
+  {
+    id: "executive",
+    name: "Executive",
+    note: "Trust, leadership, executive calm",
+    primary: "#1e3a5f",
+    secondary: "#2fbf9b",
+  },
+  {
+    id: "growth",
+    name: "Growth",
+    note: "Clarity, progress, easy management",
+    primary: "#214e48",
+    secondary: "#57c4ad",
+  },
+  {
+    id: "consulting",
+    name: "Consulting",
+    note: "Strategic and premium",
+    primary: "#27364a",
+    secondary: "#6db7c9",
+  },
+] as const;
+const templateCards = [
+  ["minimal", "Executive", "Direct, clean, corporate"],
+  ["professional-logo", "Brand Focus", "Logo-first and professional"],
+  ["professional-photo", "Founder", "Human, warm, personal"],
+  ["administrative-area", "Operations", "Functional and team-oriented"],
+] as const;
 const personalFields = [
   ["fullName", "Full name"],
   ["jobTitle", "Job title"],
@@ -17,106 +46,201 @@ const personalFields = [
 ---
 
 <section
-  class="editor"
+  class="editor-shell"
   data-editor
   data-copied={t.copied}
   data-invalid={t.invalid}
   data-cleared={t.cleared}
+  data-saved-to-library={t.savedToLibrary}
+  data-library-empty={t.libraryEmpty}
 >
-  <form id="signature-form">
-    <div class="form-heading">
-      <div>
-        <span class="eyebrow">Editor</span>
-        <h2>{t.form}</h2>
-      </div>
-      <span class="autosave">{t.saved}</span>
+  <div class="workspace-top">
+    <div>
+      <span class="eyebrow">OpenSign Workspace</span>
+      <h2>{t.form}</h2>
+      <p class="panel-copy">{t.directStart}</p>
     </div>
+    <div class="workspace-meta">
+      <span class="autosave">{t.saved}</span>
+      <span class="workspace-tag">Web first, mobile ready</span>
+    </div>
+  </div>
 
-    <details class="config-section" open>
-      <summary><span>1</span> Template</summary>
-      <div class="config-body">
-        <label
-          >Template<select name="template"
-            ><option value="minimal">Minimal</option
-            ><option value="professional-logo">Professional logo</option
-            ><option value="professional-photo">Professional photo</option
-            ><option value="administrative-area">Administrative area</option
-            ></select
-          ></label
-        >
+  <section class="editor">
+    <aside class="editor-rail rail-config">
+      <div class="rail-heading">
+        <span class="eyebrow">Configuration</span>
+        <h3>Build your signature</h3>
       </div>
-    </details>
 
-    <details class="config-section" open>
-      <summary><span>2</span> Personal and company data</summary>
-      <div class="config-body field-grid">
+      <form id="signature-form">
+        <details class="config-section" open>
+          <summary><span>1</span> Template</summary>
+          <div class="config-body">
+            <label
+              >Template<select name="template"
+                ><option value="minimal">Minimal</option
+                ><option value="professional-logo">Professional logo</option
+                ><option value="professional-photo">Professional photo</option
+                ><option value="administrative-area">Administrative area</option
+                ></select
+              ></label
+            >
+          </div>
+        </details>
+
+        <details class="config-section" open>
+          <summary><span>2</span> Personal and company data</summary>
+          <div class="config-body field-grid">
+            {
+              personalFields.map(([name, label]) => (
+                <label class:list={{ wide: name === "legalText" || name === "address" }}>
+                  {label}
+                  <input
+                    name={name}
+                    type={name === "email" ? "email" : name === "website" ? "url" : "text"}
+                  />
+                </label>
+              ))
+            }
+          </div>
+        </details>
+
+        <details class="config-section">
+          <summary><span>3</span> Photo and logo</summary>
+          <div class="config-body">
+            <label>Public logo URL HTTPS<input name="logoUrl" type="url" /></label>
+            <label>Public photo URL HTTPS<input name="photoUrl" type="url" /></label>
+            <label
+              >Local logo/photo preview<input id="local-image" type="file" accept="image/*"
+            /></label>
+            <p id="local-warning" class="warning" hidden>{t.localWarning}</p>
+          </div>
+        </details>
+
+        <details class="config-section" open>
+          <summary><span>4</span> Colors and appearance</summary>
+          <div class="config-body appearance-grid">
+            <label>Primary color<input name="primaryColor" type="color" /></label>
+            <label>Secondary color<input name="secondaryColor" type="color" /></label>
+            <label
+              >Size<select name="size"
+                ><option>compact</option><option selected>normal</option><option>wide</option
+                ></select
+              ></label
+            >
+            <div class="palette-presets">
+              <p class="section-help">
+                Quick palettes based on trust, usability, and entrepreneurial clarity.
+              </p>
+              <div class="palette-list">
+                {
+                  palettePresets.map((palette) => (
+                    <button
+                      class="palette-chip"
+                      type="button"
+                      data-palette-primary={palette.primary}
+                      data-palette-secondary={palette.secondary}
+                    >
+                      <span class="palette-dots">
+                        <span style={`background:${palette.primary}`}></span>
+                        <span style={`background:${palette.secondary}`}></span>
+                      </span>
+                      <span>
+                        <strong>{palette.name}</strong>
+                        <small>{palette.note}</small>
+                      </span>
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="config-section" open>
+          <summary><span>5</span> Social media buttons</summary>
+          <div class="config-body">
+            <p class="section-help">
+              Add as many buttons as needed, including multiple buttons for the same platform.
+            </p>
+            <div id="social-list" class="social-list"></div>
+            <button id="add-social" class="add-social" type="button">+ Add social network</button>
+          </div>
+        </details>
+      </form>
+    </aside>
+
+    <main class="preview-workspace">
+      <div class="preview-heading">
+        <div>
+          <span class="eyebrow">Live preview</span>
+          <h3>{t.preview}</h3>
+          <p class="panel-copy">{t.previewNote}</p>
+        </div>
+        <div class="preview-switch">
+          <button class="view-toggle active" type="button">Desktop</button>
+          <button class="view-toggle" type="button">Mobile</button>
+        </div>
+      </div>
+
+      <div class="preview-stage">
+        <div class="preview-window">
+          <div class="preview-window-bar"></div>
+          <div id="preview" class="preview"></div>
+        </div>
+      </div>
+
+      <div class="mini-plan">
+        <article>
+          <strong>{t.mainFlowTitle}</strong>
+          <p>{t.mainFlowCopy}</p>
+        </article>
+        <article>
+          <strong>{t.savedFlowTitle}</strong>
+          <p>{t.savedFlowCopy}</p>
+        </article>
+      </div>
+
+      <div class="actions">
+        <button id="copy">{t.copy}</button>
+        <button id="download">{t.download}</button>
+        <button id="export">{t.export}</button>
+        <label class="button">{t.import}<input id="import" type="file" accept=".json,application/json" /></label>
+        <button id="save-library" class="secondary">{t.saveToLibrary}</button>
+        <button id="clear" class="secondary">{t.clear}</button>
+      </div>
+      <p id="status" role="status" aria-live="polite">{t.saved}</p>
+    </main>
+
+    <aside class="editor-rail rail-library">
+      <div class="rail-heading">
+        <span class="eyebrow">Templates</span>
+        <h3>Pick a direction</h3>
+      </div>
+      <div class="template-showcase">
         {
-          personalFields.map(([name, label]) => (
-            <label class:list={{ wide: name === "legalText" || name === "address" }}>
-              {label}
-              <input
-                name={name}
-                type={name === "email" ? "email" : name === "website" ? "url" : "text"}
-              />
-            </label>
+          templateCards.map(([value, title, note]) => (
+            <button class="template-card" type="button" data-template={value}>
+              <div class="template-thumb"></div>
+              <strong>{title}</strong>
+              <span>{note}</span>
+            </button>
           ))
         }
       </div>
-    </details>
 
-    <details class="config-section">
-      <summary><span>3</span> Photo and logo</summary>
-      <div class="config-body">
-        <label>Public logo URL HTTPS<input name="logoUrl" type="url" /></label>
-        <label>Public photo URL HTTPS<input name="photoUrl" type="url" /></label>
-        <label
-          >Local logo/photo preview<input id="local-image" type="file" accept="image/*"
-        /></label>
-        <p id="local-warning" class="warning" hidden>{t.localWarning}</p>
-      </div>
-    </details>
-
-    <details class="config-section">
-      <summary><span>4</span> Colors and appearance</summary>
-      <div class="config-body appearance-grid">
-        <label>Primary color<input name="primaryColor" type="color" /></label>
-        <label>Secondary color<input name="secondaryColor" type="color" /></label>
-        <label
-          >Size<select name="size"
-            ><option>compact</option><option selected>normal</option><option>wide</option
-            ></select
-          ></label
-        >
-      </div>
-    </details>
-
-    <details class="config-section" open>
-      <summary><span>5</span> Social media buttons</summary>
-      <div class="config-body">
-        <p class="section-help">
-          Add as many buttons as needed, including multiple buttons for the same platform.
-        </p>
-        <div id="social-list" class="social-list"></div>
-        <button id="add-social" class="add-social" type="button">+ Add social network</button>
-      </div>
-    </details>
-  </form>
-
-  <section class="preview-panel">
-    <div class="preview-heading">
-      <div><span class="eyebrow">Live</span><h2>{t.preview}</h2></div>
-      <span class="preview-dot">Updated</span>
-    </div>
-    <div id="preview" class="preview"></div>
-    <p>{t.about}</p>
-    <div class="actions">
-      <button id="copy">{t.copy}</button>
-      <button id="download">{t.download}</button>
-      <button id="export">{t.export}</button>
-      <label class="button">{t.import}<input id="import" type="file" accept=".json,application/json" /></label>
-      <button id="clear" class="secondary">{t.clear}</button>
-    </div>
-    <p id="status" role="status" aria-live="polite">{t.saved}</p>
+      <section class="saved-library">
+        <div class="saved-library-heading">
+          <div>
+            <span class="eyebrow">Library</span>
+            <h3>{t.savedLibrary}</h3>
+          </div>
+          <a class="library-link" href="#saved-list">{t.savedLibraryHint}</a>
+        </div>
+        <div id="saved-list" class="saved-list"></div>
+      </section>
+    </aside>
   </section>
 </section>
 <script>

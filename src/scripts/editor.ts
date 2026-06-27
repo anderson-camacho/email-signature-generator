@@ -10,6 +10,9 @@ import {
   loadDraft,
   saveDraft,
   clearDraft,
+  loadSavedSignatures,
+  saveSavedSignatures,
+  type SavedSignatureRecord,
 } from "../storage/local-storage-adapter";
 
 const editor = document.querySelector<HTMLElement>("[data-editor]")!;
@@ -22,6 +25,12 @@ const form = document.querySelector<HTMLFormElement>("#signature-form")!;
 const preview = document.querySelector<HTMLElement>("#preview")!;
 const status = document.querySelector<HTMLElement>("#status")!;
 const socialList = document.querySelector<HTMLElement>("#social-list")!;
+const savedList = document.querySelector<HTMLElement>("#saved-list")!;
+const saveLibraryButton =
+  document.querySelector<HTMLButtonElement>("#save-library")!;
+const templateButtons = document.querySelectorAll<HTMLButtonElement>(
+  "[data-template]",
+);
 const control = (name: string) =>
   form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
 let config: SignatureConfig = (() => {
@@ -32,6 +41,13 @@ let config: SignatureConfig = (() => {
   }
 })();
 let timer: ReturnType<typeof setTimeout>;
+let savedSignatures: SavedSignatureRecord[] = (() => {
+  try {
+    return loadSavedSignatures(localStorage);
+  } catch {
+    return [];
+  }
+})();
 
 function populate() {
   for (const [key, value] of Object.entries(config)) {
@@ -49,6 +65,63 @@ function read() {
 const render = () => {
   preview.innerHTML = renderSignature(config);
 };
+
+function renderSavedList() {
+  savedList.replaceChildren();
+  if (!savedSignatures.length) {
+    const empty = document.createElement("p");
+    empty.className = "social-empty";
+    empty.textContent =
+      editor.dataset.libraryEmpty ?? "No saved versions in this browser yet.";
+    savedList.append(empty);
+    return;
+  }
+
+  savedSignatures.forEach((entry) => {
+    const card = document.createElement("article");
+    card.className = "saved-card";
+
+    const heading = document.createElement("div");
+    heading.className = "saved-card-heading";
+    const title = document.createElement("strong");
+    title.textContent = entry.name;
+    const meta = document.createElement("span");
+    meta.textContent = new Date(entry.updatedAt).toLocaleDateString();
+    heading.append(title, meta);
+
+    const detail = document.createElement("p");
+    detail.textContent = `${entry.config.fullName} - ${entry.config.jobTitle}`;
+
+    const actions = document.createElement("div");
+    actions.className = "saved-card-actions";
+
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "ghost-button";
+    open.textContent = "Open";
+    open.addEventListener("click", () => {
+      config = structuredClone(entry.config);
+      populate();
+      render();
+      scheduleSave();
+      status.textContent = `${entry.name} loaded.`;
+    });
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "ghost-button danger";
+    remove.textContent = "Delete";
+    remove.addEventListener("click", () => {
+      savedSignatures = savedSignatures.filter((item) => item.id !== entry.id);
+      saveSavedSignatures(localStorage, savedSignatures);
+      renderSavedList();
+    });
+
+    actions.append(open, remove);
+    card.append(heading, detail, actions);
+    savedList.append(card);
+  });
+}
 const download = (content: string, name: string, type: string) => {
   const anchor = document.createElement("a");
   anchor.href = URL.createObjectURL(new Blob([content], { type }));
@@ -180,6 +253,7 @@ function scheduleSave() {
 
 populate();
 render();
+renderSavedList();
 form.addEventListener("input", () => {
   read();
   render();
@@ -253,6 +327,24 @@ document.querySelector<HTMLButtonElement>("#clear")!.onclick = () => {
   render();
   status.textContent = messages.cleared;
 };
+saveLibraryButton.onclick = () => {
+  read();
+  const name =
+    config.fullName.trim() ||
+    config.company.trim() ||
+    `Signature ${savedSignatures.length + 1}`;
+  const entry: SavedSignatureRecord = {
+    id: crypto.randomUUID(),
+    name,
+    updatedAt: new Date().toISOString(),
+    config: structuredClone(config),
+  };
+  savedSignatures = [entry, ...savedSignatures].slice(0, 12);
+  saveSavedSignatures(localStorage, savedSignatures);
+  renderSavedList();
+  status.textContent =
+    editor.dataset.savedToLibrary ?? "Signature saved in this browser.";
+};
 document.querySelector<HTMLInputElement>("#local-image")!.onchange = (
   event,
 ) => {
@@ -266,3 +358,34 @@ document.querySelector<HTMLInputElement>("#local-image")!.onchange = (
     preview.prepend(image);
   }
 };
+
+document.querySelectorAll<HTMLButtonElement>("[data-palette-primary]").forEach(
+  (button) => {
+    button.addEventListener("click", () => {
+      const primary = button.dataset.palettePrimary;
+      const secondary = button.dataset.paletteSecondary;
+      if (!primary || !secondary) return;
+      const primaryInput = control("primaryColor");
+      const secondaryInput = control("secondaryColor");
+      if (primaryInput && secondaryInput) {
+        primaryInput.value = primary;
+        secondaryInput.value = secondary;
+        read();
+        render();
+        scheduleSave();
+      }
+    });
+  },
+);
+
+templateButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const template = button.dataset.template;
+    const templateInput = control("template");
+    if (!template || !templateInput) return;
+    templateInput.value = template;
+    read();
+    render();
+    scheduleSave();
+  });
+});
