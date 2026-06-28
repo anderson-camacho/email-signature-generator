@@ -1,3 +1,103 @@
 ---
-return Astro.redirect("/es/");
+import {
+  localeStorageKey,
+  locales,
+} from "../i18n/dictionaries";
+const fallbackHref = "/en/";
 ---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Email Signature Generator</title>
+    <meta
+      name="description"
+      content="Redirecting to the best language for your browser."
+    />
+    <meta http-equiv="refresh" content={`0;url=${fallbackHref}`} />
+  </head>
+  <body>
+    <p>Redirecting...</p>
+    <script is:inline define:vars={{ supportedLocales: locales, storageKey: localeStorageKey }}>
+
+      const normalizeLocaleCandidate = (value) => {
+        if (!value) return null;
+        const lower = value.toLowerCase();
+        if (lower === "pt" || lower.startsWith("pt-")) return "pt-BR";
+        if (lower === "zh" || lower.startsWith("zh-")) return "zh-CN";
+        if (lower === "es" || lower.startsWith("es-")) return "es";
+        if (lower === "en" || lower.startsWith("en-")) return "en";
+        if (lower === "fr" || lower.startsWith("fr-")) return "fr";
+        if (lower === "de" || lower.startsWith("de-")) return "de";
+        return supportedLocales.includes(value) ? value : null;
+      };
+
+      const regionToLocale = {
+        AR: "es",
+        AU: "en",
+        AT: "de",
+        BE: "fr",
+        BO: "es",
+        BR: "pt-BR",
+        CA: "en",
+        CH: "de",
+        CL: "es",
+        CM: "fr",
+        CN: "zh-CN",
+        CO: "es",
+        CR: "es",
+        CU: "es",
+        DE: "de",
+        DO: "es",
+        EC: "es",
+        ES: "es",
+        FR: "fr",
+        GB: "en",
+        GT: "es",
+        HK: "zh-CN",
+        HN: "es",
+        IE: "en",
+        LU: "fr",
+        MC: "fr",
+        MO: "zh-CN",
+        MX: "es",
+        NI: "es",
+        NZ: "en",
+        PA: "es",
+        PE: "es",
+        PR: "es",
+        PY: "es",
+        SG: "zh-CN",
+        SN: "fr",
+        SV: "es",
+        TW: "zh-CN",
+        US: "en",
+        UY: "es",
+        VE: "es",
+      };
+
+      const resolvePreferredLocale = (candidates) => {
+        for (const candidate of candidates) {
+          const normalized = normalizeLocaleCandidate(candidate);
+          if (normalized) return normalized;
+
+          const parts = candidate.split("-");
+          const region = parts[1]?.toUpperCase();
+          if (region && regionToLocale[region]) return regionToLocale[region];
+        }
+        return "en";
+      };
+
+      const storedLocale = normalizeLocaleCandidate(localStorage.getItem(storageKey));
+      const preferredLocale =
+        storedLocale ??
+        resolvePreferredLocale(
+          Array.from(new Set([...(navigator.languages ?? []), navigator.language].filter(Boolean))),
+        );
+
+      window.location.replace(`/${preferredLocale}/`);
+    </script>
+  </body>
+</html>
