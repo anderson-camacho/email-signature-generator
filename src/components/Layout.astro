@@ -27,12 +27,30 @@ const canonical = new URL(Astro.url.pathname, site);
   </head>
   <body>
     <a class="skip" href="#content">Skip to content</a>
-    <header>
-      <a class="brand" href={`/${locale}/`}>Email Signature Generator</a>
-      <nav aria-label="Main navigation">
-        <a href={`/${locale}/email-installation-guide/`}>{t.guide}</a><a href={`/${locale}/email-signature-templates/`}>{t.templates}</a><a href={`/${locale}/faq/`}>{t.faq}</a><a href={`/${locale}/saved-signatures/`}>{t.savedLibrary}</a>
-      </nav>
-      <label class="language">{t.language} <select id="language">{locales.map((item) => <option value={item} selected={item === locale}>{localeNames[item]}</option>)}</select></label>
+    <header class="site-header">
+      <div class="header-shell">
+        <a class="brand" href={`/${locale}/`}>
+          <span class="brand-mark">ES</span>
+          <span class="brand-copy">
+            <strong>Email Signature Generator</strong>
+            <small>Fast editor, local library, multilingual setup</small>
+          </span>
+        </a>
+        <div class="header-controls">
+          <nav aria-label="Main navigation" class="main-nav">
+            <a href={`/${locale}/email-installation-guide/`}>{t.guide}</a>
+            <a href={`/${locale}/email-signature-templates/`}>{t.templates}</a>
+            <a href={`/${locale}/faq/`}>{t.faq}</a>
+            <a href={`/${locale}/saved-signatures/`}>{t.savedLibrary}</a>
+          </nav>
+          <label class="language-picker">
+            <span>{t.language}</span>
+            <select id="language">
+              {locales.map((item) => <option value={item} selected={item === locale}>{localeNames[item]}</option>)}
+            </select>
+          </label>
+        </div>
+      </div>
     </header>
     <main id="content"><slot /></main>
     <footer><a href={`/${locale}/privacy/`}>{t.privacyPage}</a> · <a href="https://github.com/anderson-camacho/email-signature-generator">Repository</a> · <a href="/LICENSE">MPL-2.0</a></footer>
