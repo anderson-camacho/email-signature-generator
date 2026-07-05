@@ -481,6 +481,10 @@ main {
   gap: 0 0.8rem;
   min-width: 0;
 }
+.field-grid > [data-field-wrapper] {
+  grid-template-rows: auto minmax(46px, auto) minmax(2.8em, auto);
+  align-content: start;
+}
 .field-grid .wide {
   grid-column: 1 / -1;
 }
@@ -686,6 +690,7 @@ label {
   font-size: 0.74rem;
   line-height: 1.4;
   font-weight: 700;
+  align-self: start;
 }
 [data-field-wrapper].is-field-unused input,
 [data-field-wrapper].is-field-unused select {
