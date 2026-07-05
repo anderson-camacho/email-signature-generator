@@ -80,6 +80,25 @@ const detailLine = (
     ? `<div style="margin-top:4px;font-family:Arial,sans-serif;font-size:12px;line-height:1.55;color:${color}"><strong style="color:${labelColor}">${safe(label)}:</strong> ${safe(value)}</div>`
     : "";
 
+const pronounChip = (
+  c: SignatureConfig,
+  options: {
+    background?: string;
+    color?: string;
+    borderColor?: string;
+    marginTop?: number;
+  } = {},
+) => {
+  if (!c.pronouns) return "";
+  const {
+    background = "#eef4ff",
+    color = c.primaryColor,
+    borderColor = "transparent",
+    marginTop = 8,
+  } = options;
+  return `<div style="margin-top:${marginTop}px;display:inline-block;padding:4px 10px;border-radius:999px;background:${background};border:1px solid ${borderColor};color:${color};font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:0.03em">${safe(c.pronouns)}</div>`;
+};
+
 const contactStack = (c: SignatureConfig, color = "#425466") =>
   [
     c.email ? detailLine("email", c.email, color, c.primaryColor) : "",
@@ -199,7 +218,11 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 14),
     )};font-weight:bold;color:${c.secondaryColor}">${safe(c.jobTitle)}${
       c.company ? ` &middot; ${safe(c.company)}` : ""
-    }</div><div style="margin-top:10px;font-size:12px;line-height:1.7;color:#5b6b7c">${contactInline(
+    }</div>${pronounChip(c, {
+      background: "#eff5ff",
+      color: c.primaryColor,
+      marginTop: 6,
+    })}<div style="margin-top:10px;font-size:12px;line-height:1.7;color:#5b6b7c">${contactInline(
       c,
       c.secondaryColor,
     )}</div>${socialRow(c, { shape: "square" })}</td></tr></table>`;
@@ -231,7 +254,15 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       c,
     )}</div><div style="margin-top:5px;font-size:13px;font-weight:bold;color:${c.secondaryColor}">${safe(
       c.jobTitle,
-    )}</div><div style="margin-top:14px">${contactStack(c)}</div>${socialRow(c, {
+    )}</div>${
+      c.department
+        ? `<div style="margin-top:4px;font-size:12px;color:#8090a0">${safe(c.department)}</div>`
+        : ""
+    }${pronounChip(c, {
+      background: "#f4f8ff",
+      color: c.primaryColor,
+      marginTop: 8,
+    })}<div style="margin-top:14px">${contactStack(c)}</div>${socialRow(c, {
       shape: "square",
     })}</td></tr></table>`;
   },
@@ -250,9 +281,11 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       initials(c.fullName),
     )}</td><td style="padding:${px(scaled(c, 22))} ${px(
       scaled(c, 22),
-    )} ${px(scaled(c, 22))} 0;vertical-align:top"><div style="display:inline-block;padding:4px 10px;border-radius:999px;background:#ffffff;color:${c.secondaryColor};font-size:11px;font-weight:bold;letter-spacing:0.05em;text-transform:uppercase">${safe(
-      c.pronouns || "Founder Profile",
-    )}</div><div style="margin-top:10px;font-size:${px(
+    )} ${px(scaled(c, 22))} 0;vertical-align:top">${pronounChip(c, {
+      background: "#ffffff",
+      color: c.secondaryColor,
+      marginTop: 0,
+    })}<div style="margin-top:10px;font-size:${px(
       scaled(c, 24),
     )};font-weight:bold;line-height:1.05;color:${c.primaryColor}">${signatureName(
       c,
@@ -285,7 +318,11 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       c.company || c.fullName,
     )}</div><div style="margin-top:6px;font-size:14px;color:#5c6c7c">${safe(
       c.fullName,
-    )}${c.jobTitle ? ` &middot; ${safe(c.jobTitle)}` : ""}</div></td><td style="vertical-align:top;width:${px(
+    )}${c.jobTitle ? ` &middot; ${safe(c.jobTitle)}` : ""}</div>${pronounChip(c, {
+      background: "#eef5ff",
+      color: c.primaryColor,
+      marginTop: 8,
+    })}</td><td style="vertical-align:top;width:${px(
       scaled(c, 180),
     )};border-left:1px solid #d8e3ed;padding-left:${px(
       scaled(c, 18),
@@ -301,6 +338,8 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       c.website,
       websiteLabel(c.website),
       c.primaryColor,
+    ) : ""}${(c.email || c.phone || c.website) && c.address ? "<br>" : ""}${c.address ? safe(
+      c.address,
     ) : ""}</div></td></tr></table>${socialRow(c, {
       shape: "square",
     })}${
@@ -332,7 +371,12 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 23),
     )};font-weight:bold;color:${c.primaryColor}">${signatureName(c)}</div><div style="margin-top:4px;font-family:Arial,sans-serif;font-size:14px;color:#5b5965">${safe(
       c.jobTitle,
-    )}${c.company ? ` | ${safe(c.company)}` : ""}</div><div style="margin-top:8px;font-family:Arial,sans-serif;font-size:12px;line-height:1.8;color:#445064">${contactStack(
+    )}${c.company ? ` | ${safe(c.company)}` : ""}</div>${pronounChip(c, {
+      background: "#ffffff",
+      color: c.secondaryColor,
+      borderColor: `${c.secondaryColor}33`,
+      marginTop: 8,
+    })}<div style="margin-top:8px;font-family:Arial,sans-serif;font-size:12px;line-height:1.8;color:#445064">${contactStack(
       c,
     )}</div>${socialRow(c, {
       shape: "circle",
@@ -360,7 +404,16 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 20),
     )};font-weight:bold;color:#ffffff">${signatureName(c)}</div><div style="margin-top:4px;font-size:13px;color:#eef4ff">${safe(
       c.jobTitle,
-    )}</div><div style="margin-top:10px;font-size:12px;line-height:1.7;color:#ffffff">${contactInline(
+    )}</div>${
+      c.department
+        ? `<div style="margin-top:4px;font-size:12px;color:#ffffff">${safe(c.department)}</div>`
+        : ""
+    }${pronounChip(c, {
+      background: "rgba(255,255,255,0.14)",
+      color: "#ffffff",
+      borderColor: "rgba(255,255,255,0.24)",
+      marginTop: 8,
+    })}<div style="margin-top:10px;font-size:12px;line-height:1.7;color:#ffffff">${contactInline(
       c,
       "#ffffff",
     )}</div>${socialRow(c, {
@@ -410,12 +463,20 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 22),
     )};font-weight:bold;color:${c.primaryColor}">${signatureName(c)}</div><div style="margin-top:4px;font-size:14px;color:#635564">${safe(
       c.jobTitle,
-    )}${c.company ? ` · ${safe(c.company)}` : ""}</div><div style="margin-top:10px">${detailLine(
+    )}${c.company ? ` · ${safe(c.company)}` : ""}</div>${pronounChip(c, {
+      background: "#fff6fb",
+      color: c.secondaryColor,
+      borderColor: "#f0d9e5",
+      marginTop: 8,
+    })}<div style="margin-top:10px">${detailLine(
       "phone",
       c.phone,
     )}${detailLine("email", c.email)}${detailLine(
       "website",
       c.website ? websiteLabel(c.website) : "",
+    )}${detailLine(
+      "address",
+      c.address,
     )}</div>${socialRow(c, {
       shape: "circle",
       size: scaled(c, 26),
@@ -454,7 +515,15 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 18),
     )};font-weight:bold;color:${c.primaryColor}">${signatureName(c)}</div><div style="margin-top:3px;font-size:13px;color:#6d7683">${safe(
       c.jobTitle,
-    )}${c.company ? ` · ${safe(c.company)}` : ""}</div><div style="margin-top:10px;font-size:12px;line-height:1.7;color:#4f5967">${contactInline(
+    )}${c.company ? ` · ${safe(c.company)}` : ""}</div>${
+      c.department
+        ? `<div style="margin-top:4px;font-size:12px;color:#7c8796">${safe(c.department)}</div>`
+        : ""
+    }${pronounChip(c, {
+      background: "#f4f8ff",
+      color: c.primaryColor,
+      marginTop: 8,
+    })}<div style="margin-top:10px;font-size:12px;line-height:1.7;color:#4f5967">${contactInline(
       c,
       c.primaryColor,
     )}</div>${socialRow(c, {
@@ -474,19 +543,28 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       orb,
     )};height:${px(orb)};border-radius:999px;background:radial-gradient(circle at 35% 35%, ${c.secondaryColor}, ${c.primaryColor});display:grid;place-items:center;color:#ffffff;font-size:${px(
       scaled(c, 34),
-    )};font-weight:bold">${c.logoUrl ? image(
-      c.logoUrl,
-      `${c.company} logo`,
+    )};font-weight:bold">${c.logoUrl || c.photoUrl ? image(
+      c.logoUrl || c.photoUrl,
+      c.logoUrl ? `${c.company} logo` : c.fullName,
       scaled(c, 86),
       "border-radius:50%;",
-      initials(c.company),
+      initials(c.company || c.fullName),
     ) : initials(c.company || c.fullName)}</div></td><td style="padding:${px(
       scaled(c, 22),
     )} ${px(scaled(c, 22))} ${px(scaled(c, 22))} 0;vertical-align:middle"><div style="font-size:${px(
       scaled(c, 25),
-    )};font-weight:bold;color:${c.secondaryColor}">${safe(c.company || c.fullName)}</div><div style="margin-top:6px;font-size:16px;color:#615c67">${safe(
+    )};font-weight:bold;color:${c.secondaryColor}">${signatureName(c)}</div>${
+      c.company && c.company !== c.fullName
+        ? `<div style="margin-top:4px;font-size:14px;color:#615c67">${safe(c.company)}</div>`
+        : ""
+    }<div style="margin-top:6px;font-size:16px;color:#615c67">${safe(
       c.jobTitle || c.department,
-    )}</div><div style="margin-top:10px">${detailLine(
+    )}</div>${pronounChip(c, {
+      background: "#f7f1fb",
+      color: c.secondaryColor,
+      borderColor: "#e7d7f2",
+      marginTop: 8,
+    })}<div style="margin-top:10px">${detailLine(
       "website",
       c.website ? websiteLabel(c.website) : "",
       "#675f70",
@@ -494,6 +572,11 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
     )}${detailLine("email", c.email, "#675f70", c.secondaryColor)}${detailLine(
       "phone",
       c.phone,
+      "#675f70",
+      c.secondaryColor,
+    )}${detailLine(
+      "address",
+      c.address,
       "#675f70",
       c.secondaryColor,
     )}</div>${socialRow(c, {
@@ -521,7 +604,12 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       c.company,
     )}</div><div style="margin-top:3px;font-size:12px;color:#7c8796">${safe(
       c.department || c.jobTitle,
-    )}</div><table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:${px(
+    )}</div>${pronounChip(c, {
+      background: "#ffffff",
+      color: c.primaryColor,
+      borderColor: "#dfe8f3",
+      marginTop: 8,
+    })}<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:${px(
       scaled(c, 14),
     )};background:#eaf1f8"><tr><td style="padding:${px(
       scaled(c, 12),
@@ -546,7 +634,12 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 22),
     )};font-weight:bold;color:#111111">${signatureName(c)}</div><div style="margin-top:4px;font-size:14px;color:${c.secondaryColor}">${safe(
       c.jobTitle,
-    )}</div><div style="margin-top:10px;font-size:12px;line-height:1.8;color:#35507a">${contactStack(
+    )}${c.company ? ` · ${safe(c.company)}` : ""}</div>${pronounChip(c, {
+      background: "#f4f8ff",
+      color: c.primaryColor,
+      borderColor: "#dae3ef",
+      marginTop: 8,
+    })}<div style="margin-top:10px;font-size:12px;line-height:1.8;color:#35507a">${contactStack(
       c,
       "#35507a",
     )}</div></td><td style="width:${px(photo)};vertical-align:top">${image(
@@ -590,7 +683,12 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 22),
     )};font-weight:bold;color:${c.primaryColor}">${signatureName(c)}</div><div style="margin-top:4px;font-size:14px;color:#63556c">${safe(
       c.jobTitle,
-    )}</div><div style="margin-top:10px">${divider(
+    )}${c.company ? ` · ${safe(c.company)}` : ""}</div>${pronounChip(c, {
+      background: "#fff7fc",
+      color: c.secondaryColor,
+      borderColor: "#eadff1",
+      marginTop: 8,
+    })}<div style="margin-top:10px">${divider(
       `${c.secondaryColor}55`,
       "100%",
     )}</div><div style="margin-top:10px;font-size:12px;line-height:1.8;color:#4b5565">${contactInline(
@@ -613,7 +711,15 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 22),
     )};font-weight:bold;color:${c.primaryColor}">${signatureName(c)}</div><div style="margin-top:4px;font-size:14px;color:#4f5865">${safe(
       c.jobTitle,
-    )}${c.company ? ` · ${safe(c.company)}` : ""}</div><table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:${px(
+    )}${c.company ? ` · ${safe(c.company)}` : ""}</div>${
+      c.department
+        ? `<div style="margin-top:4px;font-size:12px;color:#6b7581">${safe(c.department)}</div>`
+        : ""
+    }${pronounChip(c, {
+      background: "#f4f8ff",
+      color: c.primaryColor,
+      marginTop: 8,
+    })}<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:${px(
       scaled(c, 14),
     )}"><tr><td style="vertical-align:top;padding-right:${px(
       scaled(c, 14),
@@ -647,7 +753,16 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 24),
     )};font-weight:bold;color:#37291c">${signatureName(c)}</div><div style="margin-top:5px;font-size:14px;color:#6a5848">${safe(
       c.jobTitle,
-    )}</div><div style="margin-top:12px">${contactStack(
+    )}</div>${
+      c.department
+        ? `<div style="margin-top:4px;font-size:12px;color:#82684f">${safe(c.department)}</div>`
+        : ""
+    }${pronounChip(c, {
+      background: "#fff7eb",
+      color: "#6f4b1d",
+      borderColor: "#eadfca",
+      marginTop: 8,
+    })}<div style="margin-top:12px">${contactStack(
       c,
       "#5a4b3a",
     )}</div>${socialRow(c, {
@@ -697,7 +812,18 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 24),
     )};font-weight:bold;color:${c.secondaryColor}">${signatureName(c)}</div><div style="margin-top:4px;font-size:14px;font-weight:bold;color:${c.primaryColor}">${safe(
       c.jobTitle || "Healthcare Specialist",
-    )}</div><div style="margin-top:12px;font-size:12px;line-height:1.8;color:#39516a">${contactInline(
+    )}</div>${
+      c.company || c.department
+        ? `<div style="margin-top:4px;font-size:12px;color:#5b6f86">${safe(
+            [c.company, c.department].filter(Boolean).join(" · "),
+          )}</div>`
+        : ""
+    }${pronounChip(c, {
+      background: "#ffffff",
+      color: c.secondaryColor,
+      borderColor: "#d9e8f5",
+      marginTop: 8,
+    })}<div style="margin-top:12px;font-size:12px;line-height:1.8;color:#39516a">${contactInline(
       c,
       c.primaryColor,
     )}</div>${socialRow(c, {
@@ -736,9 +862,19 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 21),
     )};font-weight:bold;color:${c.primaryColor}">${signatureName(c)}</div><div style="margin-top:4px;font-size:14px;color:#8c6d78">${safe(
       c.company || c.jobTitle,
-    )}</div><div style="margin-top:10px">${detailLine(
+    )}</div>${pronounChip(c, {
+      background: "#fff7fb",
+      color: c.primaryColor,
+      borderColor: "#f2d8df",
+      marginTop: 8,
+    })}<div style="margin-top:10px">${detailLine(
       "email",
       c.email,
+      "#6c5860",
+      c.primaryColor,
+    )}${detailLine(
+      "phone",
+      c.phone,
       "#6c5860",
       c.primaryColor,
     )}${detailLine("website", c.website ? websiteLabel(c.website) : "", "#6c5860", c.primaryColor)}${detailLine(

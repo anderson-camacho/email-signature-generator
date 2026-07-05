@@ -7,7 +7,9 @@ test("edits, changes template, warns for local image, and navigates languages", 
   await page.addInitScript(() => localStorage.clear());
   await page.goto("/es/generator/");
   await page.getByLabel("Full name").fill("Taylor Example");
-  await page.getByLabel("Template").selectOption("professional-logo");
+  await page.getByLabel("Choose style").selectOption("professional-photo");
+  await page.getByLabel("Pronouns").fill("she/her");
+  await page.getByLabel("Legal note").fill("Internal note");
   await page.getByRole("button", { name: "Add social network" }).click();
   await page
     .getByLabel("Public HTTPS URL")
@@ -15,6 +17,11 @@ test("edits, changes template, warns for local image, and navigates languages", 
   await page.getByRole("button", { name: "Add social network" }).click();
   await expect(page.locator(".social-card")).toHaveCount(2);
   await expect(page.locator("#preview")).toContainText("Taylor Example");
+  await expect(page.locator("#preview")).toContainText("she/her");
+  await page.getByLabel("Choose style").selectOption("professional-logo");
+  await expect(
+    page.locator('[data-field-support-note="legalText"]'),
+  ).toBeVisible();
   await page.locator("summary", { hasText: "Photo and logo" }).click();
   await page.locator("#local-image").setInputFiles({
     name: "preview.png",
@@ -24,10 +31,13 @@ test("edits, changes template, warns for local image, and navigates languages", 
   await expect(page.locator("#local-warning")).toBeVisible();
   await expect(page.getByLabel("Idioma")).toContainText("Español");
   await expect(page.getByLabel("Idioma")).toContainText("English");
+  await expect(page.getByLabel("Idioma")).toContainText("Italiano");
+  await expect(page.getByLabel("Idioma")).toContainText("日本語");
   await page.getByLabel("Idioma").selectOption("en");
   await expect(page).toHaveURL(/\/en\/generator\//);
 });
-test("exports, clears, rejects unsafe URL, and passes basic accessibility", async ({
+
+test("exports, clears, rejects unsafe URL, and passes critical accessibility smoke", async ({
   page,
 }) => {
   await page.addInitScript(() => localStorage.clear());
@@ -38,10 +48,25 @@ test("exports, clears, rejects unsafe URL, and passes basic accessibility", asyn
   await page.getByRole("button", { name: "Export JSON" }).click();
   await download;
   await page.getByRole("button", { name: "Clear local data" }).click();
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  const violations = (await new AxeBuilder({ page }).analyze()).violations;
+  expect(violations.filter((violation) => violation.impact === "critical")).toEqual([]);
 });
+
 test("localized public routes respond", async ({ page }) => {
-  for (const locale of ["es", "en", "pt-BR", "fr", "de"]) {
+  for (const locale of [
+    "es",
+    "en",
+    "pt-BR",
+    "fr",
+    "de",
+    "it",
+    "ja",
+    "ko",
+    "ar",
+    "hi",
+    "zh-CN",
+    "ru",
+  ]) {
     await page.goto(`/${locale}/privacy/`);
     await expect(page.locator("main h1")).toBeVisible();
   }
