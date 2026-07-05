@@ -1,21 +1,399 @@
 ---
-import Layout from "../../components/Layout.astro"; import { dictionary, locales, type Locale } from "../../i18n/dictionaries";
+import Layout from "../../components/Layout.astro";
+import { dictionary, locales, type Locale } from "../../i18n/dictionaries";
+
+type StaticPageKey =
+  | "privacy"
+  | "email-installation-guide"
+  | "faq"
+  | "support-open-source"
+  | "donations";
+
+type BasicContent = {
+  title: string;
+  paragraphs: string[];
+};
+
+type GuideSection = {
+  title: string;
+  audience: string;
+  steps: string[];
+  notes: string[];
+  resourceLabel: string;
+  resourceUrl: string;
+};
+
+type InstallationGuide = {
+  title: string;
+  intro: string;
+  checklistTitle: string;
+  checklist: string[];
+  sections: GuideSection[];
+  managedTitle: string;
+  managedCopy: string[];
+};
+
 export function getStaticPaths() {
-  const pages = ["privacy", "email-installation-guide", "faq", "support-open-source", "donations"];
-  return locales.flatMap((locale) => pages.map((page) => ({ params: { locale, page }, props: { locale, page } })));
+  const pages: StaticPageKey[] = [
+    "privacy",
+    "email-installation-guide",
+    "faq",
+    "support-open-source",
+    "donations",
+  ];
+
+  return locales.flatMap((locale) =>
+    pages.map((page) => ({ params: { locale, page }, props: { locale, page } })),
+  );
 }
 
-const { locale, page } = Astro.props as { locale: Locale; page: string };
+const { locale, page } = Astro.props as { locale: Locale; page: StaticPageKey };
 const t = dictionary(locale);
-const contents: Record<string, { title: string; paragraphs: string[] }> = {
-privacy:{title:t.privacyPage,paragraphs:["The application works entirely in your browser.","Drafts are stored only in localStorage on your device.","Signature data is not sent to our servers.","You can erase local data from the generator.","There is no required account, remote storage, first-party cookies, or sale of personal data.","Avoid publishing private information. Public HTTPS images depend on your chosen hosting provider.","This privacy text must be reviewed before commercial launch or adding data collection."]},
-"email-installation-guide":{title:t.guide,paragraphs:["Generate your signature.","Copy or download the signature.","Open your email client's settings.","Find the signature or account preferences section.","Paste the signature and save changes.","Send a test email on desktop and mobile.","If something looks off, adjust spacing, image hosting, or links and test again."]},
-faq:{title:t.faq,paragraphs:["Is it free? Yes, the static MVP is free and open source.","Where is my data stored? Only in your browser localStorage.","Does it work with every email client? It is designed for many email clients, but you should always send a test message.","Can I use local images? Only for preview. Final signatures require public HTTPS image URLs."]}
-,
-"support-open-source":{title:t.supportTitle,paragraphs:["This project is being built as a practical open-source tool for professional signatures.","Community support can help fund maintenance, testing, documentation, and future template improvements.","You can support through GitHub Sponsors, Open Collective, one-time donations, or direct code contributions.","Before adding commercial flows, this support page keeps the project direction transparent and community-friendly."]}
-,
-"donations":{title:"Donations under construction",paragraphs:["This donation page is still being prepared.","The PayPal donation flow is not available yet.","For now, the project support options are being organized before enabling direct payments.","Once the donation setup is ready, this page will be updated with the final payment method."]}
+
+const basicContents: Record<Exclude<StaticPageKey, "email-installation-guide">, BasicContent> = {
+  privacy: {
+    title: t.privacyPage,
+    paragraphs: [
+      "The application works entirely in your browser.",
+      "Drafts are stored only in localStorage on your device.",
+      "Signature data is not sent to our servers.",
+      "You can erase local data from the generator.",
+      "There is no required account, remote storage, first-party cookies, or sale of personal data.",
+      "Avoid publishing private information. Public HTTPS images depend on your chosen hosting provider.",
+      "This privacy text must be reviewed before commercial launch or adding data collection.",
+    ],
+  },
+  faq: {
+    title: t.faq,
+    paragraphs: [
+      "Is it free? Yes, the static MVP is free and open source.",
+      "Where is my data stored? Only in your browser localStorage.",
+      "Does it work with every email client? It is designed for many email clients, but you should always send a test message.",
+      "Can I use local images? Only for preview. Final signatures require public HTTPS image URLs.",
+    ],
+  },
+  "support-open-source": {
+    title: t.supportTitle,
+    paragraphs: [
+      "This project is being built as a practical open-source tool for professional signatures.",
+      "Community support can help fund maintenance, testing, documentation, and future template improvements.",
+      "You can support through GitHub Sponsors, Open Collective, one-time donations, or direct code contributions.",
+      "Before adding commercial flows, this support page keeps the project direction transparent and community-friendly.",
+    ],
+  },
+  donations: {
+    title: "Donations under construction",
+    paragraphs: [
+      "This donation page is still being prepared.",
+      "The PayPal donation flow is not available yet.",
+      "For now, the project support options are being organized before enabling direct payments.",
+      "Once the donation setup is ready, this page will be updated with the final payment method.",
+    ],
+  },
 };
-const content = contents[page]!;
+
+const installationGuide: InstallationGuide =
+  locale === "es"
+    ? {
+        title: "Guía de instalación",
+        intro:
+          "Sigue la ruta concreta según el cliente de correo que usa tu empresa o tu cuenta personal. La idea es generar la firma aquí, copiarla y pegarla en el lugar exacto donde cada plataforma administra las firmas.",
+        checklistTitle: "Antes de pegar la firma",
+        checklist: [
+          "Genera la firma final en esta herramienta y revisa que el logo y las fotos usen URLs HTTPS públicas.",
+          "Usa preferiblemente el botón de copiar desde escritorio para conservar mejor el formato.",
+          "Si tu empresa usa varias direcciones o varias firmas, define cuál debe ir en correos nuevos y cuál en respuestas.",
+          "Después de guardar, envía un correo de prueba a Gmail, Outlook y móvil para revisar espaciado, imágenes y enlaces.",
+        ],
+        sections: [
+          {
+            title: "Gmail o Google Workspace",
+            audience:
+              "Para cuentas personales de Gmail y empresas que trabajan en Google Workspace desde el navegador.",
+            steps: [
+              "Abre Gmail en el navegador.",
+              "Haz clic en Configuración y luego en Ver todos los ajustes.",
+              "En la pestaña General, baja hasta la sección Firma.",
+              "Crea una firma nueva o edita una existente y pega la firma generada.",
+              "Si usas varias direcciones en la misma cuenta, elige la dirección correcta y define la firma predeterminada para correos nuevos y respuestas.",
+              "Baja al final de la página y pulsa Guardar cambios.",
+            ],
+            notes: [
+              "La firma de la app móvil de Gmail suele manejarse por separado y normalmente es solo de texto.",
+              "Si Gmail rompe el formato, primero revisa que las imágenes sean públicas y no locales.",
+            ],
+            resourceLabel: "Ver ayuda oficial de Gmail",
+            resourceUrl:
+              "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en",
+          },
+          {
+            title: "Outlook web, nuevo Outlook y Microsoft 365",
+            audience:
+              "Para empresas con correo en Outlook web, Outlook.com o Microsoft 365 usando la experiencia nueva.",
+            steps: [
+              "Abre Outlook y entra a Configuración.",
+              "Ve a Cuentas > Signatures.",
+              "Si tienes más de una cuenta, selecciona la cuenta correcta antes de crear la firma.",
+              "Pulsa Add signature, escribe un nombre y pega la firma en el editor.",
+              "Activa si esa firma debe aparecer en correos nuevos y en respuestas o reenvíos.",
+              "Guarda los cambios.",
+            ],
+            notes: [
+              "En Microsoft 365, una misma persona puede necesitar una firma distinta por cuenta o por tipo de mensaje.",
+              "Si la organización usa firmas centralizadas, puede que TI sobrescriba la firma del usuario.",
+            ],
+            resourceLabel: "Ver ayuda oficial de Outlook web",
+            resourceUrl:
+              "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook",
+          },
+          {
+            title: "Outlook clásico en Windows",
+            audience:
+              "Para equipos corporativos que todavía usan la versión clásica de Outlook de escritorio en Windows.",
+            steps: [
+              "Abre un correo nuevo.",
+              "En el menú Message, entra a Signature > Signatures.",
+              "En Select signature to edit, pulsa New y asigna un nombre a la firma.",
+              "Pega la firma en el cuadro Edit signature.",
+              "En Choose default signature, selecciona la cuenta y define si aplica a mensajes nuevos y a respuestas o reenvíos.",
+              "Pulsa OK para guardar.",
+            ],
+            notes: [
+              "La firma nueva no siempre se inserta automáticamente en el correo que ya estaba abierto; si hace falta, agrégala manualmente desde Signature.",
+              "Outlook clásico suele respetar mejor firmas pegadas desde el editor que firmas recreadas a mano.",
+            ],
+            resourceLabel: "Ver ayuda oficial de Outlook clásico",
+            resourceUrl:
+              "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook",
+          },
+          {
+            title: "Apple Mail en Mac e iCloud Mail",
+            audience:
+              "Para usuarios que envían correo desde la app Mail de macOS o desde iCloud Mail en web.",
+            steps: [
+              "En Mail para Mac, abre la app y ve a Mail > Settings > Signatures.",
+              "Selecciona la cuenta correcta, crea una firma nueva con el botón + y pega el contenido en la vista previa.",
+              "Si la creaste en All Signatures, arrástrala luego a la cuenta donde quieres usarla.",
+              "Si usas iCloud Mail web, entra a icloud.com/mail, abre Settings y luego Composing.",
+              "Activa Add a signature y escribe o pega la firma correspondiente.",
+              "Haz una prueba enviando un correo desde Mac y otra desde iCloud web si usas ambas.",
+            ],
+            notes: [
+              "En Apple Mail puedes decidir si la firma queda encima o debajo del texto citado en respuestas.",
+              "Si el formato cambia en iCloud web, usa una versión más simple con menos bloques visuales.",
+            ],
+            resourceLabel: "Ver ayuda oficial de Apple",
+            resourceUrl: "https://support.apple.com/guide/mail/edit-text-and-email-signatures-mail11943/mac",
+          },
+          {
+            title: "Thunderbird",
+            audience:
+              "Para equipos o cuentas que trabajan con Thunderbird como cliente de escritorio.",
+            steps: [
+              "Abre Thunderbird y entra a Account Settings.",
+              "Selecciona la cuenta de correo donde vas a usar la firma.",
+              "Ubica el campo de firma dentro de la configuración de esa cuenta.",
+              "Pega la firma si usarás firma directa en texto o HTML.",
+              "Si tu empresa maneja una firma HTML externa, configura la opción para usar firma desde archivo HTML.",
+              "Guarda y envía un mensaje de prueba para revisar cómo queda en respuestas y reenvíos.",
+            ],
+            notes: [
+              "Thunderbird configura la firma por cuenta, así que hay que repetir el proceso si manejas varias casillas.",
+              "Si usas imágenes, conviene probar que no se adjunten como archivo separado.",
+            ],
+            resourceLabel: "Ver ayuda oficial de Thunderbird",
+            resourceUrl: "https://support.mozilla.org/en-US/kb/signatures",
+          },
+        ],
+        managedTitle: "Si tu empresa administra las firmas",
+        managedCopy: [
+          "Algunas empresas no dejan que cada usuario cambie la firma libremente porque la controlan desde Microsoft 365, Google Workspace o una herramienta externa de branding.",
+          "Si no ves la opción de firma, si tus cambios se borran solos o si aparece otra firma distinta al enviar, lo correcto es pedir a TI o a marketing la ruta exacta o confirmar si la firma se empuja de forma centralizada.",
+        ],
+      }
+    : {
+        title: "Installation guide",
+        intro:
+          "Choose the exact path that matches the email client your company or personal account uses. The goal is to generate the signature here, copy it, and paste it into the specific signature area used by each platform.",
+        checklistTitle: "Before you paste the signature",
+        checklist: [
+          "Generate the final signature here and make sure logos and photos use public HTTPS URLs.",
+          "Prefer the copy button from desktop so the formatting is preserved more reliably.",
+          "If you use multiple addresses or multiple signatures, decide which one should be used for new emails and which one should be used for replies.",
+          "After saving, send a test email to Gmail, Outlook, and a mobile device to review spacing, images, and links.",
+        ],
+        sections: [
+          {
+            title: "Gmail or Google Workspace",
+            audience:
+              "For personal Gmail accounts and businesses using Google Workspace in the browser.",
+            steps: [
+              "Open Gmail in your browser.",
+              "Click Settings and then See all settings.",
+              "In the General tab, scroll to the Signature section.",
+              "Create a new signature or edit an existing one and paste the generated signature.",
+              "If you use multiple sending addresses, choose the correct address and set the default signature for new emails and replies.",
+              "Scroll to the bottom and click Save Changes.",
+            ],
+            notes: [
+              "The Gmail mobile app usually manages a separate text-only mobile signature.",
+              "If Gmail breaks the layout, first confirm that your images are public and not local files.",
+            ],
+            resourceLabel: "Open the official Gmail guide",
+            resourceUrl:
+              "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en",
+          },
+          {
+            title: "Outlook on the web, new Outlook, and Microsoft 365",
+            audience:
+              "For business accounts using Outlook on the web, Outlook.com, or Microsoft 365 in the newer experience.",
+            steps: [
+              "Open Outlook and go to Settings.",
+              "Go to Accounts > Signatures.",
+              "If you have more than one account, select the correct account before creating the signature.",
+              "Choose Add signature, give it a name, and paste the signature into the editor.",
+              "Choose whether the signature should be applied to new emails and to replies or forwards.",
+              "Save your changes.",
+            ],
+            notes: [
+              "In Microsoft 365, one user may need different signatures per account or per message type.",
+              "If your organization uses centralized signature management, IT may overwrite the user-level signature.",
+            ],
+            resourceLabel: "Open the official Outlook web guide",
+            resourceUrl:
+              "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook",
+          },
+          {
+            title: "Classic Outlook on Windows",
+            audience:
+              "For business computers that still use the classic desktop version of Outlook on Windows.",
+            steps: [
+              "Open a new email message.",
+              "On the Message menu, go to Signature > Signatures.",
+              "Under Select signature to edit, choose New and give the signature a name.",
+              "Paste the signature into the Edit signature box.",
+              "Under Choose default signature, select the account and define whether it applies to new messages and to replies or forwards.",
+              "Choose OK to save.",
+            ],
+            notes: [
+              "The new signature may not insert itself into the message you already had open, so you may need to add it manually from Signature.",
+              "Classic Outlook usually preserves pasted signatures better than rebuilding them manually.",
+            ],
+            resourceLabel: "Open the official classic Outlook guide",
+            resourceUrl:
+              "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook",
+          },
+          {
+            title: "Apple Mail on Mac and iCloud Mail",
+            audience:
+              "For users who send email from the macOS Mail app or from iCloud Mail on the web.",
+            steps: [
+              "In Mail for Mac, open the app and go to Mail > Settings > Signatures.",
+              "Select the correct account, create a new signature with the plus button, and paste the content into the preview area.",
+              "If you created it under All Signatures, drag it to the account where you want to use it.",
+              "If you use iCloud Mail on the web, go to icloud.com/mail, open Settings, and then Composing.",
+              "Enable Add a signature and type or paste the signature there.",
+              "Send one test from Mail on Mac and another from iCloud web if you use both.",
+            ],
+            notes: [
+              "Apple Mail lets you decide whether the signature appears above or below quoted text in replies.",
+              "If iCloud web changes the appearance, use a simpler version with fewer visual blocks.",
+            ],
+            resourceLabel: "Open the official Apple guide",
+            resourceUrl: "https://support.apple.com/guide/mail/edit-text-and-email-signatures-mail11943/mac",
+          },
+          {
+            title: "Thunderbird",
+            audience:
+              "For teams or personal accounts that use Thunderbird as the desktop mail client.",
+            steps: [
+              "Open Thunderbird and go to Account Settings.",
+              "Select the mail account where you want to use the signature.",
+              "Find the signature field in that account configuration.",
+              "Paste the signature if you will use a direct text or HTML signature.",
+              "If your company manages an external HTML signature, configure Thunderbird to use an HTML signature file instead.",
+              "Save and send a test message to verify replies and forwards.",
+            ],
+            notes: [
+              "Thunderbird configures signatures per account, so repeat the process if you manage multiple mailboxes.",
+              "If you use images, confirm that they do not appear as separate attachments.",
+            ],
+            resourceLabel: "Open the official Thunderbird guide",
+            resourceUrl: "https://support.mozilla.org/en-US/kb/signatures",
+          },
+        ],
+        managedTitle: "If your company centrally manages signatures",
+        managedCopy: [
+          "Some organizations do not allow users to edit signatures freely because signatures are managed from Microsoft 365, Google Workspace, or an external branding platform.",
+          "If you cannot find the signature option, if your changes disappear, or if another signature replaces yours after sending, ask IT or marketing for the exact process or confirm whether signatures are enforced centrally.",
+        ],
+      };
+
+const isInstallationGuide = page === "email-installation-guide";
+const basicPage = isInstallationGuide ? null : basicContents[page];
 ---
-<Layout {locale} title={content.title}><article class="content-card"><h1>{content.title}</h1>{content.paragraphs.map(item=><p>{item}</p>)}</article></Layout>
+<Layout
+  {locale}
+  title={isInstallationGuide ? installationGuide.title : basicPage!.title}
+>
+  {
+    isInstallationGuide ? (
+      <article class="content-card guide-card">
+        <h1>{installationGuide.title}</h1>
+        <p class="guide-intro">{installationGuide.intro}</p>
+
+        <section class="guide-checklist">
+          <h2>{installationGuide.checklistTitle}</h2>
+          <ol>
+            {installationGuide.checklist.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ol>
+        </section>
+
+        <div class="guide-grid">
+          {installationGuide.sections.map((section) => (
+            <section class="guide-section">
+              <div class="guide-section-head">
+                <h2>{section.title}</h2>
+                <p>{section.audience}</p>
+              </div>
+
+              <ol>
+                {section.steps.map((step) => (
+                  <li>{step}</li>
+                ))}
+              </ol>
+
+              <ul class="guide-notes">
+                {section.notes.map((note) => (
+                  <li>{note}</li>
+                ))}
+              </ul>
+
+              <p class="guide-resource">
+                <a href={section.resourceUrl} target="_blank" rel="noreferrer">
+                  {section.resourceLabel}
+                </a>
+              </p>
+            </section>
+          ))}
+        </div>
+
+        <section class="guide-managed">
+          <h2>{installationGuide.managedTitle}</h2>
+          {installationGuide.managedCopy.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </section>
+      </article>
+    ) : (
+      <article class="content-card">
+        <h1>{basicPage!.title}</h1>
+        {basicPage!.paragraphs.map((item) => (
+          <p>{item}</p>
+        ))}
+      </article>
+    )
+  }
+</Layout>
