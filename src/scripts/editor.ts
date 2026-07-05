@@ -136,6 +136,8 @@ function updateFieldSupportState() {
     const isSupported = supportedFields.has(fieldName);
     wrapper.classList.toggle("is-field-unused", !isSupported);
     supportNote.hidden = isSupported;
+    supportNote.style.display = isSupported ? "none" : "block";
+    supportNote.setAttribute("aria-hidden", String(isSupported));
 
     if (!isSupported && wrapper.dataset.fieldLabel) {
       hiddenLabels.push(wrapper.dataset.fieldLabel);
