@@ -207,8 +207,10 @@ function socialControl(
   label: string,
   value: string,
   onChange: (value: string) => void,
+  className?: string,
 ) {
   const wrapper = document.createElement("label");
+  if (className) wrapper.className = className;
   wrapper.textContent = label;
   const element = document.createElement(tag);
   if (element instanceof HTMLInputElement) {
@@ -247,11 +249,15 @@ function renderSocialEditor() {
     badge.className = "social-card-number";
     badge.textContent = String(index + 1);
 
+    const header = document.createElement("div");
+    header.className = "social-card-header";
+
     const platform = socialControl(
       "select",
       "Platform",
       social.platform,
       (value) => updateSocial(social.id, { platform: value as SocialPlatform }),
+      "social-field social-field-platform",
     );
 
     platforms.forEach((name) => {
@@ -267,6 +273,7 @@ function renderSocialEditor() {
       "Public HTTPS URL",
       social.url,
       (value) => updateSocial(social.id, { url: value }),
+      "social-field social-field-url",
     );
 
     const style = socialControl(
@@ -277,6 +284,7 @@ function renderSocialEditor() {
         updateSocial(social.id, {
           iconStyle: value === "primary" ? "primary" : "original",
         }),
+      "social-field social-field-style",
     );
 
     (
@@ -303,7 +311,12 @@ function renderSocialEditor() {
       scheduleSave();
     });
 
-    card.append(badge, platform.wrapper, url.wrapper, style.wrapper, remove);
+    const grid = document.createElement("div");
+    grid.className = "social-card-grid";
+    grid.append(platform.wrapper, style.wrapper, url.wrapper);
+
+    header.append(badge, remove);
+    card.append(header, grid);
     socialList.append(card);
   });
 }
