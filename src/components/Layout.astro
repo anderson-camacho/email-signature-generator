@@ -38,9 +38,9 @@ const canonical = new URL(Astro.url.pathname, site);
         </a>
         <div class="header-controls">
           <nav aria-label="Main navigation" class="main-nav">
+            <a href={`/${locale}/saved-signatures/`}>{t.savedLibrary}</a>
             <a href={`/${locale}/email-installation-guide/`}>{t.guide}</a>
             <a href={`/${locale}/faq/`}>{t.faq}</a>
-            <a href={`/${locale}/saved-signatures/`}>{t.savedLibrary}</a>
           </nav>
           <div class="header-donate-shell">
             <div id="header-donate-button-container" class="header-donate-button-container">
