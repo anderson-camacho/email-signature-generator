@@ -6,6 +6,20 @@ import type {
 } from "./signature-types";
 import { isEmail, normalizePhone, safeColor, safeHttpsUrl } from "./validators";
 
+const supportedSocialPlatforms: SocialPlatform[] = [
+  "linkedin",
+  "instagram",
+  "facebook",
+  "x",
+  "youtube",
+  "tiktok",
+  "whatsapp",
+  "github",
+  "dribbble",
+  "behance",
+  "pinterest",
+];
+
 export const escapeHtml = (value: string) =>
   value.replace(
     /[&<>"']/g,
@@ -21,21 +35,12 @@ export const escapeHtml = (value: string) =>
 
 export function sanitizeConfig(config: SignatureConfig): SignatureConfig {
   const text = (value: string) => value.slice(0, 500);
-  const platforms: SocialPlatform[] = [
-    "linkedin",
-    "instagram",
-    "facebook",
-    "x",
-    "youtube",
-    "tiktok",
-    "whatsapp",
-    "github",
-  ];
   const socials = Array.isArray(config.socials)
     ? config.socials
         .filter(
           (social): social is SocialLink =>
-            Boolean(social) && platforms.includes(social.platform),
+            Boolean(social) &&
+            supportedSocialPlatforms.includes(social.platform),
         )
         .slice(0, 24)
         .map((social) => ({

@@ -1,5 +1,6 @@
 ---
 import { dictionary, type Locale } from "../i18n/dictionaries";
+import { templateCatalog } from "../templates/catalog";
 const { locale } = Astro.props as { locale: Locale };
 const t = dictionary(locale);
 const palettePresets = [
@@ -24,12 +25,6 @@ const palettePresets = [
     primary: "#27364a",
     secondary: "#6db7c9",
   },
-] as const;
-const templateCards = [
-  ["minimal", "Executive", "Direct, clean, corporate"],
-  ["professional-logo", "Brand Focus", "Logo-first and professional"],
-  ["professional-photo", "Founder", "Human, warm, personal"],
-  ["administrative-area", "Operations", "Functional and team-oriented"],
 ] as const;
 const personalFields = [
   ["fullName", "Full name"],
@@ -119,11 +114,11 @@ const personalFields = [
           <div class="config-body">
             <label
               >Choose style<select name="template"
-                ><option value="minimal">Minimal</option
-                ><option value="professional-logo">Professional logo</option
-                ><option value="professional-photo">Professional photo</option
-                ><option value="administrative-area">Administrative area</option
-                ></select
+                >{
+                  templateCatalog.map((template) => (
+                    <option value={template.id}>{template.label}</option>
+                  ))
+                }</select
               ></label
             >
           </div>
@@ -275,13 +270,13 @@ const personalFields = [
       </div>
       <div class="template-showcase">
         {
-          templateCards.map(([value, title, note]) => (
-            <button class="template-card" type="button" data-template={value}>
+          templateCatalog.map((template) => (
+            <button class="template-card" type="button" data-template={template.id}>
               <div class="template-thumb">
-                <div class="template-thumb-canvas" data-template-preview={value}></div>
+                <div class="template-thumb-canvas" data-template-preview={template.id}></div>
               </div>
-              <strong>{title}</strong>
-              <span>{note}</span>
+              <strong>{template.cardTitle}</strong>
+              <span>{template.note}</span>
             </button>
           ))
         }

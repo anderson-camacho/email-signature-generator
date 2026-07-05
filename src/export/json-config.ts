@@ -1,5 +1,6 @@
 import { defaultConfig, type SignatureConfig } from "../core/signature-types";
 import { sanitizeConfig } from "../core/signature-sanitizer";
+import { templateIds } from "../templates/catalog";
 
 export const exportConfig = (config: SignatureConfig) =>
   JSON.stringify(sanitizeConfig(config), null, 2);
@@ -28,14 +29,7 @@ export function importConfig(value: string): SignatureConfig {
     ...raw,
     socials: migratedSocials,
   };
-  if (
-    ![
-      "minimal",
-      "professional-logo",
-      "professional-photo",
-      "administrative-area",
-    ].includes(candidate.template)
-  )
+  if (!templateIds.includes(candidate.template))
     throw new Error("Unknown template.");
   return sanitizeConfig(candidate as SignatureConfig);
 }

@@ -1,9 +1,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-export type TemplateId =
-  | "minimal"
-  | "professional-logo"
-  | "professional-photo"
-  | "administrative-area";
+import type { TemplateId } from "../templates/catalog";
+
+export type { TemplateId };
 export type Size = "compact" | "normal" | "wide";
 export type SocialPlatform =
   | "linkedin"
@@ -13,7 +11,10 @@ export type SocialPlatform =
   | "youtube"
   | "tiktok"
   | "whatsapp"
-  | "github";
+  | "github"
+  | "dribbble"
+  | "behance"
+  | "pinterest";
 export type SocialIconStyle = "original" | "primary";
 
 export interface SocialLink {
