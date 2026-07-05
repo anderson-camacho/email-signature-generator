@@ -78,6 +78,23 @@ const canonical = new URL(Astro.url.pathname, site);
         location.href = `/${locale}${location.pathname.replace(/^\/[^/]+/, "")}`;
       });
 
+      const footer = document.querySelector("footer");
+      const licenseLink = footer?.querySelector('a[href="/LICENSE"]');
+      if (
+        footer instanceof HTMLElement &&
+        licenseLink instanceof HTMLAnchorElement &&
+        !footer.querySelector('[data-creator-link="true"]')
+      ) {
+        footer.insertBefore(document.createTextNode(" · "), licenseLink);
+
+        const creatorLink = document.createElement("a");
+        creatorLink.href = "https://github.com/anderson-camacho";
+        creatorLink.textContent = "Creador";
+        creatorLink.dataset.creatorLink = "true";
+
+        footer.insertBefore(creatorLink, licenseLink);
+      }
+
       let donationFeedbackTimeout;
 
       const showDonationFeedback = () => {
