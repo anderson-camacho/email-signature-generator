@@ -3,8 +3,11 @@ import { defaultConfig } from "../../src/core/signature-types";
 import { escapeHtml, sanitizeConfig } from "../../src/core/signature-sanitizer";
 import {
   isEmail,
+  isReadableText,
   normalizePhone,
+  safeReadableText,
   safeHttpsUrl,
+  safeImageUrl,
 } from "../../src/core/validators";
 import { renderSignature, templates } from "../../src/templates/registry";
 import { exportConfig, importConfig } from "../../src/export/json-config";
@@ -23,9 +26,29 @@ describe("security and validation", () => {
   ])("rejects unsafe URL %s", (url) => expect(safeHttpsUrl(url)).toBe(""));
   it("accepts HTTPS", () =>
     expect(safeHttpsUrl("https://example.com")).toBe("https://example.com/"));
+  it("accepts optimized local image data URLs for image fields", () => {
+    const dataUrl = "data:image/webp;base64,aaaa";
+    expect(safeImageUrl(dataUrl)).toBe(dataUrl);
+    expect(
+      sanitizeConfig({ ...defaultConfig, photoUrl: dataUrl }).photoUrl,
+    ).toBe(dataUrl);
+  });
   it("validates email and normalizes phone", () => {
     expect(isEmail("alex@example.com")).toBe(true);
+    expect(isEmail("not-an-email")).toBe(false);
     expect(normalizePhone("+1 555 010 0000")).toBe("+15550100000");
+    expect(normalizePhone("phone-text")).toBe("");
+    expect(normalizePhone("+57 300 123 4567")).toBe("+573001234567");
+  });
+  it("validates public HTTPS URLs and readable international text", () => {
+    expect(safeHttpsUrl("https://example.com/path")).toBe(
+      "https://example.com/path",
+    );
+    expect(safeHttpsUrl("https://example")).toBe("");
+    expect(isReadableText("José 山田太郎 김민준 محمد")).toBe(true);
+    expect(isReadableText("<script>")).toBe(false);
+    expect(safeReadableText("Valid Company 3M")).toBe("Valid Company 3M");
+    expect(safeReadableText("{bad}")).toBe("");
   });
   it("removes malicious values from config", () => {
     const value = sanitizeConfig({

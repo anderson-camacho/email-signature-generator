@@ -4,12 +4,16 @@ import {
   saveSavedSignatures,
   saveDraft,
 } from "../storage/local-storage-adapter";
+import type { Locale } from "../i18n/dictionaries";
+import { savedSignaturesUiByLocale } from "../i18n/localized-ui";
 
 const page = document.querySelector<HTMLElement>("[data-saved-page]");
 if (!page) {
   // no-op outside saved signatures page
 } else {
   const locale = page.dataset.locale ?? "es";
+  const ui =
+    savedSignaturesUiByLocale[locale as Locale] ?? savedSignaturesUiByLocale.es;
   const grid = document.querySelector<HTMLElement>("#saved-page-grid")!;
   const empty = document.querySelector<HTMLElement>("#saved-empty")!;
 
@@ -39,7 +43,7 @@ if (!page) {
 
       const preview = document.createElement("div");
       preview.className = "saved-page-preview";
-      preview.innerHTML = `<div class="saved-page-preview-inner">${renderSignature(entry.config)}</div>`;
+      preview.innerHTML = `<div class="saved-page-preview-inner">${renderSignature(entry.config, locale)}</div>`;
 
       const body = document.createElement("div");
       body.className = "saved-page-body";
@@ -56,7 +60,7 @@ if (!page) {
 
       const open = document.createElement("button");
       open.className = "ghost-button";
-      open.textContent = "Open";
+      open.textContent = ui.open;
       open.addEventListener("click", () => {
         saveDraft(localStorage, entry.config);
         window.location.href = `/${locale}/`;
@@ -64,13 +68,13 @@ if (!page) {
 
       const duplicate = document.createElement("button");
       duplicate.className = "ghost-button";
-      duplicate.textContent = "Duplicate";
+      duplicate.textContent = ui.duplicate;
       duplicate.addEventListener("click", () => {
         signatures = [
           {
             ...entry,
             id: crypto.randomUUID(),
-            name: `${entry.name} copy`,
+            name: `${entry.name} ${ui.duplicateSuffix}`,
             updatedAt: new Date().toISOString(),
           },
           ...signatures,
@@ -81,7 +85,7 @@ if (!page) {
 
       const remove = document.createElement("button");
       remove.className = "ghost-button danger";
-      remove.textContent = "Delete";
+      remove.textContent = ui.remove;
       remove.addEventListener("click", () => {
         signatures = signatures.filter((item) => item.id !== entry.id);
         saveSavedSignatures(localStorage, signatures);

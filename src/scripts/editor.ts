@@ -18,13 +18,67 @@ import {
   saveSavedSignatures,
   type SavedSignatureRecord,
 } from "../storage/local-storage-adapter";
+import {
+  isEmail,
+  isReadableText,
+  normalizePhone,
+  safeHttpsUrl,
+} from "../core/validators";
 
 const editor = document.querySelector<HTMLElement>("[data-editor]")!;
+const locale = editor.dataset.locale ?? "en";
 const messages = {
   copied: editor.dataset.copied!,
   invalid: editor.dataset.invalid!,
   cleared: editor.dataset.cleared!,
 };
+const socialMessages = {
+  empty:
+    editor.dataset.socialEmpty ??
+    "No social buttons added. Your signature will not show this section.",
+  platform: editor.dataset.socialPlatformLabel ?? "Platform",
+  url: editor.dataset.socialUrlLabel ?? "Public HTTPS URL",
+  icon: editor.dataset.socialIconLabel ?? "Icon color",
+  original: editor.dataset.socialOriginalLabel ?? "Original platform color",
+  primary: editor.dataset.socialPrimaryLabel ?? "Selected primary color",
+  remove: editor.dataset.socialRemoveLabel ?? "Remove",
+};
+const exportMessages = {
+  title: editor.dataset.exportTitle ?? "Your email signature",
+  copy:
+    editor.dataset.exportCopy ??
+    "Copy the signature below and paste it into your email client's signature settings.",
+};
+const localImageMessages = {
+  noFile: editor.dataset.localImageNoFile ?? "Choose an image to adjust.",
+  ready:
+    editor.dataset.localImageReady ??
+    "Image ready and saved with this signature.",
+  invalid: editor.dataset.localImageInvalid ?? "Use JPG, PNG, WebP, or GIF.",
+};
+const validationMessages = {
+  email:
+    editor.dataset.validationEmail ??
+    "Enter a valid email address, for example name@example.com.",
+  phone:
+    editor.dataset.validationPhone ??
+    "Use an international phone number with 7 to 15 digits.",
+  website:
+    editor.dataset.validationWebsite ??
+    "Use a valid public HTTPS URL, for example https://example.com.",
+  text:
+    editor.dataset.validationText ??
+    "Use readable text only. Letters from any language, numbers, spaces, and normal punctuation are allowed.",
+};
+const localizedDefaults = (() => {
+  try {
+    return JSON.parse(
+      editor.dataset.defaultConfig ?? "{}",
+    ) as Partial<SignatureConfig>;
+  } catch {
+    return {};
+  }
+})();
 const form = document.querySelector<HTMLFormElement>("#signature-form")!;
 const preview = document.querySelector<HTMLElement>("#preview")!;
 const status = document.querySelector<HTMLElement>("#status")!;
@@ -40,7 +94,9 @@ const previewModeButtons = document.querySelectorAll<HTMLButtonElement>(
   "[data-preview-mode]",
 );
 const previewStage = document.querySelector<HTMLElement>("#preview-stage")!;
-const editorLayout = document.querySelector<HTMLElement>("[data-editor-layout]");
+const editorLayout = document.querySelector<HTMLElement>(
+  "[data-editor-layout]",
+);
 const drawerBackdrop = document.querySelector<HTMLElement>(
   "[data-drawer-backdrop]",
 );
@@ -63,16 +119,57 @@ const fieldWrappers = document.querySelectorAll<HTMLElement>(
 const templateFieldSummary = document.querySelector<HTMLElement>(
   "#template-field-summary",
 );
+const localImageInput =
+  document.querySelector<HTMLInputElement>("#local-image")!;
+const localImageWarning =
+  document.querySelector<HTMLElement>("#local-warning")!;
+const localImageModal =
+  document.querySelector<HTMLElement>("#local-image-modal")!;
+const localImageCanvas = document.querySelector<HTMLCanvasElement>(
+  "#local-image-canvas",
+)!;
+const localImageContext = localImageCanvas.getContext("2d")!;
+const localImageTarget = document.querySelector<HTMLSelectElement>(
+  "#local-image-target",
+)!;
+const localImageMode =
+  document.querySelector<HTMLSelectElement>("#local-image-mode")!;
+const localImageFormat = document.querySelector<HTMLSelectElement>(
+  "#local-image-format",
+)!;
+const localImageZoom =
+  document.querySelector<HTMLInputElement>("#local-image-zoom")!;
+const localImageX = document.querySelector<HTMLInputElement>("#local-image-x")!;
+const localImageY = document.querySelector<HTMLInputElement>("#local-image-y")!;
+const openLocalImageToolsButton = document.querySelector<HTMLButtonElement>(
+  "#open-local-image-tools",
+)!;
+const applyLocalImageButton =
+  document.querySelector<HTMLButtonElement>("#apply-local-image")!;
+const removeLocalImageButton = document.querySelector<HTMLButtonElement>(
+  "#remove-local-image",
+)!;
 const control = (name: string) =>
   form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
+const dataImagePattern = /^data:image\/(png|jpe?g|webp|gif);base64,/i;
+const isDataImageUrl = (value: string) => dataImagePattern.test(value);
+type ValidationKind = "email" | "phone" | "website" | "text";
+
+const freshConfig = (): SignatureConfig => ({
+  ...structuredClone(defaultConfig),
+  ...localizedDefaults,
+  socials: [],
+});
 
 type DrawerName = keyof typeof drawerPanels;
 
 let config: SignatureConfig = (() => {
+  const base = freshConfig();
   try {
-    return loadDraft(localStorage) ?? structuredClone(defaultConfig);
+    const draft = loadDraft(localStorage);
+    return draft ? { ...base, ...draft, socials: draft.socials ?? [] } : base;
   } catch {
-    return structuredClone(defaultConfig);
+    return base;
   }
 })();
 let timer: ReturnType<typeof setTimeout>;
@@ -89,7 +186,24 @@ function populate() {
   for (const [key, value] of Object.entries(config)) {
     if (key !== "socials") {
       const input = control(key);
-      if (input) input.value = String(value);
+      if (input) {
+        if (
+          (key === "logoUrl" || key === "photoUrl") &&
+          isDataImageUrl(String(value))
+        ) {
+          input.value = "";
+          if (input instanceof HTMLInputElement) {
+            input.placeholder = localImageMessages.ready;
+          }
+        } else {
+          input.value = String(value);
+        }
+        if (input instanceof HTMLInputElement && input.dataset.exampleValue) {
+          input.dataset.exampleActive = String(
+            input.value === input.dataset.exampleValue,
+          );
+        }
+      }
     }
   }
   renderSocialEditor();
@@ -97,24 +211,37 @@ function populate() {
 
 function read() {
   const data = Object.fromEntries(new FormData(form));
-  config = { ...config, ...data } as SignatureConfig;
+  const nextConfig = { ...config, ...data } as SignatureConfig;
+  (["logoUrl", "photoUrl"] as const).forEach((key) => {
+    const value = String(data[key] ?? "").trim();
+    if (!value && isDataImageUrl(config[key])) {
+      nextConfig[key] = config[key];
+    }
+  });
+  config = nextConfig;
 }
 
 const render = () => {
-  preview.innerHTML = renderSignature(config);
+  preview.innerHTML = renderSignature(config, locale);
   renderTemplatePreviews();
   updateFieldSupportState();
+  validateFormFields();
+  updateLocalImageRemoveState();
 };
 
 function renderTemplatePreviews() {
   templatePreviews.forEach((node) => {
-    const template = node.dataset
-      .templatePreview as SignatureConfig["template"] | undefined;
+    const template = node.dataset.templatePreview as
+      | SignatureConfig["template"]
+      | undefined;
     if (!template) return;
-    node.innerHTML = renderSignature({
-      ...config,
-      template,
-    });
+    node.innerHTML = renderSignature(
+      {
+        ...config,
+        template,
+      },
+      locale,
+    );
   });
 }
 
@@ -161,9 +288,49 @@ function updateFieldSupportState() {
   }
 
   templateFieldSummary.textContent = `${
-    editor.dataset.templateFieldsHiddenPrefix ??
-    "This template does not show:"
+    editor.dataset.templateFieldsHiddenPrefix ?? "This template does not show:"
   } ${hiddenLabels.join(", ")}.`;
+}
+
+function validationMessageFor(input: HTMLInputElement) {
+  const value = input.value.trim();
+  const kind = input.dataset.validationKind as ValidationKind | undefined;
+  if (!value || input.disabled || !kind) return "";
+
+  if (kind === "email") {
+    return isEmail(value) ? "" : validationMessages.email;
+  }
+
+  if (kind === "phone") {
+    return normalizePhone(value) ? "" : validationMessages.phone;
+  }
+
+  if (kind === "website") {
+    return safeHttpsUrl(value) ? "" : validationMessages.website;
+  }
+
+  return isReadableText(value) ? "" : validationMessages.text;
+}
+
+function validateField(input: HTMLInputElement) {
+  const message = validationMessageFor(input);
+  const wrapper = input.closest<HTMLElement>("[data-field-wrapper]");
+  const error = wrapper?.querySelector<HTMLElement>("[data-field-error]");
+
+  input.setCustomValidity(message);
+  input.setAttribute("aria-invalid", String(Boolean(message)));
+  wrapper?.classList.toggle("has-field-error", Boolean(message));
+
+  if (error) {
+    error.textContent = message;
+    error.hidden = !message;
+  }
+}
+
+function validateFormFields() {
+  form
+    .querySelectorAll<HTMLInputElement>("[data-validation-kind]")
+    .forEach(validateField);
 }
 
 const download = (content: string, name: string, type: string) => {
@@ -236,8 +403,7 @@ function renderSocialEditor() {
   if (!config.socials.length) {
     const empty = document.createElement("p");
     empty.className = "social-empty";
-    empty.textContent =
-      "No social buttons added. Your signature will not show this section.";
+    empty.textContent = socialMessages.empty;
     socialList.append(empty);
   }
 
@@ -254,7 +420,7 @@ function renderSocialEditor() {
 
     const platform = socialControl(
       "select",
-      "Platform",
+      socialMessages.platform,
       social.platform,
       (value) => updateSocial(social.id, { platform: value as SocialPlatform }),
       "social-field social-field-platform",
@@ -270,7 +436,7 @@ function renderSocialEditor() {
 
     const url = socialControl(
       "input",
-      "Public HTTPS URL",
+      socialMessages.url,
       social.url,
       (value) => updateSocial(social.id, { url: value }),
       "social-field social-field-url",
@@ -278,7 +444,7 @@ function renderSocialEditor() {
 
     const style = socialControl(
       "select",
-      "Icon color",
+      socialMessages.icon,
       social.iconStyle,
       (value) =>
         updateSocial(social.id, {
@@ -289,8 +455,8 @@ function renderSocialEditor() {
 
     (
       [
-        ["original", "Original platform color"],
-        ["primary", "Selected primary color"],
+        ["original", socialMessages.original],
+        ["primary", socialMessages.primary],
       ] as const
     ).forEach(([value, label]) => {
       const option = document.createElement("option");
@@ -303,7 +469,7 @@ function renderSocialEditor() {
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "remove-social";
-    remove.textContent = "Remove";
+    remove.textContent = socialMessages.remove;
     remove.addEventListener("click", () => {
       config.socials = config.socials.filter((item) => item.id !== social.id);
       renderSocialEditor();
@@ -370,11 +536,153 @@ function closeDrawer() {
   setDrawer(null);
 }
 
+let sourceLocalImage: HTMLImageElement | null = null;
+let localImageFileUrl: string | null = null;
+let localImageUploadTarget: "photoUrl" | "logoUrl" = "photoUrl";
+
+function supportsLocalImage(file: File) {
+  const supportedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  const supportedExtensions = /\.(jpe?g|png|webp|gif)$/i;
+  return (
+    supportedTypes.includes(file.type) || supportedExtensions.test(file.name)
+  );
+}
+
+function setLocalImageModal(open: boolean) {
+  localImageModal.hidden = !open;
+  document.body.classList.toggle("drawer-lock", open || activeDrawer !== null);
+}
+
+function resetLocalImageControls() {
+  localImageMode.value = "cover";
+  localImageFormat.value = "image/webp";
+  localImageZoom.value = "1";
+  localImageX.value = "0";
+  localImageY.value = "0";
+}
+
+function drawLocalImagePreview() {
+  if (!sourceLocalImage) return;
+
+  const size = localImageCanvas.width;
+  const mode = localImageMode.value;
+  const zoom = Number(localImageZoom.value);
+  const xOffset = Number(localImageX.value) / 100;
+  const yOffset = Number(localImageY.value) / 100;
+  const scaleBase =
+    mode === "contain"
+      ? Math.min(
+          size / sourceLocalImage.naturalWidth,
+          size / sourceLocalImage.naturalHeight,
+        )
+      : Math.max(
+          size / sourceLocalImage.naturalWidth,
+          size / sourceLocalImage.naturalHeight,
+        );
+  const scale = scaleBase * zoom;
+  const width = sourceLocalImage.naturalWidth * scale;
+  const height = sourceLocalImage.naturalHeight * scale;
+  const maxX = Math.max(0, (width - size) / 2);
+  const maxY = Math.max(0, (height - size) / 2);
+  const x = (size - width) / 2 + maxX * xOffset;
+  const y = (size - height) / 2 + maxY * yOffset;
+
+  localImageContext.clearRect(0, 0, size, size);
+  localImageContext.fillStyle = "#ffffff";
+  localImageContext.fillRect(0, 0, size, size);
+  localImageContext.drawImage(sourceLocalImage, x, y, width, height);
+}
+
+function updateLocalImageRemoveState() {
+  removeLocalImageButton.disabled = !(
+    isDataImageUrl(config.photoUrl) || isDataImageUrl(config.logoUrl)
+  );
+}
+
+async function openLocalImageEditor(file: File) {
+  if (!supportsLocalImage(file)) {
+    status.textContent = localImageMessages.invalid;
+    localImageInput.value = "";
+    return;
+  }
+
+  if (localImageFileUrl) URL.revokeObjectURL(localImageFileUrl);
+  localImageFileUrl = URL.createObjectURL(file);
+  sourceLocalImage = new Image();
+  sourceLocalImage.src = localImageFileUrl;
+  await sourceLocalImage.decode();
+  localImageTarget.value = localImageUploadTarget;
+  resetLocalImageControls();
+  drawLocalImagePreview();
+  localImageWarning.hidden = false;
+  setLocalImageModal(true);
+}
+
+function applyLocalImage() {
+  if (!sourceLocalImage) {
+    status.textContent = localImageMessages.noFile;
+    return;
+  }
+
+  drawLocalImagePreview();
+  const format = localImageFormat.value;
+  const dataUrl = localImageCanvas.toDataURL(
+    format,
+    format === "image/png" ? undefined : 0.82,
+  );
+  localImageUploadTarget = localImageTarget.value as "photoUrl" | "logoUrl";
+  config = {
+    ...config,
+    [localImageUploadTarget]: dataUrl,
+  };
+  populate();
+  render();
+  scheduleSave();
+  localImageWarning.hidden = true;
+  status.textContent = localImageMessages.ready;
+  setLocalImageModal(false);
+}
+
+function removeLocalImage() {
+  localImageInput.value = "";
+  if (isDataImageUrl(config.photoUrl)) config.photoUrl = "";
+  if (isDataImageUrl(config.logoUrl)) config.logoUrl = "";
+  localImageWarning.hidden = true;
+  populate();
+  render();
+  scheduleSave();
+}
+
 populate();
 render();
 setDrawer(null);
 
 form.addEventListener("input", () => {
+  const activeField = document.activeElement;
+  if (
+    activeField instanceof HTMLInputElement &&
+    activeField.dataset.exampleValue &&
+    activeField.dataset.exampleActive !== "false"
+  ) {
+    activeField.dataset.exampleActive = "false";
+  }
+  read();
+  render();
+  scheduleSave();
+});
+
+form.addEventListener("focusin", (event) => {
+  const target = event.target;
+  if (
+    !(target instanceof HTMLInputElement) ||
+    !target.dataset.exampleValue ||
+    target.disabled ||
+    target.dataset.exampleActive !== "true"
+  ) {
+    return;
+  }
+  target.value = "";
+  target.dataset.exampleActive = "false";
   read();
   render();
   scheduleSave();
@@ -392,7 +700,7 @@ document.querySelector<HTMLButtonElement>("#add-social")!.onclick = () => {
 };
 
 document.querySelector<HTMLButtonElement>("#copy")!.onclick = async () => {
-  const html = renderSignature(config);
+  const html = renderSignature(config, locale);
   try {
     await navigator.clipboard.write([
       new ClipboardItem({
@@ -415,7 +723,7 @@ document.querySelector<HTMLButtonElement>("#copy")!.onclick = async () => {
 
 document.querySelector<HTMLButtonElement>("#download")!.onclick = () =>
   download(
-    `<!doctype html><meta charset="utf-8"><h1>Your email signature</h1><p>Copy the signature below and paste it into your email client's signature settings.</p>${renderSignature(config)}`,
+    `<!doctype html><meta charset="utf-8"><h1>${exportMessages.title}</h1><p>${exportMessages.copy}</p>${renderSignature(config, locale)}`,
     "email-signature.html",
     "text/html",
   );
@@ -448,7 +756,7 @@ document.querySelector<HTMLButtonElement>("#clear")!.onclick = () => {
   } catch {
     /* unavailable storage is non-fatal */
   }
-  config = structuredClone(defaultConfig);
+  config = freshConfig();
   populate();
   render();
   status.textContent = messages.cleared;
@@ -472,19 +780,45 @@ saveLibraryButton.onclick = () => {
     editor.dataset.savedToLibrary ?? "Signature saved in this browser.";
 };
 
-document.querySelector<HTMLInputElement>("#local-image")!.onchange = (
-  event,
-) => {
+localImageInput.addEventListener("change", (event) => {
   const file = (event.currentTarget as HTMLInputElement).files?.[0];
-  document.querySelector<HTMLElement>("#local-warning")!.hidden = !file;
-  if (file) {
-    const image = document.createElement("img");
-    image.src = URL.createObjectURL(file);
-    image.alt = "Local preview";
-    image.width = 72;
-    preview.prepend(image);
+  if (!file) {
+    localImageWarning.hidden = true;
+    return;
   }
-};
+  void openLocalImageEditor(file).catch(() => {
+    status.textContent = localImageMessages.invalid;
+  });
+});
+
+openLocalImageToolsButton.addEventListener("click", () => {
+  const file = localImageInput.files?.[0];
+  if (!file) {
+    status.textContent = localImageMessages.noFile;
+    return;
+  }
+  void openLocalImageEditor(file).catch(() => {
+    status.textContent = localImageMessages.invalid;
+  });
+});
+
+applyLocalImageButton.addEventListener("click", applyLocalImage);
+removeLocalImageButton.addEventListener("click", removeLocalImage);
+document
+  .querySelectorAll<HTMLElement>("[data-local-image-cancel]")
+  .forEach((button) => {
+    button.addEventListener("click", () => setLocalImageModal(false));
+  });
+[
+  localImageTarget,
+  localImageMode,
+  localImageFormat,
+  localImageZoom,
+  localImageX,
+  localImageY,
+].forEach((element) => {
+  element.addEventListener("input", drawLocalImagePreview);
+});
 
 drawerToggles.forEach((button) => {
   button.addEventListener("click", () => {
@@ -501,6 +835,10 @@ drawerCloseButtons.forEach((button) => {
 drawerBackdrop?.addEventListener("click", closeDrawer);
 
 window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !localImageModal.hidden) {
+    setLocalImageModal(false);
+    return;
+  }
   if (event.key === "Escape") closeDrawer();
 });
 

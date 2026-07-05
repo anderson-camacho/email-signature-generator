@@ -4,7 +4,14 @@ import type {
   SocialLink,
   SocialPlatform,
 } from "./signature-types";
-import { isEmail, normalizePhone, safeColor, safeHttpsUrl } from "./validators";
+import {
+  isEmail,
+  normalizePhone,
+  safeColor,
+  safeHttpsUrl,
+  safeImageUrl,
+  safeReadableText,
+} from "./validators";
 
 const supportedSocialPlatforms: SocialPlatform[] = [
   "linkedin",
@@ -34,7 +41,7 @@ export const escapeHtml = (value: string) =>
   );
 
 export function sanitizeConfig(config: SignatureConfig): SignatureConfig {
-  const text = (value: string) => value.slice(0, 500);
+  const text = (value: string) => safeReadableText(value, 500);
   const socials = Array.isArray(config.socials)
     ? config.socials
         .filter(
@@ -44,7 +51,7 @@ export function sanitizeConfig(config: SignatureConfig): SignatureConfig {
         )
         .slice(0, 24)
         .map((social) => ({
-          id: text(String(social.id || crypto.randomUUID())),
+          id: String(social.id || crypto.randomUUID()).slice(0, 500),
           platform: social.platform,
           url: safeHttpsUrl(String(social.url || "")),
           iconStyle:
@@ -66,8 +73,8 @@ export function sanitizeConfig(config: SignatureConfig): SignatureConfig {
     email: isEmail(config.email) ? config.email.trim() : "",
     phone: normalizePhone(config.phone),
     website: safeHttpsUrl(config.website),
-    logoUrl: safeHttpsUrl(config.logoUrl),
-    photoUrl: safeHttpsUrl(config.photoUrl),
+    logoUrl: safeImageUrl(config.logoUrl),
+    photoUrl: safeImageUrl(config.photoUrl),
     primaryColor: safeColor(config.primaryColor),
     secondaryColor: safeColor(config.secondaryColor, "#075d78"),
     socials,

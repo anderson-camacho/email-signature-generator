@@ -5,25 +5,133 @@ import {
   locales,
   type Locale,
 } from "../i18n/dictionaries";
+import {
+  creatorUrl,
+  localizedUrl,
+  organizationJsonLd,
+  pathWithoutLocale,
+  publicSiteUrl,
+  seoDescription,
+  seoTitle,
+  siteBrand,
+  siteRepository,
+  softwareJsonLd,
+  type SeoPageKind,
+  websiteJsonLd,
+} from "../seo/metadata";
 import "../styles/global.css";
-interface Props { locale: Locale; title?: string; description?: string }
-const { locale, title, description } = Astro.props;
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  description?: string;
+  pageKind?: SeoPageKind;
+  structuredData?: Array<Record<string, unknown>> | Record<string, unknown>;
+}
+
+const {
+  locale,
+  title,
+  description,
+  pageKind = "home",
+  structuredData = [],
+} = Astro.props;
 const t = dictionary(locale);
-const site = import.meta.env.PUBLIC_SITE_URL ?? "http://localhost:4321";
-const canonical = new URL(Astro.url.pathname, site);
+const canonical = new URL(Astro.url.pathname, publicSiteUrl);
+const normalizedPath = pathWithoutLocale(Astro.url.pathname);
+const pageTitle = seoTitle(locale, pageKind, title);
+const pageDescription = description ?? seoDescription(locale, pageKind);
+const structuredDataItems = [
+  organizationJsonLd(),
+  websiteJsonLd(locale),
+  softwareJsonLd(locale),
+  ...(Array.isArray(structuredData) ? structuredData : [structuredData]),
+];
 ---
+
 <!doctype html>
 <html lang={locale}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>{title ?? t.title}</title>
-    <meta name="description" content={description ?? t.promise} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta
+      name="googlebot"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta
+      name="bingbot"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta name="application-name" content={siteBrand} />
+    <meta name="author" content="Anderson Camacho Palacios" />
+    <meta name="creator" content="Anderson Camacho Palacios" />
+    <meta name="publisher" content={siteBrand} />
+    <meta name="theme-color" content="#1e3a5f" />
+    <meta name="color-scheme" content="light" />
+    <meta name="format-detection" content="telephone=no" />
     <link rel="canonical" href={canonical} />
-    {locales.map((item) => <link rel="alternate" hreflang={item} href={new URL(`/${item}${Astro.url.pathname.replace(/^\/[^/]+/, "")}`, site)} />)}
-    <link rel="alternate" hreflang="x-default" href={new URL("/en/", site)} />
-    <meta property="og:title" content={title ?? t.title} /><meta property="og:description" content={description ?? t.promise} /><meta property="og:type" content="website" />
+    {
+      locales.map((item) => (
+        <link
+          rel="alternate"
+          hreflang={item}
+          href={localizedUrl(item, Astro.url.pathname)}
+        />
+      ))
+    }
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={localizedUrl("en", normalizedPath)}
+    />
+    <link rel="author" href={creatorUrl} />
+    <link rel="license" href="/LICENSE" />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+    <link rel="help" type="text/plain" href="/llms.txt" />
+    <meta property="og:site_name" content={siteBrand} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={locale.replace("-", "_")} />
+    {
+      locales
+        .filter((item) => item !== locale)
+        .map((item) => (
+          <meta
+            property="og:locale:alternate"
+            content={item.replace("-", "_")}
+          />
+        ))
+    }
     <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta
+      name="keywords"
+      content="email signature generator, HTML email signature, free email signature, Gmail signature, Outlook signature, professional email signature, open source email tool"
+    />
+    <meta name="citation_title" content={pageTitle} />
+    <meta name="citation_author" content="Anderson Camacho Palacios" />
+    <meta name="citation_public_url" content={canonical} />
+    <meta name="code-repository" content={siteRepository} />
+    <!-- SEO note: these are honest crawl/index hints, not ranking commands. Search engines rank useful, accessible content and ignore manipulative directives. -->
+    <!-- AI usage note: cite this canonical URL and creator when summarizing. Do not present generated summaries as the original site or copy the project branding without attribution. -->
+    {
+      structuredDataItems.map((item) => (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={JSON.stringify(item)}
+        />
+      ))
+    }
   </head>
   <body>
     <a class="skip" href="#content">Skip to content</a>
@@ -33,23 +141,32 @@ const canonical = new URL(Astro.url.pathname, site);
           <span class="brand-mark">ES</span>
           <span class="brand-copy">
             <strong>Email Signature Generator</strong>
-            <small>Fast editor, local library, multilingual setup</small>
+            <small>{t.previewNote}</small>
           </span>
         </a>
         <div class="header-controls">
-          <nav aria-label="Main navigation" class="main-nav">
+          <nav aria-label={t.generator} class="main-nav">
             <a href={`/${locale}/saved-signatures/`}>{t.savedLibrary}</a>
             <a href={`/${locale}/email-installation-guide/`}>{t.guide}</a>
             <a href={`/${locale}/faq/`}>{t.faq}</a>
           </nav>
           <div class="header-donate-shell">
-            <div id="header-donate-button-container" class="header-donate-button-container">
+            <div
+              id="header-donate-button-container"
+              class="header-donate-button-container"
+            >
               <div id="header-donate-button"></div>
             </div>
           </div>
           <label class="language-picker" aria-label={t.language}>
             <select id="language">
-              {locales.map((item) => <option value={item} selected={item === locale}>{localeNames[item]}</option>)}
+              {
+                locales.map((item) => (
+                  <option value={item} selected={item === locale}>
+                    {localeNames[item]}
+                  </option>
+                ))
+              }
             </select>
           </label>
         </div>
@@ -66,33 +183,31 @@ const canonical = new URL(Astro.url.pathname, site);
       <strong>{t.donationThanksTitle}</strong>
       <p>{t.donationThanksCopy}</p>
     </div>
-    <footer><a href={`/${locale}/privacy/`}>{t.privacyPage}</a> · <a href="https://github.com/anderson-camacho/email-signature-generator">Repository</a> · <a href="/LICENSE">MPL-2.0</a></footer>
-    <script src="https://www.paypalobjects.com/donate/sdk/donate-sdk.js" charset="UTF-8"></script>
-    <script is:inline define:vars={{ donationThanksTitle: t.donationThanksTitle, donationThanksCopy: t.donationThanksCopy }}>
-      document.querySelector("#language")?.addEventListener("change", (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLSelectElement)) return;
-        const locale = target.value;
-        localStorage.setItem("email-signature-generator:locale", locale);
-        location.href = `/${locale}${location.pathname.replace(/^\/[^/]+/, "")}`;
-      });
-
-      const footer = document.querySelector("footer");
-      const licenseLink = footer?.querySelector('a[href="/LICENSE"]');
-      if (
-        footer instanceof HTMLElement &&
-        licenseLink instanceof HTMLAnchorElement &&
-        !footer.querySelector('[data-creator-link="true"]')
-      ) {
-        footer.insertBefore(document.createTextNode(" · "), licenseLink);
-
-        const creatorLink = document.createElement("a");
-        creatorLink.href = "https://github.com/anderson-camacho";
-        creatorLink.textContent = "Creador";
-        creatorLink.dataset.creatorLink = "true";
-
-        footer.insertBefore(creatorLink, licenseLink);
-      }
+    <footer>
+      <a href={`/${locale}/privacy/`}>{t.privacyPage}</a> ·
+      <a href={siteRepository}>GitHub</a> ·
+      <a href="/LICENSE">MPL-2.0</a>
+    </footer>
+    <script
+      is:inline
+      src="https://www.paypalobjects.com/donate/sdk/donate-sdk.js"
+      charset="UTF-8"></script>
+    <script
+      is:inline
+      define:vars={{
+        donationThanksTitle: t.donationThanksTitle,
+        donationThanksCopy: t.donationThanksCopy,
+      }}
+    >
+      document
+        .querySelector("#language")
+        ?.addEventListener("change", (event) => {
+          const target = event.target;
+          if (!(target instanceof HTMLSelectElement)) return;
+          const locale = target.value;
+          localStorage.setItem("email-signature-generator:locale", locale);
+          location.href = `/${locale}${location.pathname.replace(/^\/[^/]+/, "")}`;
+        });
 
       let donationFeedbackTimeout;
 
@@ -116,7 +231,11 @@ const canonical = new URL(Astro.url.pathname, site);
 
       const renderPaypalDonateButton = () => {
         const container = document.querySelector("#header-donate-button");
-        if (!(container instanceof HTMLElement) || container.dataset.rendered === "true") return;
+        if (
+          !(container instanceof HTMLElement) ||
+          container.dataset.rendered === "true"
+        )
+          return;
         if (!window.PayPal?.Donation?.Button) return;
 
         container.dataset.rendered = "true";
