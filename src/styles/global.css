@@ -503,8 +503,10 @@ main {
   grid-template-rows: minmax(2.5em, auto) auto;
 }
 .appearance-label {
-  display: flex;
-  align-items: flex-end;
+  display: block;
+  min-height: 2.5em;
+  line-height: 1.2;
+  padding-top: 0.05rem;
 }
 .appearance-grid input[type="color"],
 .appearance-grid select {
