@@ -5,6 +5,10 @@ import {
   type SocialPlatform,
 } from "../core/signature-types";
 import { renderSignature } from "../templates/registry";
+import {
+  templateFieldSupport,
+  type ConfigurableFieldName,
+} from "../templates/catalog";
 import { exportConfig, importConfig } from "../export/json-config";
 import {
   loadDraft,
@@ -53,9 +57,17 @@ const drawerPanels = {
   ),
 };
 const compactEditorMedia = window.matchMedia("(max-width: 1100px)");
+const fieldWrappers = document.querySelectorAll<HTMLElement>(
+  "[data-field-wrapper]",
+);
+const templateFieldSummary = document.querySelector<HTMLElement>(
+  "#template-field-summary",
+);
 const control = (name: string) =>
   form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
+
 type DrawerName = keyof typeof drawerPanels;
+
 let config: SignatureConfig = (() => {
   try {
     return loadDraft(localStorage) ?? structuredClone(defaultConfig);
@@ -82,26 +94,76 @@ function populate() {
   }
   renderSocialEditor();
 }
+
 function read() {
   const data = Object.fromEntries(new FormData(form));
   config = { ...config, ...data } as SignatureConfig;
 }
+
 const render = () => {
   preview.innerHTML = renderSignature(config);
   renderTemplatePreviews();
+  updateFieldSupportState();
 };
 
 function renderTemplatePreviews() {
   templatePreviews.forEach((node) => {
     const template = node.dataset
-      .templatePreview as SignatureConfig["template"];
+      .templatePreview as SignatureConfig["template"] | undefined;
     if (!template) return;
-    const previewConfig = {
+    node.innerHTML = renderSignature({
       ...config,
       template,
-    };
-    node.innerHTML = renderSignature(previewConfig);
+    });
   });
+}
+
+function updateFieldSupportState() {
+  const supportedFields = new Set(
+    templateFieldSupport[config.template] ?? [],
+  ) as Set<ConfigurableFieldName>;
+  const hiddenLabels: string[] = [];
+
+  fieldWrappers.forEach((wrapper) => {
+    const fieldName = wrapper.dataset.fieldName as
+      | ConfigurableFieldName
+      | undefined;
+    const supportNote = wrapper.querySelector<HTMLElement>(
+      "[data-field-support-note]",
+    );
+    const fieldControl = wrapper.querySelector<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >("[data-field-control]");
+    if (!fieldName || !supportNote) return;
+
+    const isSupported = supportedFields.has(fieldName);
+    wrapper.classList.toggle("is-field-unused", !isSupported);
+    supportNote.hidden = isSupported;
+    supportNote.style.display = isSupported ? "none" : "inline-flex";
+    supportNote.setAttribute("aria-hidden", String(isSupported));
+    if (fieldControl) {
+      fieldControl.disabled = !isSupported;
+      fieldControl.setAttribute("aria-disabled", String(!isSupported));
+    }
+
+    if (!isSupported && wrapper.dataset.fieldLabel) {
+      hiddenLabels.push(wrapper.dataset.fieldLabel);
+    }
+  });
+
+  if (!templateFieldSummary) return;
+
+  if (!hiddenLabels.length) {
+    templateFieldSummary.textContent =
+      editor.dataset.templateFieldsAll ??
+      "This template shows all of these configurable fields.";
+    return;
+  }
+
+  templateFieldSummary.textContent = `${
+    editor.dataset.templateFieldsHiddenPrefix ??
+    "This template does not show:"
+  } ${hiddenLabels.join(", ")}.`;
 }
 
 const download = (content: string, name: string, type: string) => {
@@ -111,6 +173,7 @@ const download = (content: string, name: string, type: string) => {
   anchor.click();
   URL.revokeObjectURL(anchor.href);
 };
+
 const platforms: SocialPlatform[] = [
   "linkedin",
   "instagram",
@@ -124,6 +187,7 @@ const platforms: SocialPlatform[] = [
   "behance",
   "pinterest",
 ];
+
 const platformLabels: Record<SocialPlatform, string> = {
   linkedin: "LinkedIn",
   instagram: "Instagram",
@@ -143,8 +207,10 @@ function socialControl(
   label: string,
   value: string,
   onChange: (value: string) => void,
+  className?: string,
 ) {
   const wrapper = document.createElement("label");
+  if (className) wrapper.className = className;
   wrapper.textContent = label;
   const element = document.createElement(tag);
   if (element instanceof HTMLInputElement) {
@@ -174,19 +240,26 @@ function renderSocialEditor() {
       "No social buttons added. Your signature will not show this section.";
     socialList.append(empty);
   }
+
   config.socials.forEach((social, index) => {
     const card = document.createElement("div");
     card.className = "social-card";
+
     const badge = document.createElement("span");
     badge.className = "social-card-number";
     badge.textContent = String(index + 1);
+
+    const header = document.createElement("div");
+    header.className = "social-card-header";
 
     const platform = socialControl(
       "select",
       "Platform",
       social.platform,
       (value) => updateSocial(social.id, { platform: value as SocialPlatform }),
+      "social-field social-field-platform",
     );
+
     platforms.forEach((name) => {
       const option = document.createElement("option");
       option.value = name;
@@ -200,7 +273,9 @@ function renderSocialEditor() {
       "Public HTTPS URL",
       social.url,
       (value) => updateSocial(social.id, { url: value }),
+      "social-field social-field-url",
     );
+
     const style = socialControl(
       "select",
       "Icon color",
@@ -209,7 +284,9 @@ function renderSocialEditor() {
         updateSocial(social.id, {
           iconStyle: value === "primary" ? "primary" : "original",
         }),
+      "social-field social-field-style",
     );
+
     (
       [
         ["original", "Original platform color"],
@@ -233,7 +310,13 @@ function renderSocialEditor() {
       render();
       scheduleSave();
     });
-    card.append(badge, platform.wrapper, url.wrapper, style.wrapper, remove);
+
+    const grid = document.createElement("div");
+    grid.className = "social-card-grid";
+    grid.append(platform.wrapper, style.wrapper, url.wrapper);
+
+    header.append(badge, remove);
+    card.append(header, grid);
     socialList.append(card);
   });
 }
@@ -290,11 +373,13 @@ function closeDrawer() {
 populate();
 render();
 setDrawer(null);
+
 form.addEventListener("input", () => {
   read();
   render();
   scheduleSave();
 });
+
 document.querySelector<HTMLButtonElement>("#add-social")!.onclick = () => {
   config.socials.push({
     id: crypto.randomUUID(),
@@ -305,6 +390,7 @@ document.querySelector<HTMLButtonElement>("#add-social")!.onclick = () => {
   renderSocialEditor();
   render();
 };
+
 document.querySelector<HTMLButtonElement>("#copy")!.onclick = async () => {
   const html = renderSignature(config);
   try {
@@ -326,18 +412,21 @@ document.querySelector<HTMLButtonElement>("#copy")!.onclick = async () => {
     status.textContent = messages.invalid;
   }
 };
+
 document.querySelector<HTMLButtonElement>("#download")!.onclick = () =>
   download(
     `<!doctype html><meta charset="utf-8"><h1>Your email signature</h1><p>Copy the signature below and paste it into your email client's signature settings.</p>${renderSignature(config)}`,
     "email-signature.html",
     "text/html",
   );
+
 document.querySelector<HTMLButtonElement>("#export")!.onclick = () =>
   download(
     exportConfig(config),
     "email-signature-config.json",
     "application/json",
   );
+
 document.querySelector<HTMLInputElement>("#import")!.onchange = async (
   event,
 ) => {
@@ -352,6 +441,7 @@ document.querySelector<HTMLInputElement>("#import")!.onchange = async (
     status.textContent = messages.invalid;
   }
 };
+
 document.querySelector<HTMLButtonElement>("#clear")!.onclick = () => {
   try {
     clearDraft(localStorage);
@@ -363,6 +453,7 @@ document.querySelector<HTMLButtonElement>("#clear")!.onclick = () => {
   render();
   status.textContent = messages.cleared;
 };
+
 saveLibraryButton.onclick = () => {
   read();
   const name =
@@ -380,6 +471,7 @@ saveLibraryButton.onclick = () => {
   status.textContent =
     editor.dataset.savedToLibrary ?? "Signature saved in this browser.";
 };
+
 document.querySelector<HTMLInputElement>("#local-image")!.onchange = (
   event,
 ) => {
