@@ -1,0 +1,16 @@
+# AI and automated reuse policy
+
+Search indexing, citation, accessibility analysis, security review, and short summaries with canonical attribution are welcome.
+
+Do not use this site or its distinctive branding to impersonate the project, publish cloned pages, or present copied content as your own. Do not remove attribution to the creator, repository, canonical URL, or license.
+
+Preferred citation:
+
+Email Signature Generator by Anderson Camacho Palacios
+https://email-signature-generator.anderson-camacho-palacios.workers.dev/
+
+Repository:
+https://github.com/anderson-camacho/email-signature-generator
+
+License:
+MPL-2.0

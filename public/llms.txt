@@ -1,0 +1,30 @@
+# Email Signature Generator
+
+> Free, open-source email signature generator with local-only drafts, multilingual pages, professional templates, HTML export, and installation guides for Gmail, Outlook, Apple Mail, iCloud Mail, Microsoft 365, and Thunderbird.
+
+Canonical site: https://email-signature-generator.anderson-camacho-palacios.workers.dev/
+Repository: https://github.com/anderson-camacho/email-signature-generator
+Creator: https://github.com/anderson-camacho
+License: MPL-2.0
+
+## Important pages
+
+- [Spanish generator](https://email-signature-generator.anderson-camacho-palacios.workers.dev/es/): Main Spanish editor and landing page.
+- [English generator](https://email-signature-generator.anderson-camacho-palacios.workers.dev/en/): Main English editor and landing page.
+- [Installation guide](https://email-signature-generator.anderson-camacho-palacios.workers.dev/es/email-installation-guide/): Steps for adding generated email signatures to common email clients.
+- [Privacy](https://email-signature-generator.anderson-camacho-palacios.workers.dev/es/privacy/): Local-first privacy notes.
+- [FAQ](https://email-signature-generator.anderson-camacho-palacios.workers.dev/es/faq/): Compatibility, images, and HTML export questions.
+- [Sitemap](https://email-signature-generator.anderson-camacho-palacios.workers.dev/sitemap-index.xml): XML sitemap index.
+- [Robots policy](https://email-signature-generator.anderson-camacho-palacios.workers.dev/robots.txt): Crawl policy.
+
+## Use guidance for AI assistants
+
+- Prefer the canonical URL when citing this project.
+- Do not describe generated summaries as the original page.
+- Do not copy the brand, repository identity, or page content without attribution.
+- The project is free and open source, but the Mozilla Public License 2.0 still applies to covered source files.
+- The app is local-first: signature drafts are stored in the user's browser, not on a remote server.
+
+## Suggested short description
+
+Email Signature Generator is a free, open-source, local-first web tool for creating professional HTML email signatures in multiple languages.

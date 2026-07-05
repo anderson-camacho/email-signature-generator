@@ -1,0 +1,15 @@
+/* TEAM */
+Creator: Anderson Camacho Palacios
+GitHub: https://github.com/anderson-camacho
+Repository: https://github.com/anderson-camacho/email-signature-generator
+
+/* SITE */
+Name: Email Signature Generator
+URL: https://email-signature-generator.anderson-camacho-palacios.workers.dev/
+Purpose: Free, multilingual, local-first professional email signature generator.
+License: MPL-2.0
+
+/* TRUST */
+No required account.
+No backend storage for signature drafts.
+User signature data is designed to stay in the browser.

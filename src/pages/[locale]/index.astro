@@ -9,4 +9,29 @@ export function getStaticPaths() {
 const { locale } = Astro.props as { locale: Locale };
 const t = dictionary(locale);
 ---
-<Layout {locale}><section class="hero hero-compact"><h1>{t.title}</h1><p>{t.promise}</p><p class="notice">{t.privacy}</p></section><Editor {locale} /><section class="content-card"><h2>{t.savedFlowTitle}</h2><p>{t.savedFlowCopy}</p></section></Layout>
+
+<Layout {locale} pageKind="home">
+  <section class="hero hero-compact">
+    <h1>{t.title}</h1>
+    <p>{t.promise}</p>
+    <p class="notice">{t.privacy}</p>
+  </section>
+
+  <section class="content-card seo-intro" aria-labelledby="seo-benefits">
+    <h2 id="seo-benefits">{t.mainFlowTitle}</h2>
+    <p>{t.about}</p>
+    <ul class="seo-list">
+      <li>{t.directStart}</li>
+      <li>{t.mainFlowCopy}</li>
+      <li>{t.savedFlowCopy}</li>
+      <li>{t.privacy}</li>
+    </ul>
+  </section>
+
+  <Editor {locale} />
+
+  <section class="content-card" id="saved-list">
+    <h2>{t.savedFlowTitle}</h2>
+    <p>{t.savedFlowCopy}</p>
+  </section>
+</Layout>

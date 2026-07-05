@@ -2,21 +2,18 @@
 import Layout from "../../components/Layout.astro";
 import Editor from "../../components/Editor.astro";
 import { locales, type Locale } from "../../i18n/dictionaries";
+import { breadcrumbJsonLd } from "../../seo/metadata";
 export function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale }, props: { locale } }));
 }
 
 const { locale } = Astro.props as { locale: Locale };
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "Email Signature Generator",
-  applicationCategory: "BusinessApplication",
-  operatingSystem: "Web",
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-};
+const breadcrumbs = breadcrumbJsonLd(locale, [
+  { name: "Home", path: "/" },
+  { name: "Generator", path: "/generator/" },
+]);
 ---
-<Layout {locale}>
+
+<Layout {locale} pageKind="generator" structuredData={breadcrumbs}>
   <Editor {locale} />
-  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 </Layout>

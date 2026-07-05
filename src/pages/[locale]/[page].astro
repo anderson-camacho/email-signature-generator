@@ -1,6 +1,11 @@
 ---
 import Layout from "../../components/Layout.astro";
 import { dictionary, locales, type Locale } from "../../i18n/dictionaries";
+import {
+  breadcrumbJsonLd,
+  faqJsonLd,
+  type SeoPageKind,
+} from "../../seo/metadata";
 
 type StaticPageKey =
   | "privacy"
@@ -1101,11 +1106,49 @@ const installationGuide: InstallationGuide =
 
 const isInstallationGuide = page === "email-installation-guide";
 const basicPage = isInstallationGuide ? null : basicContents[page];
+const pageKindByStaticPage: Record<StaticPageKey, SeoPageKind> = {
+  privacy: "privacy",
+  "email-installation-guide": "guide",
+  faq: "faq",
+  "support-open-source": "support",
+  donations: "donations",
+};
+const pageTitle = isInstallationGuide
+  ? installationGuide.title
+  : basicPage!.title;
+const pageKind = pageKindByStaticPage[page];
+const structuredData = [
+  breadcrumbJsonLd(locale, [
+    { name: t.title, path: "/" },
+    { name: pageTitle, path: `/${page}/` },
+  ]),
+  ...(page === "faq"
+    ? [
+        faqJsonLd(
+          basicContents.faq.paragraphs.map((paragraph, index) => {
+            const [question, ...answerParts] = paragraph.split("?");
+            return {
+              question:
+                answerParts.length > 0
+                  ? `${question}?`
+                  : `${basicContents.faq.title} ${index + 1}`,
+              answer:
+                answerParts.length > 0
+                  ? answerParts.join("?").trim()
+                  : paragraph,
+            };
+          }),
+        ),
+      ]
+    : []),
+];
 ---
 
 <Layout
   {locale}
-  title={isInstallationGuide ? installationGuide.title : basicPage!.title}
+  title={pageTitle}
+  pageKind={pageKind}
+  structuredData={structuredData}
 >
   {
     isInstallationGuide ? (
