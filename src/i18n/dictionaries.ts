@@ -1,4 +1,4 @@
-export const locales = ["es", "en", "pt-BR", "fr", "de", "zh-CN"] as const;
+export const locales = ["es", "en", "pt-BR", "fr", "de", "zh-CN", "ru"] as const;
 export type Locale = (typeof locales)[number];
 
 export const localeNames: Record<Locale, string> = {
@@ -8,6 +8,7 @@ export const localeNames: Record<Locale, string> = {
   fr: "Français",
   de: "Deutsch",
   "zh-CN": "简体中文",
+  ru: "Русский",
 };
 
 const es = {
@@ -226,6 +227,58 @@ const zhCN: Dictionary = {
     "帮助这个工具继续保持免费、实用，并为社区提供更好的维护。",
 };
 
+const ru: Dictionary = {
+  ...en,
+  language: "Язык",
+  title: "Бесплатный генератор email-подписей",
+  promise:
+    "Создавайте профессиональную email-подпись бесплатно, без регистрации и прямо в браузере.",
+  privacy: "Ваши данные остаются на этом устройстве и не отправляются на серверы.",
+  generator: "Генератор",
+  guide: "Руководство по установке",
+  templates: "Шаблоны",
+  faq: "Частые вопросы",
+  privacyPage: "Конфиденциальность",
+  form: "Настройте подпись",
+  preview: "Предпросмотр",
+  copy: "Копировать подпись",
+  download: "Скачать HTML",
+  export: "Экспорт JSON",
+  import: "Импорт JSON",
+  clear: "Очистить локальные данные",
+  saved: "Черновик сохранен локально.",
+  localWarning:
+    "Локальное изображение используется только для предпросмотра. Перед копированием итоговой подписи используйте публичный HTTPS URL.",
+  copied: "Подпись скопирована. Вставьте ее в почтовый клиент и отправьте тестовое письмо.",
+  invalid: "Проверьте отмеченные поля или импортированный файл.",
+  cleared: "Локальные данные очищены.",
+  about:
+    "Подходит для разных почтовых клиентов. Отображение может отличаться, поэтому всегда отправляйте тестовое письмо.",
+  directStart:
+    "Сразу начинайте собирать подпись с живым предпросмотром и локальным сохранением черновика.",
+  previewNote:
+    "Сделано так, чтобы с первой минуты ощущаться профессионально, быстро и понятно.",
+  mainFlowTitle: "Основной сценарий",
+  mainFlowCopy:
+    "Открывайте сайт и сразу переходите к редактированию без промежуточной объясняющей страницы.",
+  savedFlowTitle: "Сохраненные подписи",
+  savedFlowCopy:
+    "Храните локальные версии в браузере, чтобы быстро открывать их снова и сравнивать.",
+  saveToLibrary: "Сохранить версию",
+  savedToLibrary: "Подпись сохранена в этом браузере.",
+  savedLibrary: "Сохраненные подписи",
+  savedLibraryHint: "Открыть локальные версии",
+  libraryEmpty: "В этом браузере пока нет сохраненных версий.",
+  savedPageCopy:
+    "Просматривайте сохраненные версии удобнее, открывайте, дублируйте или удаляйте лишнее.",
+  savedPageAction: "Открыть библиотеку",
+  savedBackAction: "Назад в редактор",
+  supportTitle: "Поддержать проект",
+  supportLink: "Посмотреть поддержку",
+  supportCopy:
+    "Помогите сохранить инструмент бесплатным, полезным и лучше поддерживаемым для сообщества.",
+};
+
 export const dictionaries: Record<Locale, Dictionary> = {
   es,
   en,
@@ -233,6 +286,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
   fr,
   de,
   "zh-CN": zhCN,
+  ru,
 };
 
 export const dictionary = (locale: string) =>
@@ -240,15 +294,17 @@ export const dictionary = (locale: string) =>
 
 const regionToLocale: Record<string, Locale> = {
   AR: "es",
-  AU: "en",
   AT: "de",
+  AU: "en",
   BE: "fr",
   BO: "es",
   BR: "pt-BR",
+  BY: "ru",
   CA: "en",
   CH: "de",
   CL: "es",
   CM: "fr",
+  CN: "zh-CN",
   CO: "es",
   CR: "es",
   CU: "es",
@@ -259,10 +315,16 @@ const regionToLocale: Record<string, Locale> = {
   FR: "fr",
   GB: "en",
   GT: "es",
+  HK: "zh-CN",
   HN: "es",
   IE: "en",
+  KG: "ru",
+  KZ: "ru",
   LU: "fr",
+  LV: "ru",
   MC: "fr",
+  MD: "ru",
+  MO: "zh-CN",
   MX: "es",
   NI: "es",
   NZ: "en",
@@ -270,16 +332,18 @@ const regionToLocale: Record<string, Locale> = {
   PE: "es",
   PR: "es",
   PY: "es",
-  SV: "es",
-  SN: "fr",
-  UY: "es",
-  US: "en",
-  VE: "es",
-  CN: "zh-CN",
-  HK: "zh-CN",
-  MO: "zh-CN",
+  RU: "ru",
   SG: "zh-CN",
+  SN: "fr",
+  SV: "es",
+  TJ: "ru",
+  TM: "ru",
   TW: "zh-CN",
+  UA: "ru",
+  US: "en",
+  UY: "es",
+  UZ: "ru",
+  VE: "es",
 };
 
 export const localeStorageKey = "email-signature-generator:locale";
@@ -293,6 +357,7 @@ export function normalizeLocaleCandidate(value: string | null | undefined): Loca
   if (lower === "en" || lower.startsWith("en-")) return "en";
   if (lower === "fr" || lower.startsWith("fr-")) return "fr";
   if (lower === "de" || lower.startsWith("de-")) return "de";
+  if (lower === "ru" || lower.startsWith("ru-")) return "ru";
   return locales.includes(value as Locale) ? (value as Locale) : null;
 }
 

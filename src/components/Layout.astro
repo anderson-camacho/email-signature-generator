@@ -43,8 +43,14 @@ const canonical = new URL(Astro.url.pathname, site);
             <a href={`/${locale}/faq/`}>{t.faq}</a>
             <a href={`/${locale}/saved-signatures/`}>{t.savedLibrary}</a>
           </nav>
-          <label class="language-picker">
-            <span>{t.language}</span>
+          <div class="header-donate-shell">
+            <span class="header-donate-copy">Donar</span>
+            <div
+              id="header-paypal-donate-button"
+              class="header-paypal-donate-button"
+            ></div>
+          </div>
+          <label class="language-picker" aria-label={t.language}>
             <select id="language">
               {locales.map((item) => <option value={item} selected={item === locale}>{localeNames[item]}</option>)}
             </select>
@@ -54,6 +60,7 @@ const canonical = new URL(Astro.url.pathname, site);
     </header>
     <main id="content"><slot /></main>
     <footer><a href={`/${locale}/privacy/`}>{t.privacyPage}</a> · <a href="https://github.com/anderson-camacho/email-signature-generator">Repository</a> · <a href="/LICENSE">MPL-2.0</a></footer>
+    <script src="https://www.paypalobjects.com/donate/sdk/donate-sdk.js" charset="UTF-8"></script>
     <script is:inline>
       document.querySelector("#language")?.addEventListener("change", (event) => {
         const target = event.target;
@@ -62,6 +69,34 @@ const canonical = new URL(Astro.url.pathname, site);
         localStorage.setItem("email-signature-generator:locale", locale);
         location.href = `/${locale}${location.pathname.replace(/^\/[^/]+/, "")}`;
       });
+
+      const renderHeaderDonateButton = () => {
+        const container = document.querySelector("#header-paypal-donate-button");
+        if (!(container instanceof HTMLElement) || container.dataset.rendered === "true") return;
+        if (!window.PayPal?.Donation?.Button) return;
+
+        container.dataset.rendered = "true";
+        window.PayPal.Donation.Button({
+          env: "production",
+          hosted_button_id: "9HLNFUZS5DJ72",
+          image: {
+            src: "https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif",
+            alt: "Donate with PayPal button",
+            title: "PayPal - The safer, easier way to pay online!",
+          },
+        }).render("#header-paypal-donate-button");
+      };
+
+      const waitForHeaderDonateButton = () => {
+        if (window.PayPal?.Donation?.Button) {
+          renderHeaderDonateButton();
+          return;
+        }
+
+        window.setTimeout(waitForHeaderDonateButton, 120);
+      };
+
+      waitForHeaderDonateButton();
     </script>
   </body>
 </html>
