@@ -19,6 +19,26 @@ const ui = isSpanish
       personalSection: "Datos personales y de empresa",
       mediaSection: "Foto y logotipo",
       localPreviewLabel: "Vista local de logo o foto",
+      localImageHelp:
+        "Permite JPG, PNG, WebP o GIF. Se optimiza en tu navegador y queda guardada en esta firma.",
+      localImageOpen: "Ajustar imagen",
+      localImageRemove: "Quitar carga",
+      localImageNoFile: "Selecciona una imagen para ajustar.",
+      localImageReady: "Imagen lista y guardada en esta firma.",
+      localImageInvalid: "Usa JPG, PNG, WebP o GIF.",
+      localImageModalTitle: "Ajustar imagen",
+      localImageTarget: "Usar como",
+      localImagePhoto: "Foto",
+      localImageLogo: "Logotipo",
+      localImageMode: "Encuadre",
+      localImageCover: "Recortar al centro",
+      localImageContain: "Mostrar completa",
+      localImageZoom: "Zoom",
+      localImageHorizontal: "Horizontal",
+      localImageVertical: "Vertical",
+      localImageFormat: "Formato",
+      localImageCancel: "Cancelar",
+      localImageApply: "Guardar imagen",
       colorsSection: "Colores y apariencia",
       primaryColor: "Color principal",
       secondaryColor: "Color secundario",
@@ -26,7 +46,8 @@ const ui = isSpanish
       sizeCompact: "compacto",
       sizeNormal: "normal",
       sizeWide: "amplio",
-      paletteHelp: "Paletas rapidas pensadas para confianza, claridad y lectura facil.",
+      paletteHelp:
+        "Paletas rapidas pensadas para confianza, claridad y lectura facil.",
       socialSection: "Botones de redes sociales",
       socialHelp:
         "Agrega tantos botones como necesites, incluso varios para la misma plataforma.",
@@ -87,6 +108,26 @@ const ui = isSpanish
       personalSection: "Personal and company data",
       mediaSection: "Photo and logo",
       localPreviewLabel: "Local logo or photo preview",
+      localImageHelp:
+        "Supports JPG, PNG, WebP, or GIF. It is optimized in your browser and saved with this signature.",
+      localImageOpen: "Adjust image",
+      localImageRemove: "Remove upload",
+      localImageNoFile: "Choose an image to adjust.",
+      localImageReady: "Image ready and saved with this signature.",
+      localImageInvalid: "Use JPG, PNG, WebP, or GIF.",
+      localImageModalTitle: "Adjust image",
+      localImageTarget: "Use as",
+      localImagePhoto: "Photo",
+      localImageLogo: "Logo",
+      localImageMode: "Framing",
+      localImageCover: "Center crop",
+      localImageContain: "Show full image",
+      localImageZoom: "Zoom",
+      localImageHorizontal: "Horizontal",
+      localImageVertical: "Vertical",
+      localImageFormat: "Format",
+      localImageCancel: "Cancel",
+      localImageApply: "Save image",
       colorsSection: "Colors and appearance",
       primaryColor: "Primary color",
       secondaryColor: "Secondary color",
@@ -94,8 +135,7 @@ const ui = isSpanish
       sizeCompact: "compact",
       sizeNormal: "normal",
       sizeWide: "wide",
-      paletteHelp:
-        "Quick palettes based on trust, clarity, and easy scanning.",
+      paletteHelp: "Quick palettes based on trust, clarity, and easy scanning.",
       socialSection: "Social media buttons",
       socialHelp:
         "Add as many buttons as needed, including multiple buttons for the same platform.",
@@ -287,16 +327,36 @@ const localizedTemplates = isSpanish
   : templateCatalog;
 
 const personalFields = [
-  { name: "fullName", label: ui.fields.fullName, example: ui.examples.fullName },
-  { name: "jobTitle", label: ui.fields.jobTitle, example: ui.examples.jobTitle },
+  {
+    name: "fullName",
+    label: ui.fields.fullName,
+    example: ui.examples.fullName,
+  },
+  {
+    name: "jobTitle",
+    label: ui.fields.jobTitle,
+    example: ui.examples.jobTitle,
+  },
   { name: "company", label: ui.fields.company, example: ui.examples.company },
-  { name: "department", label: ui.fields.department, example: ui.examples.department },
+  {
+    name: "department",
+    label: ui.fields.department,
+    example: ui.examples.department,
+  },
   { name: "email", label: ui.fields.email, example: ui.examples.email },
   { name: "phone", label: ui.fields.phone, example: ui.examples.phone },
   { name: "website", label: ui.fields.website, example: ui.examples.website },
   { name: "address", label: ui.fields.address, example: ui.examples.address },
-  { name: "pronouns", label: ui.fields.pronouns, example: ui.examples.pronouns },
-  { name: "legalText", label: ui.fields.legalText, example: ui.examples.legalText },
+  {
+    name: "pronouns",
+    label: ui.fields.pronouns,
+    example: ui.examples.pronouns,
+  },
+  {
+    name: "legalText",
+    label: ui.fields.legalText,
+    example: ui.examples.legalText,
+  },
 ] as const;
 
 const localizedDefaultConfig = {
@@ -335,6 +395,9 @@ const localizedDefaultConfig = {
   data-export-title={ui.exportTitle}
   data-export-copy={ui.exportCopy}
   data-default-config={JSON.stringify(localizedDefaultConfig)}
+  data-local-image-no-file={ui.localImageNoFile}
+  data-local-image-ready={ui.localImageReady}
+  data-local-image-invalid={ui.localImageInvalid}
 >
   <div class="workspace-top">
     <div>
@@ -343,7 +406,9 @@ const localizedDefaultConfig = {
       <p class="panel-copy">{t.directStart}</p>
     </div>
     <div class="workspace-meta">
-      <a class="workspace-action" href={`/${locale}/saved-signatures/`}>{t.savedPageAction}</a>
+      <a class="workspace-action" href={`/${locale}/saved-signatures/`}
+        >{t.savedPageAction}</a
+      >
       <span class="autosave">{t.saved}</span>
       <span class="workspace-tag">{ui.workspaceTag}</span>
     </div>
@@ -411,7 +476,11 @@ const localizedDefaultConfig = {
                 }
               </select>
             </label>
-            <p id="template-field-summary" class="template-support-summary" aria-live="polite">
+            <p
+              id="template-field-summary"
+              class="template-support-summary"
+              aria-live="polite"
+            >
               {t.templateFieldSummaryAll}
             </p>
           </div>
@@ -424,7 +493,8 @@ const localizedDefaultConfig = {
               personalFields.map((field) => (
                 <label
                   class:list={{
-                    wide: field.name === "legalText" || field.name === "address",
+                    wide:
+                      field.name === "legalText" || field.name === "address",
                   }}
                   data-field-wrapper
                   data-field-name={field.name}
@@ -500,8 +570,30 @@ const localizedDefaultConfig = {
             </label>
             <label>
               {ui.localPreviewLabel}
-              <input id="local-image" type="file" accept="image/*" />
+              <input
+                id="local-image"
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif"
+              />
             </label>
+            <p class="section-help">{ui.localImageHelp}</p>
+            <div class="local-image-actions">
+              <button
+                id="open-local-image-tools"
+                class="ghost-button"
+                type="button"
+              >
+                {ui.localImageOpen}
+              </button>
+              <button
+                id="remove-local-image"
+                class="ghost-button danger"
+                type="button"
+                disabled
+              >
+                {ui.localImageRemove}
+              </button>
+            </div>
             <p id="local-warning" class="warning" hidden>{t.localWarning}</p>
           </div>
         </details>
@@ -537,8 +629,8 @@ const localizedDefaultConfig = {
                       data-palette-secondary={palette.secondary}
                     >
                       <span class="palette-dots">
-                        <span style={`background:${palette.primary}`}></span>
-                        <span style={`background:${palette.secondary}`}></span>
+                        <span style={`background:${palette.primary}`} />
+                        <span style={`background:${palette.secondary}`} />
                       </span>
                       <span>
                         <strong>{palette.name}</strong>
@@ -557,7 +649,9 @@ const localizedDefaultConfig = {
           <div class="config-body">
             <p class="section-help">{ui.socialHelp}</p>
             <div id="social-list" class="social-list"></div>
-            <button id="add-social" class="add-social" type="button">{ui.addSocial}</button>
+            <button id="add-social" class="add-social" type="button"
+              >{ui.addSocial}</button
+            >
           </div>
         </details>
       </form>
@@ -571,7 +665,11 @@ const localizedDefaultConfig = {
           <p class="panel-copy">{t.previewNote}</p>
         </div>
         <div class="preview-switch">
-          <button class="view-toggle active" type="button" data-preview-mode="desktop">
+          <button
+            class="view-toggle active"
+            type="button"
+            data-preview-mode="desktop"
+          >
             {ui.previewDesktop}
           </button>
           <button class="view-toggle" type="button" data-preview-mode="mobile">
@@ -603,7 +701,11 @@ const localizedDefaultConfig = {
         <button id="download">{t.download}</button>
         <button id="export">{t.export}</button>
         <label class="button"
-          >{t.import}<input id="import" type="file" accept=".json,application/json" /></label
+          >{t.import}<input
+            id="import"
+            type="file"
+            accept=".json,application/json"
+          /></label
         >
         <button id="save-library" class="secondary">{t.saveToLibrary}</button>
         <button id="clear" class="secondary">{t.clear}</button>
@@ -635,9 +737,16 @@ const localizedDefaultConfig = {
       <div class="template-showcase">
         {
           localizedTemplates.map((template) => (
-            <button class="template-card" type="button" data-template={template.id}>
+            <button
+              class="template-card"
+              type="button"
+              data-template={template.id}
+            >
               <div class="template-thumb">
-                <div class="template-thumb-canvas" data-template-preview={template.id}></div>
+                <div
+                  class="template-thumb-canvas"
+                  data-template-preview={template.id}
+                />
               </div>
               <strong>{template.cardTitle}</strong>
               <span>{template.note}</span>
@@ -655,11 +764,15 @@ const localizedDefaultConfig = {
           <span class="eyebrow">{ui.libraryEyebrow}</span>
           <h3>{t.savedLibrary}</h3>
         </div>
-        <a class="library-link" href={`/${locale}/saved-signatures/`}>{t.savedLibraryHint}</a>
+        <a class="library-link" href={`/${locale}/saved-signatures/`}
+          >{t.savedLibraryHint}</a
+        >
       </div>
       <p class="support-copy">{t.savedPageCopy}</p>
       <div class="support-actions">
-        <a class="support-pill" href={`/${locale}/saved-signatures/`}>{t.savedPageAction}</a>
+        <a class="support-pill" href={`/${locale}/saved-signatures/`}
+          >{t.savedPageAction}</a
+        >
       </div>
     </div>
   </section>
@@ -671,16 +784,125 @@ const localizedDefaultConfig = {
           <span class="eyebrow">{ui.supportEyebrow}</span>
           <h3>{t.supportTitle}</h3>
         </div>
-        <a class="library-link" href={`/${locale}/support-open-source/`}>{t.supportLink}</a>
+        <a class="library-link" href={`/${locale}/support-open-source/`}
+          >{t.supportLink}</a
+        >
       </div>
       <p class="support-copy">{t.supportCopy}</p>
       <div class="support-actions support-actions-inline">
-        <a class="support-pill" href="https://github.com/sponsors" target="_blank" rel="noreferrer">GitHub Sponsors</a>
-        <a class="support-pill" href="https://opencollective.com/" target="_blank" rel="noreferrer">Open Collective</a>
-        <a class="support-pill tertiary" href={`/${locale}/donations/`}>Donaciones</a>
+        <a
+          class="support-pill"
+          href="https://github.com/sponsors"
+          target="_blank"
+          rel="noreferrer">GitHub Sponsors</a
+        >
+        <a
+          class="support-pill"
+          href="https://opencollective.com/"
+          target="_blank"
+          rel="noreferrer">Open Collective</a
+        >
+        <a class="support-pill tertiary" href={`/${locale}/donations/`}
+          >Donaciones</a
+        >
       </div>
     </div>
   </section>
+
+  <div
+    class="image-tools-modal"
+    id="local-image-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="local-image-modal-title"
+    hidden
+  >
+    <div class="image-tools-backdrop" data-local-image-cancel></div>
+    <section class="image-tools-panel">
+      <div class="image-tools-header">
+        <h3 id="local-image-modal-title">{ui.localImageModalTitle}</h3>
+        <button
+          class="drawer-close"
+          type="button"
+          data-local-image-cancel
+          aria-label={ui.localImageCancel}
+        >
+          <span class="drawer-close-glyph" aria-hidden="true">×</span>
+          <span class="sr-only">{ui.localImageCancel}</span>
+        </button>
+      </div>
+      <canvas
+        id="local-image-canvas"
+        class="image-tools-canvas"
+        width="384"
+        height="384"></canvas>
+      <div class="image-tools-controls">
+        <label>
+          {ui.localImageTarget}
+          <select id="local-image-target">
+            <option value="photoUrl">{ui.localImagePhoto}</option>
+            <option value="logoUrl">{ui.localImageLogo}</option>
+          </select>
+        </label>
+        <label>
+          {ui.localImageMode}
+          <select id="local-image-mode">
+            <option value="cover">{ui.localImageCover}</option>
+            <option value="contain">{ui.localImageContain}</option>
+          </select>
+        </label>
+        <label>
+          {ui.localImageFormat}
+          <select id="local-image-format">
+            <option value="image/webp">WebP</option>
+            <option value="image/jpeg">JPG</option>
+            <option value="image/png">PNG</option>
+          </select>
+        </label>
+        <label>
+          {ui.localImageZoom}
+          <input
+            id="local-image-zoom"
+            type="range"
+            min="1"
+            max="2"
+            step="0.01"
+            value="1"
+          />
+        </label>
+        <label>
+          {ui.localImageHorizontal}
+          <input
+            id="local-image-x"
+            type="range"
+            min="-100"
+            max="100"
+            step="1"
+            value="0"
+          />
+        </label>
+        <label>
+          {ui.localImageVertical}
+          <input
+            id="local-image-y"
+            type="range"
+            min="-100"
+            max="100"
+            step="1"
+            value="0"
+          />
+        </label>
+      </div>
+      <div class="image-tools-actions">
+        <button class="ghost-button" type="button" data-local-image-cancel>
+          {ui.localImageCancel}
+        </button>
+        <button id="apply-local-image" type="button"
+          >{ui.localImageApply}</button
+        >
+      </div>
+    </section>
+  </div>
 </section>
 <script>
   import "../scripts/editor";

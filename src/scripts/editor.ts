@@ -43,11 +43,18 @@ const exportMessages = {
     editor.dataset.exportCopy ??
     "Copy the signature below and paste it into your email client's signature settings.",
 };
+const localImageMessages = {
+  noFile: editor.dataset.localImageNoFile ?? "Choose an image to adjust.",
+  ready:
+    editor.dataset.localImageReady ??
+    "Image ready and saved with this signature.",
+  invalid: editor.dataset.localImageInvalid ?? "Use JPG, PNG, WebP, or GIF.",
+};
 const localizedDefaults = (() => {
   try {
-    return JSON.parse(editor.dataset.defaultConfig ?? "{}") as Partial<
-      SignatureConfig
-    >;
+    return JSON.parse(
+      editor.dataset.defaultConfig ?? "{}",
+    ) as Partial<SignatureConfig>;
   } catch {
     return {};
   }
@@ -67,7 +74,9 @@ const previewModeButtons = document.querySelectorAll<HTMLButtonElement>(
   "[data-preview-mode]",
 );
 const previewStage = document.querySelector<HTMLElement>("#preview-stage")!;
-const editorLayout = document.querySelector<HTMLElement>("[data-editor-layout]");
+const editorLayout = document.querySelector<HTMLElement>(
+  "[data-editor-layout]",
+);
 const drawerBackdrop = document.querySelector<HTMLElement>(
   "[data-drawer-backdrop]",
 );
@@ -90,8 +99,40 @@ const fieldWrappers = document.querySelectorAll<HTMLElement>(
 const templateFieldSummary = document.querySelector<HTMLElement>(
   "#template-field-summary",
 );
+const localImageInput =
+  document.querySelector<HTMLInputElement>("#local-image")!;
+const localImageWarning =
+  document.querySelector<HTMLElement>("#local-warning")!;
+const localImageModal =
+  document.querySelector<HTMLElement>("#local-image-modal")!;
+const localImageCanvas = document.querySelector<HTMLCanvasElement>(
+  "#local-image-canvas",
+)!;
+const localImageContext = localImageCanvas.getContext("2d")!;
+const localImageTarget = document.querySelector<HTMLSelectElement>(
+  "#local-image-target",
+)!;
+const localImageMode =
+  document.querySelector<HTMLSelectElement>("#local-image-mode")!;
+const localImageFormat = document.querySelector<HTMLSelectElement>(
+  "#local-image-format",
+)!;
+const localImageZoom =
+  document.querySelector<HTMLInputElement>("#local-image-zoom")!;
+const localImageX = document.querySelector<HTMLInputElement>("#local-image-x")!;
+const localImageY = document.querySelector<HTMLInputElement>("#local-image-y")!;
+const openLocalImageToolsButton = document.querySelector<HTMLButtonElement>(
+  "#open-local-image-tools",
+)!;
+const applyLocalImageButton =
+  document.querySelector<HTMLButtonElement>("#apply-local-image")!;
+const removeLocalImageButton = document.querySelector<HTMLButtonElement>(
+  "#remove-local-image",
+)!;
 const control = (name: string) =>
   form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
+const dataImagePattern = /^data:image\/(png|jpe?g|webp|gif);base64,/i;
+const isDataImageUrl = (value: string) => dataImagePattern.test(value);
 
 const freshConfig = (): SignatureConfig => ({
   ...structuredClone(defaultConfig),
@@ -125,7 +166,17 @@ function populate() {
     if (key !== "socials") {
       const input = control(key);
       if (input) {
-        input.value = String(value);
+        if (
+          (key === "logoUrl" || key === "photoUrl") &&
+          isDataImageUrl(String(value))
+        ) {
+          input.value = "";
+          if (input instanceof HTMLInputElement) {
+            input.placeholder = localImageMessages.ready;
+          }
+        } else {
+          input.value = String(value);
+        }
         if (input instanceof HTMLInputElement && input.dataset.exampleValue) {
           input.dataset.exampleActive = String(
             input.value === input.dataset.exampleValue,
@@ -139,19 +190,28 @@ function populate() {
 
 function read() {
   const data = Object.fromEntries(new FormData(form));
-  config = { ...config, ...data } as SignatureConfig;
+  const nextConfig = { ...config, ...data } as SignatureConfig;
+  (["logoUrl", "photoUrl"] as const).forEach((key) => {
+    const value = String(data[key] ?? "").trim();
+    if (!value && isDataImageUrl(config[key])) {
+      nextConfig[key] = config[key];
+    }
+  });
+  config = nextConfig;
 }
 
 const render = () => {
   preview.innerHTML = renderSignature(config, locale);
   renderTemplatePreviews();
   updateFieldSupportState();
+  updateLocalImageRemoveState();
 };
 
 function renderTemplatePreviews() {
   templatePreviews.forEach((node) => {
-    const template = node.dataset
-      .templatePreview as SignatureConfig["template"] | undefined;
+    const template = node.dataset.templatePreview as
+      | SignatureConfig["template"]
+      | undefined;
     if (!template) return;
     node.innerHTML = renderSignature(
       {
@@ -206,8 +266,7 @@ function updateFieldSupportState() {
   }
 
   templateFieldSummary.textContent = `${
-    editor.dataset.templateFieldsHiddenPrefix ??
-    "This template does not show:"
+    editor.dataset.templateFieldsHiddenPrefix ?? "This template does not show:"
   } ${hiddenLabels.join(", ")}.`;
 }
 
@@ -414,6 +473,123 @@ function closeDrawer() {
   setDrawer(null);
 }
 
+let sourceLocalImage: HTMLImageElement | null = null;
+let localImageFileUrl: string | null = null;
+let localImageUploadTarget: "photoUrl" | "logoUrl" = "photoUrl";
+
+function supportsLocalImage(file: File) {
+  const supportedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  const supportedExtensions = /\.(jpe?g|png|webp|gif)$/i;
+  return (
+    supportedTypes.includes(file.type) || supportedExtensions.test(file.name)
+  );
+}
+
+function setLocalImageModal(open: boolean) {
+  localImageModal.hidden = !open;
+  document.body.classList.toggle("drawer-lock", open || activeDrawer !== null);
+}
+
+function resetLocalImageControls() {
+  localImageMode.value = "cover";
+  localImageFormat.value = "image/webp";
+  localImageZoom.value = "1";
+  localImageX.value = "0";
+  localImageY.value = "0";
+}
+
+function drawLocalImagePreview() {
+  if (!sourceLocalImage) return;
+
+  const size = localImageCanvas.width;
+  const mode = localImageMode.value;
+  const zoom = Number(localImageZoom.value);
+  const xOffset = Number(localImageX.value) / 100;
+  const yOffset = Number(localImageY.value) / 100;
+  const scaleBase =
+    mode === "contain"
+      ? Math.min(
+          size / sourceLocalImage.naturalWidth,
+          size / sourceLocalImage.naturalHeight,
+        )
+      : Math.max(
+          size / sourceLocalImage.naturalWidth,
+          size / sourceLocalImage.naturalHeight,
+        );
+  const scale = scaleBase * zoom;
+  const width = sourceLocalImage.naturalWidth * scale;
+  const height = sourceLocalImage.naturalHeight * scale;
+  const maxX = Math.max(0, (width - size) / 2);
+  const maxY = Math.max(0, (height - size) / 2);
+  const x = (size - width) / 2 + maxX * xOffset;
+  const y = (size - height) / 2 + maxY * yOffset;
+
+  localImageContext.clearRect(0, 0, size, size);
+  localImageContext.fillStyle = "#ffffff";
+  localImageContext.fillRect(0, 0, size, size);
+  localImageContext.drawImage(sourceLocalImage, x, y, width, height);
+}
+
+function updateLocalImageRemoveState() {
+  removeLocalImageButton.disabled = !(
+    isDataImageUrl(config.photoUrl) || isDataImageUrl(config.logoUrl)
+  );
+}
+
+async function openLocalImageEditor(file: File) {
+  if (!supportsLocalImage(file)) {
+    status.textContent = localImageMessages.invalid;
+    localImageInput.value = "";
+    return;
+  }
+
+  if (localImageFileUrl) URL.revokeObjectURL(localImageFileUrl);
+  localImageFileUrl = URL.createObjectURL(file);
+  sourceLocalImage = new Image();
+  sourceLocalImage.src = localImageFileUrl;
+  await sourceLocalImage.decode();
+  localImageTarget.value = localImageUploadTarget;
+  resetLocalImageControls();
+  drawLocalImagePreview();
+  localImageWarning.hidden = false;
+  setLocalImageModal(true);
+}
+
+function applyLocalImage() {
+  if (!sourceLocalImage) {
+    status.textContent = localImageMessages.noFile;
+    return;
+  }
+
+  drawLocalImagePreview();
+  const format = localImageFormat.value;
+  const dataUrl = localImageCanvas.toDataURL(
+    format,
+    format === "image/png" ? undefined : 0.82,
+  );
+  localImageUploadTarget = localImageTarget.value as "photoUrl" | "logoUrl";
+  config = {
+    ...config,
+    [localImageUploadTarget]: dataUrl,
+  };
+  populate();
+  render();
+  scheduleSave();
+  localImageWarning.hidden = true;
+  status.textContent = localImageMessages.ready;
+  setLocalImageModal(false);
+}
+
+function removeLocalImage() {
+  localImageInput.value = "";
+  if (isDataImageUrl(config.photoUrl)) config.photoUrl = "";
+  if (isDataImageUrl(config.logoUrl)) config.logoUrl = "";
+  localImageWarning.hidden = true;
+  populate();
+  render();
+  scheduleSave();
+}
+
 populate();
 render();
 setDrawer(null);
@@ -541,19 +717,45 @@ saveLibraryButton.onclick = () => {
     editor.dataset.savedToLibrary ?? "Signature saved in this browser.";
 };
 
-document.querySelector<HTMLInputElement>("#local-image")!.onchange = (
-  event,
-) => {
+localImageInput.addEventListener("change", (event) => {
   const file = (event.currentTarget as HTMLInputElement).files?.[0];
-  document.querySelector<HTMLElement>("#local-warning")!.hidden = !file;
-  if (file) {
-    const image = document.createElement("img");
-    image.src = URL.createObjectURL(file);
-    image.alt = "Local preview";
-    image.width = 72;
-    preview.prepend(image);
+  if (!file) {
+    localImageWarning.hidden = true;
+    return;
   }
-};
+  void openLocalImageEditor(file).catch(() => {
+    status.textContent = localImageMessages.invalid;
+  });
+});
+
+openLocalImageToolsButton.addEventListener("click", () => {
+  const file = localImageInput.files?.[0];
+  if (!file) {
+    status.textContent = localImageMessages.noFile;
+    return;
+  }
+  void openLocalImageEditor(file).catch(() => {
+    status.textContent = localImageMessages.invalid;
+  });
+});
+
+applyLocalImageButton.addEventListener("click", applyLocalImage);
+removeLocalImageButton.addEventListener("click", removeLocalImage);
+document
+  .querySelectorAll<HTMLElement>("[data-local-image-cancel]")
+  .forEach((button) => {
+    button.addEventListener("click", () => setLocalImageModal(false));
+  });
+[
+  localImageTarget,
+  localImageMode,
+  localImageFormat,
+  localImageZoom,
+  localImageX,
+  localImageY,
+].forEach((element) => {
+  element.addEventListener("input", drawLocalImagePreview);
+});
 
 drawerToggles.forEach((button) => {
   button.addEventListener("click", () => {
@@ -570,6 +772,10 @@ drawerCloseButtons.forEach((button) => {
 drawerBackdrop?.addEventListener("click", closeDrawer);
 
 window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !localImageModal.hidden) {
+    setLocalImageModal(false);
+    return;
+  }
   if (event.key === "Escape") closeDrawer();
 });
 

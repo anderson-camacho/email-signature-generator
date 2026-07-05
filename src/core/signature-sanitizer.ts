@@ -4,7 +4,13 @@ import type {
   SocialLink,
   SocialPlatform,
 } from "./signature-types";
-import { isEmail, normalizePhone, safeColor, safeHttpsUrl } from "./validators";
+import {
+  isEmail,
+  normalizePhone,
+  safeColor,
+  safeHttpsUrl,
+  safeImageUrl,
+} from "./validators";
 
 const supportedSocialPlatforms: SocialPlatform[] = [
   "linkedin",
@@ -66,8 +72,8 @@ export function sanitizeConfig(config: SignatureConfig): SignatureConfig {
     email: isEmail(config.email) ? config.email.trim() : "",
     phone: normalizePhone(config.phone),
     website: safeHttpsUrl(config.website),
-    logoUrl: safeHttpsUrl(config.logoUrl),
-    photoUrl: safeHttpsUrl(config.photoUrl),
+    logoUrl: safeImageUrl(config.logoUrl),
+    photoUrl: safeImageUrl(config.photoUrl),
     primaryColor: safeColor(config.primaryColor),
     secondaryColor: safeColor(config.secondaryColor, "#075d78"),
     socials,

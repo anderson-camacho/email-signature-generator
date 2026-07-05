@@ -12,6 +12,15 @@ export function safeHttpsUrl(value: string): string {
   }
 }
 
+export function safeImageUrl(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/^data:image\/(png|jpe?g|webp|gif);base64,[a-z0-9+/=]+$/i.test(trimmed)) {
+    return trimmed;
+  }
+  return safeHttpsUrl(trimmed);
+}
+
 export const normalizePhone = (value: string) => {
   const normalized = value.trim().replace(/[^\d+]/g, "");
   return /^\+?\d{7,15}$/.test(normalized) ? normalized : "";

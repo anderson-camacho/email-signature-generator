@@ -5,6 +5,7 @@ import {
   isEmail,
   normalizePhone,
   safeHttpsUrl,
+  safeImageUrl,
 } from "../../src/core/validators";
 import { renderSignature, templates } from "../../src/templates/registry";
 import { exportConfig, importConfig } from "../../src/export/json-config";
@@ -23,6 +24,13 @@ describe("security and validation", () => {
   ])("rejects unsafe URL %s", (url) => expect(safeHttpsUrl(url)).toBe(""));
   it("accepts HTTPS", () =>
     expect(safeHttpsUrl("https://example.com")).toBe("https://example.com/"));
+  it("accepts optimized local image data URLs for image fields", () => {
+    const dataUrl = "data:image/webp;base64,aaaa";
+    expect(safeImageUrl(dataUrl)).toBe(dataUrl);
+    expect(
+      sanitizeConfig({ ...defaultConfig, photoUrl: dataUrl }).photoUrl,
+    ).toBe(dataUrl);
+  });
   it("validates email and normalizes phone", () => {
     expect(isEmail("alex@example.com")).toBe(true);
     expect(normalizePhone("+1 555 010 0000")).toBe("+15550100000");
