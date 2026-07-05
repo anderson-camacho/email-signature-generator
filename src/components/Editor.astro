@@ -215,10 +215,16 @@ const personalFields = [
         <details class="config-section" open>
           <summary><span>4</span> Colors and appearance</summary>
           <div class="config-body appearance-grid">
-            <label>Primary color<input name="primaryColor" type="color" /></label>
-            <label>Secondary color<input name="secondaryColor" type="color" /></label>
-            <label>
-              Size
+            <label class="appearance-field">
+              <span class="appearance-label">Primary color</span>
+              <input name="primaryColor" type="color" />
+            </label>
+            <label class="appearance-field">
+              <span class="appearance-label">Secondary color</span>
+              <input name="secondaryColor" type="color" />
+            </label>
+            <label class="appearance-field">
+              <span class="appearance-label">Size</span>
               <select name="size">
                 <option>compact</option>
                 <option selected>normal</option>

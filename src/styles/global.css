@@ -496,6 +496,20 @@ main {
 .appearance-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+.appearance-grid > label {
+  align-content: start;
+}
+.appearance-field {
+  grid-template-rows: minmax(2.5em, auto) auto;
+}
+.appearance-label {
+  display: flex;
+  align-items: flex-end;
+}
+.appearance-grid input[type="color"],
+.appearance-grid select {
+  height: 47px;
+}
 .palette-presets {
   grid-column: 1 / -1;
 }
