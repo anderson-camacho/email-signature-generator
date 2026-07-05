@@ -23,6 +23,9 @@ const es = {
   templates: "Plantillas",
   faq: "Preguntas frecuentes",
   privacyPage: "Privacidad",
+  donationThanksTitle: "Gracias por tu donaciÃ³n",
+  donationThanksCopy:
+    "La ventana de PayPal deberÃ­a cerrarse y tu sesiÃ³n seguirÃ¡ aquÃ­ en la pÃ¡gina.",
   form: "Personaliza tu firma",
   preview: "Vista previa",
   copy: "Copiar firma",
@@ -76,6 +79,9 @@ const en: Dictionary = {
   templates: "Templates",
   faq: "FAQ",
   privacyPage: "Privacy",
+  donationThanksTitle: "Thanks for your donation",
+  donationThanksCopy:
+    "The PayPal window should close and your session will stay here on the page.",
   form: "Customize your signature",
   preview: "Preview",
   copy: "Copy signature",
