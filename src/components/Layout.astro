@@ -44,11 +44,9 @@ const canonical = new URL(Astro.url.pathname, site);
             <a href={`/${locale}/saved-signatures/`}>{t.savedLibrary}</a>
           </nav>
           <div class="header-donate-shell">
-            <span class="header-donate-copy">Donar</span>
-            <div
-              id="header-paypal-donate-button"
-              class="header-paypal-donate-button"
-            ></div>
+            <div id="header-donate-button-container" class="header-donate-button-container">
+              <div id="header-donate-button"></div>
+            </div>
           </div>
           <label class="language-picker" aria-label={t.language}>
             <select id="language">
@@ -59,9 +57,19 @@ const canonical = new URL(Astro.url.pathname, site);
       </div>
     </header>
     <main id="content"><slot /></main>
+    <div
+      id="donation-feedback"
+      class="donation-feedback"
+      role="status"
+      aria-live="polite"
+      hidden
+    >
+      <strong>{t.donationThanksTitle}</strong>
+      <p>{t.donationThanksCopy}</p>
+    </div>
     <footer><a href={`/${locale}/privacy/`}>{t.privacyPage}</a> · <a href="https://github.com/anderson-camacho/email-signature-generator">Repository</a> · <a href="/LICENSE">MPL-2.0</a></footer>
     <script src="https://www.paypalobjects.com/donate/sdk/donate-sdk.js" charset="UTF-8"></script>
-    <script is:inline>
+    <script is:inline define:vars={{ donationThanksTitle: t.donationThanksTitle, donationThanksCopy: t.donationThanksCopy }}>
       document.querySelector("#language")?.addEventListener("change", (event) => {
         const target = event.target;
         if (!(target instanceof HTMLSelectElement)) return;
@@ -70,8 +78,28 @@ const canonical = new URL(Astro.url.pathname, site);
         location.href = `/${locale}${location.pathname.replace(/^\/[^/]+/, "")}`;
       });
 
-      const renderHeaderDonateButton = () => {
-        const container = document.querySelector("#header-paypal-donate-button");
+      let donationFeedbackTimeout;
+
+      const showDonationFeedback = () => {
+        const feedback = document.querySelector("#donation-feedback");
+        if (!(feedback instanceof HTMLElement)) return;
+
+        feedback.hidden = false;
+        feedback.classList.add("is-visible");
+        feedback.querySelector("strong")?.replaceChildren(donationThanksTitle);
+        feedback.querySelector("p")?.replaceChildren(donationThanksCopy);
+
+        window.clearTimeout(donationFeedbackTimeout);
+        donationFeedbackTimeout = window.setTimeout(() => {
+          feedback.classList.remove("is-visible");
+          window.setTimeout(() => {
+            feedback.hidden = true;
+          }, 220);
+        }, 5200);
+      };
+
+      const renderPaypalDonateButton = () => {
+        const container = document.querySelector("#header-donate-button");
         if (!(container instanceof HTMLElement) || container.dataset.rendered === "true") return;
         if (!window.PayPal?.Donation?.Button) return;
 
@@ -80,23 +108,26 @@ const canonical = new URL(Astro.url.pathname, site);
           env: "production",
           hosted_button_id: "9HLNFUZS5DJ72",
           image: {
-            src: "https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif",
+            src: "https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif",
             alt: "Donate with PayPal button",
             title: "PayPal - The safer, easier way to pay online!",
           },
-        }).render("#header-paypal-donate-button");
+          onComplete: function () {
+            showDonationFeedback();
+          },
+        }).render("#header-donate-button");
       };
 
-      const waitForHeaderDonateButton = () => {
+      const waitForPaypalDonateButton = () => {
         if (window.PayPal?.Donation?.Button) {
-          renderHeaderDonateButton();
+          renderPaypalDonateButton();
           return;
         }
 
-        window.setTimeout(waitForHeaderDonateButton, 120);
+        window.setTimeout(waitForPaypalDonateButton, 120);
       };
 
-      waitForHeaderDonateButton();
+      waitForPaypalDonateButton();
     </script>
   </body>
 </html>
