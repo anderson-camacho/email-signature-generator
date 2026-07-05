@@ -20,11 +20,38 @@ import {
 } from "../storage/local-storage-adapter";
 
 const editor = document.querySelector<HTMLElement>("[data-editor]")!;
+const locale = editor.dataset.locale ?? "en";
 const messages = {
   copied: editor.dataset.copied!,
   invalid: editor.dataset.invalid!,
   cleared: editor.dataset.cleared!,
 };
+const socialMessages = {
+  empty:
+    editor.dataset.socialEmpty ??
+    "No social buttons added. Your signature will not show this section.",
+  platform: editor.dataset.socialPlatformLabel ?? "Platform",
+  url: editor.dataset.socialUrlLabel ?? "Public HTTPS URL",
+  icon: editor.dataset.socialIconLabel ?? "Icon color",
+  original: editor.dataset.socialOriginalLabel ?? "Original platform color",
+  primary: editor.dataset.socialPrimaryLabel ?? "Selected primary color",
+  remove: editor.dataset.socialRemoveLabel ?? "Remove",
+};
+const exportMessages = {
+  title: editor.dataset.exportTitle ?? "Your email signature",
+  copy:
+    editor.dataset.exportCopy ??
+    "Copy the signature below and paste it into your email client's signature settings.",
+};
+const localizedDefaults = (() => {
+  try {
+    return JSON.parse(editor.dataset.defaultConfig ?? "{}") as Partial<
+      SignatureConfig
+    >;
+  } catch {
+    return {};
+  }
+})();
 const form = document.querySelector<HTMLFormElement>("#signature-form")!;
 const preview = document.querySelector<HTMLElement>("#preview")!;
 const status = document.querySelector<HTMLElement>("#status")!;
@@ -66,13 +93,21 @@ const templateFieldSummary = document.querySelector<HTMLElement>(
 const control = (name: string) =>
   form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
 
+const freshConfig = (): SignatureConfig => ({
+  ...structuredClone(defaultConfig),
+  ...localizedDefaults,
+  socials: [],
+});
+
 type DrawerName = keyof typeof drawerPanels;
 
 let config: SignatureConfig = (() => {
+  const base = freshConfig();
   try {
-    return loadDraft(localStorage) ?? structuredClone(defaultConfig);
+    const draft = loadDraft(localStorage);
+    return draft ? { ...base, ...draft, socials: draft.socials ?? [] } : base;
   } catch {
-    return structuredClone(defaultConfig);
+    return base;
   }
 })();
 let timer: ReturnType<typeof setTimeout>;
@@ -89,7 +124,14 @@ function populate() {
   for (const [key, value] of Object.entries(config)) {
     if (key !== "socials") {
       const input = control(key);
-      if (input) input.value = String(value);
+      if (input) {
+        input.value = String(value);
+        if (input instanceof HTMLInputElement && input.dataset.exampleValue) {
+          input.dataset.exampleActive = String(
+            input.value === input.dataset.exampleValue,
+          );
+        }
+      }
     }
   }
   renderSocialEditor();
@@ -101,7 +143,7 @@ function read() {
 }
 
 const render = () => {
-  preview.innerHTML = renderSignature(config);
+  preview.innerHTML = renderSignature(config, locale);
   renderTemplatePreviews();
   updateFieldSupportState();
 };
@@ -111,10 +153,13 @@ function renderTemplatePreviews() {
     const template = node.dataset
       .templatePreview as SignatureConfig["template"] | undefined;
     if (!template) return;
-    node.innerHTML = renderSignature({
-      ...config,
-      template,
-    });
+    node.innerHTML = renderSignature(
+      {
+        ...config,
+        template,
+      },
+      locale,
+    );
   });
 }
 
@@ -236,8 +281,7 @@ function renderSocialEditor() {
   if (!config.socials.length) {
     const empty = document.createElement("p");
     empty.className = "social-empty";
-    empty.textContent =
-      "No social buttons added. Your signature will not show this section.";
+    empty.textContent = socialMessages.empty;
     socialList.append(empty);
   }
 
@@ -254,7 +298,7 @@ function renderSocialEditor() {
 
     const platform = socialControl(
       "select",
-      "Platform",
+      socialMessages.platform,
       social.platform,
       (value) => updateSocial(social.id, { platform: value as SocialPlatform }),
       "social-field social-field-platform",
@@ -270,7 +314,7 @@ function renderSocialEditor() {
 
     const url = socialControl(
       "input",
-      "Public HTTPS URL",
+      socialMessages.url,
       social.url,
       (value) => updateSocial(social.id, { url: value }),
       "social-field social-field-url",
@@ -278,7 +322,7 @@ function renderSocialEditor() {
 
     const style = socialControl(
       "select",
-      "Icon color",
+      socialMessages.icon,
       social.iconStyle,
       (value) =>
         updateSocial(social.id, {
@@ -289,8 +333,8 @@ function renderSocialEditor() {
 
     (
       [
-        ["original", "Original platform color"],
-        ["primary", "Selected primary color"],
+        ["original", socialMessages.original],
+        ["primary", socialMessages.primary],
       ] as const
     ).forEach(([value, label]) => {
       const option = document.createElement("option");
@@ -303,7 +347,7 @@ function renderSocialEditor() {
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "remove-social";
-    remove.textContent = "Remove";
+    remove.textContent = socialMessages.remove;
     remove.addEventListener("click", () => {
       config.socials = config.socials.filter((item) => item.id !== social.id);
       renderSocialEditor();
@@ -375,6 +419,31 @@ render();
 setDrawer(null);
 
 form.addEventListener("input", () => {
+  const activeField = document.activeElement;
+  if (
+    activeField instanceof HTMLInputElement &&
+    activeField.dataset.exampleValue &&
+    activeField.dataset.exampleActive !== "false"
+  ) {
+    activeField.dataset.exampleActive = "false";
+  }
+  read();
+  render();
+  scheduleSave();
+});
+
+form.addEventListener("focusin", (event) => {
+  const target = event.target;
+  if (
+    !(target instanceof HTMLInputElement) ||
+    !target.dataset.exampleValue ||
+    target.disabled ||
+    target.dataset.exampleActive !== "true"
+  ) {
+    return;
+  }
+  target.value = "";
+  target.dataset.exampleActive = "false";
   read();
   render();
   scheduleSave();
@@ -392,7 +461,7 @@ document.querySelector<HTMLButtonElement>("#add-social")!.onclick = () => {
 };
 
 document.querySelector<HTMLButtonElement>("#copy")!.onclick = async () => {
-  const html = renderSignature(config);
+  const html = renderSignature(config, locale);
   try {
     await navigator.clipboard.write([
       new ClipboardItem({
@@ -415,7 +484,7 @@ document.querySelector<HTMLButtonElement>("#copy")!.onclick = async () => {
 
 document.querySelector<HTMLButtonElement>("#download")!.onclick = () =>
   download(
-    `<!doctype html><meta charset="utf-8"><h1>Your email signature</h1><p>Copy the signature below and paste it into your email client's signature settings.</p>${renderSignature(config)}`,
+    `<!doctype html><meta charset="utf-8"><h1>${exportMessages.title}</h1><p>${exportMessages.copy}</p>${renderSignature(config, locale)}`,
     "email-signature.html",
     "text/html",
   );
@@ -448,7 +517,7 @@ document.querySelector<HTMLButtonElement>("#clear")!.onclick = () => {
   } catch {
     /* unavailable storage is non-fatal */
   }
-  config = structuredClone(defaultConfig);
+  config = freshConfig();
   populate();
   render();
   status.textContent = messages.cleared;

@@ -12,9 +12,69 @@ const sizeScale: Record<SignatureConfig["size"], number> = {
   wide: 1.12,
 };
 
+type TemplateLocale = "es" | "en";
+
 const px = (value: number) => `${Math.round(value)}px`;
 const scaled = (config: SignatureConfig, value: number) =>
   Math.round(value * sizeScale[config.size]);
+const resolveLocale = (locale?: string): TemplateLocale =>
+  locale?.toLowerCase().startsWith("es") ? "es" : "en";
+const templateCopy = (locale?: string) =>
+  resolveLocale(locale) === "es"
+    ? {
+        bestRegards: "Saludos,",
+        sincerely: "Cordialmente,",
+        visitWebsite: "Visitar sitio",
+        promotion: "Promocion",
+        meetExperts: "Conoce a nuestro equipo",
+        joinNow: "Ver mas",
+        propertySpotlight: "Propiedad destacada",
+        perfectFit: "Encontremos tu mejor opcion",
+        viewListings: "Ver opciones",
+        followMyWork: "Ver mi trabajo",
+        bookCall: "Agendar llamada",
+        counsel: "Asesoria",
+        legalAdvisory: "Asesoria legal",
+        needLegalGuidance: "Necesitas orientacion legal?",
+        scheduleConsultation: "Agendar consulta",
+        healthcareSpecialist: "Especialista en salud",
+        happyHolidays: "Felices fiestas",
+        doingMyBest: "Dando lo mejor de mi",
+        brand: "Marca",
+        studio: "Estudio",
+        contact: "Contacto",
+        email: "correo",
+        phone: "telefono",
+        website: "sitio",
+        address: "direccion",
+      }
+    : {
+        bestRegards: "Best regards,",
+        sincerely: "Sincerely,",
+        visitWebsite: "Visit website",
+        promotion: "Promotion",
+        meetExperts: "Meet our experts",
+        joinNow: "Join now",
+        propertySpotlight: "Property spotlight",
+        perfectFit: "Let's find your perfect fit",
+        viewListings: "View listings",
+        followMyWork: "Follow my work",
+        bookCall: "Book a call",
+        counsel: "Counsel",
+        legalAdvisory: "Legal advisory",
+        needLegalGuidance: "Need legal guidance?",
+        scheduleConsultation: "Schedule consultation",
+        healthcareSpecialist: "Healthcare Specialist",
+        happyHolidays: "Happy Holidays!",
+        doingMyBest: "I'm doing my best",
+        brand: "Brand",
+        studio: "Studio",
+        contact: "Contact",
+        email: "email",
+        phone: "phone",
+        website: "website",
+        address: "address",
+      };
 
 const websiteLabel = (value: string) => {
   try {
@@ -99,17 +159,23 @@ const pronounChip = (
   return `<div style="margin-top:${marginTop}px;display:inline-block;padding:4px 10px;border-radius:999px;background:${background};border:1px solid ${borderColor};color:${color};font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:0.03em">${safe(c.pronouns)}</div>`;
 };
 
-const contactStack = (c: SignatureConfig, color = "#425466") =>
-  [
-    c.email ? detailLine("email", c.email, color, c.primaryColor) : "",
-    c.phone ? detailLine("phone", c.phone, color, c.primaryColor) : "",
+const contactStack = (
+  c: SignatureConfig,
+  locale = "en",
+  color = "#425466",
+) => {
+  const copy = templateCopy(locale);
+  return [
+    c.email ? detailLine(copy.email, c.email, color, c.primaryColor) : "",
+    c.phone ? detailLine(copy.phone, c.phone, color, c.primaryColor) : "",
     c.website
-      ? detailLine("website", websiteLabel(c.website), color, c.primaryColor)
+      ? detailLine(copy.website, websiteLabel(c.website), color, c.primaryColor)
       : "",
-    c.address ? detailLine("address", c.address, color, c.primaryColor) : "",
+    c.address ? detailLine(copy.address, c.address, color, c.primaryColor) : "",
   ]
     .filter(Boolean)
     .join("");
+};
 
 const contactInline = (c: SignatureConfig, color: string) =>
   [
@@ -198,7 +264,10 @@ const websiteCta = (
 const divider = (color: string, width = "100%") =>
   `<div style="width:${width};height:1px;background:${color};font-size:0;line-height:0"></div>`;
 
-export type TemplateRenderer = (config: SignatureConfig) => string;
+export type TemplateRenderer = (
+  config: SignatureConfig,
+  locale?: string,
+) => string;
 
 export const templates: Record<TemplateId, TemplateRenderer> = {
   minimal: (raw) => {
@@ -227,8 +296,9 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       c.secondaryColor,
     )}</div>${socialRow(c, { shape: "square" })}</td></tr></table>`;
   },
-  "professional-logo": (raw) => {
+  "professional-logo": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const logo = scaled(c, 72);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;font-size:14px;max-width:${px(
       scaled(c, 560),
@@ -243,7 +313,7 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       "border-radius:18px;",
       initials(c.company || c.fullName),
     )}<div style="margin-top:12px;font-size:11px;font-weight:bold;letter-spacing:0.08em;color:#8090a0;text-transform:uppercase">${safe(
-      c.company || "Brand",
+      c.company || copy.brand,
     )}</div></td><td style="padding:${px(scaled(c, 20))} ${px(
       scaled(c, 20),
     )} ${px(scaled(c, 18))} ${px(
@@ -262,12 +332,13 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       background: "#f4f8ff",
       color: c.primaryColor,
       marginTop: 8,
-    })}<div style="margin-top:14px">${contactStack(c)}</div>${socialRow(c, {
+    })}<div style="margin-top:14px">${contactStack(c, locale)}</div>${socialRow(c, {
       shape: "square",
     })}</td></tr></table>`;
   },
-  "professional-photo": (raw) => {
+  "professional-photo": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const isSpanish = resolveLocale(locale) === "es";
     const photo = scaled(c, 82);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;font-size:14px;max-width:${px(
       scaled(c, 560),
@@ -291,7 +362,7 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       c,
     )}</div><div style="margin-top:5px;font-size:14px;color:#7a5b73">${safe(
       c.jobTitle,
-    )}${c.company ? ` at ${safe(c.company)}` : ""}</div><div style="margin-top:12px;font-size:12px;line-height:1.7;color:#6c6170">${contactInline(
+    )}${c.company ? ` ${isSpanish ? "en" : "at"} ${safe(c.company)}` : ""}</div><div style="margin-top:12px;font-size:12px;line-height:1.7;color:#6c6170">${contactInline(
       c,
       c.secondaryColor,
     )}</div>${socialRow(c)}${
@@ -302,8 +373,9 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
         : ""
     }</td></tr></table>`;
   },
-  "administrative-area": (raw) => {
+  "administrative-area": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;font-size:14px;max-width:${px(
       scaled(c, 620),
     )};background:#fbfcfe;border:1px solid #d8e3ed"><tr><td style="padding:0;width:10px;background:${c.secondaryColor}"></td><td style="padding:${px(
@@ -326,7 +398,7 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 180),
     )};border-left:1px solid #d8e3ed;padding-left:${px(
       scaled(c, 18),
-    )}"><div style="font-size:11px;font-weight:bold;text-transform:uppercase;color:#8090a0">Contact</div><div style="margin-top:8px;font-size:12px;line-height:1.8;color:#435261">${c.email ? link(
+    )}"><div style="font-size:11px;font-weight:bold;text-transform:uppercase;color:#8090a0">${copy.contact}</div><div style="margin-top:8px;font-size:12px;line-height:1.8;color:#435261">${c.email ? link(
       `mailto:${c.email}`,
       c.email,
       c.primaryColor,
@@ -350,14 +422,15 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
         : ""
     }</td></tr></table>`;
   },
-  "scripted-intro": (raw) => {
+  "scripted-intro": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const photo = scaled(c, 84);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Georgia, 'Times New Roman', serif;font-size:14px;max-width:${px(
       scaled(c, 560),
     )};background:#ffffff"><tr><td colspan="3" style="padding:0 0 12px 0;color:${c.secondaryColor};font-size:${px(
       scaled(c, 26),
-    )};font-style:italic">Best regards,</td></tr><tr><td style="width:${px(
+    )};font-style:italic">${copy.bestRegards}</td></tr><tr><td style="width:${px(
       photo + scaled(c, 8),
     )};padding-right:${px(scaled(c, 14))};vertical-align:top">${image(
       c.photoUrl,
@@ -378,14 +451,16 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       marginTop: 8,
     })}<div style="margin-top:8px;font-family:Arial,sans-serif;font-size:12px;line-height:1.8;color:#445064">${contactStack(
       c,
+      locale,
     )}</div>${socialRow(c, {
       shape: "circle",
       size: scaled(c, 28),
       fill: "outline",
     })}</td></tr></table>`;
   },
-  "bold-banner": (raw) => {
+  "bold-banner": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const photo = scaled(c, 90);
     const logo = scaled(c, 74);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;max-width:${px(
@@ -424,7 +499,7 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
     })}</td><td style="padding:${px(scaled(c, 18))};vertical-align:top"><table role="presentation" cellpadding="0" cellspacing="0" width="100%"><tr><td style="vertical-align:top;padding-right:${px(
       scaled(c, 16),
     )}"><div style="font-size:12px;font-weight:bold;letter-spacing:0.12em;text-transform:uppercase;color:${c.secondaryColor}">${safe(
-      c.company || "Studio",
+      c.company || copy.studio,
     )}</div><div style="margin-top:10px;font-size:${px(
       scaled(c, 28),
     )};font-weight:bold;color:${c.primaryColor}">${signatureName(c)}</div><div style="margin-top:6px;font-size:15px;color:#5c6572">${safe(
@@ -432,9 +507,9 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
     )}</div><div style="margin-top:14px">${divider(
       `${c.primaryColor}22`,
       "48px",
-    )}</div><div style="margin-top:14px">${contactStack(c)}</div><div style="margin-top:16px">${websiteCta(
+    )}</div><div style="margin-top:14px">${contactStack(c, locale)}</div><div style="margin-top:16px">${websiteCta(
       c,
-      "Visit website",
+      copy.visitWebsite,
       c.primaryColor,
     )}</div></td><td style="width:${px(photo)};vertical-align:top">${image(
       c.photoUrl,
@@ -444,14 +519,15 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       initials(c.fullName),
     )}</td></tr></table></td></tr></table>`;
   },
-  "promo-banner": (raw) => {
+  "promo-banner": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const photo = scaled(c, 78);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;max-width:${px(
       scaled(c, 560),
     )};background:#ffffff"><tr><td colspan="2" style="padding:0 0 12px 0;color:#8c6c7a;font-size:${px(
       scaled(c, 24),
-    )};font-style:italic">Sincerely,</td></tr><tr><td style="padding-right:${px(
+    )};font-style:italic">${copy.sincerely}</td></tr><tr><td style="padding-right:${px(
       scaled(c, 16),
     )};vertical-align:top">${image(
       c.photoUrl,
@@ -469,13 +545,13 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       borderColor: "#f0d9e5",
       marginTop: 8,
     })}<div style="margin-top:10px">${detailLine(
-      "phone",
+      copy.phone,
       c.phone,
-    )}${detailLine("email", c.email)}${detailLine(
-      "website",
+    )}${detailLine(copy.email, c.email)}${detailLine(
+      copy.website,
       c.website ? websiteLabel(c.website) : "",
     )}${detailLine(
-      "address",
+      copy.address,
       c.address,
     )}</div>${socialRow(c, {
       shape: "circle",
@@ -485,11 +561,11 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 16),
     )}"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-radius:16px;overflow:hidden;background:linear-gradient(135deg, ${c.primaryColor}, ${c.secondaryColor})"><tr><td style="padding:${px(
       scaled(c, 18),
-    )};color:#ffffff"><div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase">Promotion</div><div style="margin-top:6px;font-size:${px(
+    )};color:#ffffff"><div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase">${copy.promotion}</div><div style="margin-top:6px;font-size:${px(
       scaled(c, 24),
-    )};font-weight:bold">Meet our experts</div><div style="margin-top:8px">${websiteCta(
+    )};font-weight:bold">${copy.meetExperts}</div><div style="margin-top:8px">${websiteCta(
       c,
-      "Join now",
+      copy.joinNow,
       "#ffffff",
       c.primaryColor,
       "#ffffff",
@@ -532,8 +608,9 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       gap: 4,
     })}</td></tr></table>`;
   },
-  "orb-profile": (raw) => {
+  "orb-profile": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const orb = scaled(c, 100);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;max-width:${px(
       scaled(c, 540),
@@ -565,17 +642,17 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       borderColor: "#e7d7f2",
       marginTop: 8,
     })}<div style="margin-top:10px">${detailLine(
-      "website",
+      copy.website,
       c.website ? websiteLabel(c.website) : "",
       "#675f70",
       c.secondaryColor,
-    )}${detailLine("email", c.email, "#675f70", c.secondaryColor)}${detailLine(
-      "phone",
+    )}${detailLine(copy.email, c.email, "#675f70", c.secondaryColor)}${detailLine(
+      copy.phone,
       c.phone,
       "#675f70",
       c.secondaryColor,
     )}${detailLine(
-      "address",
+      copy.address,
       c.address,
       "#675f70",
       c.secondaryColor,
@@ -618,8 +695,9 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       { shape: "square", size: scaled(c, 24) },
     )}</td></tr></table>`;
   },
-  "property-cta": (raw) => {
+  "property-cta": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const photo = scaled(c, 82);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;max-width:${px(
       scaled(c, 560),
@@ -641,6 +719,7 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       marginTop: 8,
     })}<div style="margin-top:10px;font-size:12px;line-height:1.8;color:#35507a">${contactStack(
       c,
+      locale,
       "#35507a",
     )}</div></td><td style="width:${px(photo)};vertical-align:top">${image(
       c.photoUrl,
@@ -652,18 +731,19 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 16),
     )};border-radius:18px;overflow:hidden;background:linear-gradient(135deg, ${c.primaryColor}, ${c.secondaryColor})"><tr><td style="padding:${px(
       scaled(c, 16),
-    )};color:#ffffff"><div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase">Property spotlight</div><div style="margin-top:6px;font-size:${px(
+    )};color:#ffffff"><div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase">${copy.propertySpotlight}</div><div style="margin-top:6px;font-size:${px(
       scaled(c, 22),
-    )};font-weight:bold">Let's find your perfect fit</div><div style="margin-top:10px">${websiteCta(
+    )};font-weight:bold">${copy.perfectFit}</div><div style="margin-top:10px">${websiteCta(
       c,
-      "View listings",
+      copy.viewListings,
       "#ffffff",
       c.primaryColor,
       "#ffffff",
     )}</div></td></tr></table></td></tr></table>`;
   },
-  "social-stack": (raw) => {
+  "social-stack": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const badge = scaled(c, 78);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;max-width:${px(
       scaled(c, 520),
@@ -696,12 +776,13 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       c.primaryColor,
     )}</div><div style="margin-top:${px(scaled(c, 14))}">${websiteCta(
       c,
-      "Follow my work",
+      copy.followMyWork,
       c.secondaryColor,
     )}</div></td></tr></table></td></tr></table>`;
   },
-  "executive-card": (raw) => {
+  "executive-card": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const photo = scaled(c, 76);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;max-width:${px(
       scaled(c, 520),
@@ -729,17 +810,18 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       photo,
       "border-radius:14px;",
       initials(c.fullName),
-    )}</td><td style="vertical-align:top">${contactStack(c)}</td></tr></table>${socialRow(
+    )}</td><td style="vertical-align:top">${contactStack(c, locale)}</td></tr></table>${socialRow(
       c,
       { shape: "square", size: scaled(c, 24) },
     )}<div style="margin-top:${px(scaled(c, 14))}">${websiteCta(
       c,
-      "Book a call",
+      copy.bookCall,
       c.primaryColor,
     )}</div></td></tr></table>`;
   },
-  "legal-brief": (raw) => {
+  "legal-brief": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const photo = scaled(c, 94);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;max-width:${px(
       scaled(c, 590),
@@ -748,7 +830,7 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
     )};vertical-align:top"><table role="presentation" cellpadding="0" cellspacing="0" width="100%"><tr><td style="vertical-align:top;padding-right:${px(
       scaled(c, 18),
     )}"><div style="font-size:12px;font-weight:bold;letter-spacing:0.12em;text-transform:uppercase;color:#9d6c2d">${safe(
-      c.company || "Counsel",
+      c.company || copy.counsel,
     )}</div><div style="margin-top:8px;font-size:${px(
       scaled(c, 24),
     )};font-weight:bold;color:#37291c">${signatureName(c)}</div><div style="margin-top:5px;font-size:14px;color:#6a5848">${safe(
@@ -764,6 +846,7 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       marginTop: 8,
     })}<div style="margin-top:12px">${contactStack(
       c,
+      locale,
       "#5a4b3a",
     )}</div>${socialRow(c, {
       shape: "square",
@@ -779,11 +862,11 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 16),
     )};background:linear-gradient(135deg, #6f4b1d, #c88a2f);border-radius:14px"><tr><td style="padding:${px(
       scaled(c, 14),
-    )};color:#fff7eb"><div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase">Legal advisory</div><div style="margin-top:5px;font-size:${px(
+    )};color:#fff7eb"><div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase">${copy.legalAdvisory}</div><div style="margin-top:5px;font-size:${px(
       scaled(c, 20),
-    )};font-weight:bold">Need legal guidance?</div><div style="margin-top:10px">${websiteCta(
+    )};font-weight:bold">${copy.needLegalGuidance}</div><div style="margin-top:10px">${websiteCta(
       c,
-      "Schedule consultation",
+      copy.scheduleConsultation,
       "#fff7eb",
       "#6f4b1d",
       "#fff7eb",
@@ -795,8 +878,9 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
         : ""
     }</td></tr></table>`;
   },
-  "medical-profile": (raw) => {
+  "medical-profile": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const photo = scaled(c, 82);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;max-width:${px(
       scaled(c, 520),
@@ -811,7 +895,7 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
     )}<div style="margin-top:10px;font-size:${px(
       scaled(c, 24),
     )};font-weight:bold;color:${c.secondaryColor}">${signatureName(c)}</div><div style="margin-top:4px;font-size:14px;font-weight:bold;color:${c.primaryColor}">${safe(
-      c.jobTitle || "Healthcare Specialist",
+      c.jobTitle || copy.healthcareSpecialist,
     )}</div>${
       c.company || c.department
         ? `<div style="margin-top:4px;font-size:12px;color:#5b6f86">${safe(
@@ -837,20 +921,21 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 14),
     )};text-align:center">${websiteCta(
       c,
-      "Schedule consultation",
+      copy.scheduleConsultation,
       "#eef7ff",
       c.secondaryColor,
       "#c4def6",
     )}</td></tr></table></td></tr></table>`;
   },
-  "holiday-postcard": (raw) => {
+  "holiday-postcard": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
+    const copy = templateCopy(locale);
     const photo = scaled(c, 76);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;max-width:${px(
       scaled(c, 540),
     )};background:#fffdfd;border:1px solid #f2d8df;border-radius:22px"><tr><td colspan="2" style="padding:0 0 14px 0;color:#b56f83;font-size:${px(
       scaled(c, 24),
-    )};font-style:italic">Happy Holidays!</td></tr><tr><td style="padding-right:${px(
+    )};font-style:italic">${copy.happyHolidays}</td></tr><tr><td style="padding-right:${px(
       scaled(c, 16),
     )};vertical-align:top">${image(
       c.photoUrl,
@@ -868,17 +953,17 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       borderColor: "#f2d8df",
       marginTop: 8,
     })}<div style="margin-top:10px">${detailLine(
-      "email",
+      copy.email,
       c.email,
       "#6c5860",
       c.primaryColor,
     )}${detailLine(
-      "phone",
+      copy.phone,
       c.phone,
       "#6c5860",
       c.primaryColor,
-    )}${detailLine("website", c.website ? websiteLabel(c.website) : "", "#6c5860", c.primaryColor)}${detailLine(
-      "address",
+    )}${detailLine(copy.website, c.website ? websiteLabel(c.website) : "", "#6c5860", c.primaryColor)}${detailLine(
+      copy.address,
       c.address,
       "#6c5860",
       c.primaryColor,
@@ -892,9 +977,9 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       scaled(c, 12),
     )} ${px(scaled(c, 18))};text-align:center;color:#8a4760;font-size:${px(
       scaled(c, 20),
-    )};font-style:italic;font-weight:bold">I'm doing my best</td></tr></table></td></tr></table>`;
+    )};font-style:italic;font-weight:bold">${copy.doingMyBest}</td></tr></table></td></tr></table>`;
   },
 };
 
-export const renderSignature = (config: SignatureConfig) =>
-  templates[config.template](config);
+export const renderSignature = (config: SignatureConfig, locale?: string) =>
+  templates[config.template](config, locale);

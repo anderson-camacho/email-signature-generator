@@ -4,48 +4,319 @@ import { templateCatalog } from "../templates/catalog";
 
 const { locale } = Astro.props as { locale: Locale };
 const t = dictionary(locale);
+const isSpanish = locale === "es";
 
-const palettePresets = [
-  {
-    id: "executive",
-    name: "Executive",
-    note: "Trust, leadership, executive calm",
-    primary: "#1e3a5f",
-    secondary: "#2fbf9b",
+const ui = isSpanish
+  ? {
+      workspaceEyebrow: "Espacio de firma",
+      workspaceTag: "Primero web, listo para movil",
+      libraryEyebrow: "Biblioteca",
+      supportEyebrow: "Apoyo",
+      configEyebrow: "Configuracion",
+      configTitle: "Configura tu firma",
+      styleSection: "Estilo de firma",
+      chooseStyle: "Elige un estilo",
+      personalSection: "Datos personales y de empresa",
+      mediaSection: "Foto y logotipo",
+      localPreviewLabel: "Vista local de logo o foto",
+      colorsSection: "Colores y apariencia",
+      primaryColor: "Color principal",
+      secondaryColor: "Color secundario",
+      size: "Tamano",
+      sizeCompact: "compacto",
+      sizeNormal: "normal",
+      sizeWide: "amplio",
+      paletteHelp: "Paletas rapidas pensadas para confianza, claridad y lectura facil.",
+      socialSection: "Botones de redes sociales",
+      socialHelp:
+        "Agrega tantos botones como necesites, incluso varios para la misma plataforma.",
+      addSocial: "+ Agregar red social",
+      socialEmpty:
+        "Todavia no agregas botones sociales. Esta parte no saldra en la firma.",
+      socialPlatform: "Plataforma",
+      socialUrl: "URL publica HTTPS",
+      socialIconColor: "Color del icono",
+      socialOriginalColor: "Color original de la plataforma",
+      socialPrimaryColor: "Color principal elegido",
+      remove: "Quitar",
+      previewEyebrow: "Vista previa en vivo",
+      previewDesktop: "Escritorio",
+      previewMobile: "Movil",
+      templatesEyebrow: "Plantillas",
+      templatesTitle: "Elige una direccion",
+      supportCompact: "No visible",
+      photoUrlLabel: "URL publica HTTPS de la foto",
+      logoUrlLabel: "URL publica HTTPS del logotipo",
+      fields: {
+        fullName: "Nombre completo",
+        jobTitle: "Cargo",
+        company: "Empresa",
+        department: "Area o departamento",
+        email: "Correo",
+        phone: "Telefono",
+        website: "Sitio web HTTPS",
+        address: "Direccion",
+        pronouns: "Pronombres",
+        legalText: "Nota legal",
+      },
+      examples: {
+        fullName: "Alex Morgan",
+        jobTitle: "Disenadora de producto",
+        company: "Estudio Ejemplo",
+        department: "Operaciones",
+        email: "alex@ejemplo.com",
+        phone: "+57 300 123 4567",
+        website: "https://ejemplo.com",
+        address: "Calle 123, Bogota",
+        pronouns: "ella",
+        legalText: "Nota legal breve",
+      },
+      exportTitle: "Tu firma de correo",
+      exportCopy:
+        "Copia la firma de abajo y pegala en la configuracion de firma de tu cliente de correo.",
+    }
+  : {
+      workspaceEyebrow: "Signature workspace",
+      workspaceTag: "Web first, mobile ready",
+      libraryEyebrow: "Library",
+      supportEyebrow: "Support",
+      configEyebrow: "Configuration",
+      configTitle: "Signature setup",
+      styleSection: "Signature style",
+      chooseStyle: "Choose style",
+      personalSection: "Personal and company data",
+      mediaSection: "Photo and logo",
+      localPreviewLabel: "Local logo or photo preview",
+      colorsSection: "Colors and appearance",
+      primaryColor: "Primary color",
+      secondaryColor: "Secondary color",
+      size: "Size",
+      sizeCompact: "compact",
+      sizeNormal: "normal",
+      sizeWide: "wide",
+      paletteHelp:
+        "Quick palettes based on trust, clarity, and easy scanning.",
+      socialSection: "Social media buttons",
+      socialHelp:
+        "Add as many buttons as needed, including multiple buttons for the same platform.",
+      addSocial: "+ Add social network",
+      socialEmpty:
+        "No social buttons added. Your signature will not show this section.",
+      socialPlatform: "Platform",
+      socialUrl: "Public HTTPS URL",
+      socialIconColor: "Icon color",
+      socialOriginalColor: "Original platform color",
+      socialPrimaryColor: "Selected primary color",
+      remove: "Remove",
+      previewEyebrow: "Live preview",
+      previewDesktop: "Desktop",
+      previewMobile: "Mobile",
+      templatesEyebrow: "Templates",
+      templatesTitle: "Pick a direction",
+      supportCompact: "Not shown",
+      photoUrlLabel: "Public photo URL HTTPS",
+      logoUrlLabel: "Public logo URL HTTPS",
+      fields: {
+        fullName: "Full name",
+        jobTitle: "Job title",
+        company: "Company",
+        department: "Area or department",
+        email: "Email",
+        phone: "Phone",
+        website: "Website HTTPS",
+        address: "Address",
+        pronouns: "Pronouns",
+        legalText: "Legal note",
+      },
+      examples: {
+        fullName: "Alex Morgan",
+        jobTitle: "Product Designer",
+        company: "Example Studio",
+        department: "Operations",
+        email: "alex@example.com",
+        phone: "+1 555 010 0000",
+        website: "https://example.com",
+        address: "123 Example Street",
+        pronouns: "she/her",
+        legalText: "Short legal note",
+      },
+      exportTitle: "Your email signature",
+      exportCopy:
+        "Copy the signature below and paste it into your email client's signature settings.",
+    };
+
+const palettePresets = isSpanish
+  ? [
+      {
+        id: "executive",
+        name: "Ejecutivo",
+        note: "Confianza, liderazgo y calma",
+        primary: "#1e3a5f",
+        secondary: "#2fbf9b",
+      },
+      {
+        id: "growth",
+        name: "Crecimiento",
+        note: "Claridad, progreso y gestion simple",
+        primary: "#214e48",
+        secondary: "#57c4ad",
+      },
+      {
+        id: "consulting",
+        name: "Consultoria",
+        note: "Estrategico y premium",
+        primary: "#27364a",
+        secondary: "#6db7c9",
+      },
+    ]
+  : [
+      {
+        id: "executive",
+        name: "Executive",
+        note: "Trust, leadership, executive calm",
+        primary: "#1e3a5f",
+        secondary: "#2fbf9b",
+      },
+      {
+        id: "growth",
+        name: "Growth",
+        note: "Clarity, progress, easy management",
+        primary: "#214e48",
+        secondary: "#57c4ad",
+      },
+      {
+        id: "consulting",
+        name: "Consulting",
+        note: "Strategic and premium",
+        primary: "#27364a",
+        secondary: "#6db7c9",
+      },
+    ];
+
+const localizedTemplateCopy = {
+  minimal: {
+    label: "Minimalista",
+    cardTitle: "Ejecutiva",
+    note: "Directa, limpia y corporativa",
   },
-  {
-    id: "growth",
-    name: "Growth",
-    note: "Clarity, progress, easy management",
-    primary: "#214e48",
-    secondary: "#57c4ad",
+  "professional-logo": {
+    label: "Logo profesional",
+    cardTitle: "Marca central",
+    note: "Enfocada en el logotipo",
   },
-  {
-    id: "consulting",
-    name: "Consulting",
-    note: "Strategic and premium",
-    primary: "#27364a",
-    secondary: "#6db7c9",
+  "professional-photo": {
+    label: "Foto profesional",
+    cardTitle: "Fundadora",
+    note: "Humana, cercana y personal",
   },
-] as const;
+  "administrative-area": {
+    label: "Area administrativa",
+    cardTitle: "Operaciones",
+    note: "Funcional y orientada al equipo",
+  },
+  "scripted-intro": {
+    label: "Intro manuscrita",
+    cardTitle: "Entrada elegante",
+    note: "Saludo manuscrito y perfil",
+  },
+  "bold-banner": {
+    label: "Banner fuerte",
+    cardTitle: "Impacto",
+    note: "Composicion marcada con enfasis",
+  },
+  "promo-banner": {
+    label: "Banner promocional",
+    cardTitle: "CTA comercial",
+    note: "Datos de contacto con franja promo",
+  },
+  "team-column": {
+    label: "Columna de equipo",
+    cardTitle: "Equipo",
+    note: "Roster corporativo compacto",
+  },
+  "orb-profile": {
+    label: "Perfil orbita",
+    cardTitle: "Brillo atlas",
+    note: "Insignia redonda con redes",
+  },
+  "scholar-strip": {
+    label: "Franja academica",
+    cardTitle: "Panel academico",
+    note: "Perfil academico o consultivo",
+  },
+  "property-cta": {
+    label: "CTA inmobiliario",
+    cardTitle: "Inmobiliaria",
+    note: "Tarjeta con llamada a la accion",
+  },
+  "social-stack": {
+    label: "Stack social",
+    cardTitle: "Creadora",
+    note: "Rail vertical de redes",
+  },
+  "executive-card": {
+    label: "Tarjeta ejecutiva",
+    cardTitle: "Pizarra ejecutiva",
+    note: "Retrato sobrio con CTA",
+  },
+  "legal-brief": {
+    label: "Resumen legal",
+    cardTitle: "Legal",
+    note: "Estilo firme y formal",
+  },
+  "medical-profile": {
+    label: "Perfil medico",
+    cardTitle: "Salud",
+    note: "Perfil claro para salud",
+  },
+  "holiday-postcard": {
+    label: "Postal estacional",
+    cardTitle: "Postal",
+    note: "Calida y expresiva",
+  },
+} as const;
+
+const localizedTemplates = isSpanish
+  ? templateCatalog.map((template) => {
+      const copy =
+        localizedTemplateCopy[
+          template.id as keyof typeof localizedTemplateCopy
+        ];
+      return copy ? { ...template, ...copy } : template;
+    })
+  : templateCatalog;
 
 const personalFields = [
-  ["fullName", "Full name"],
-  ["jobTitle", "Job title"],
-  ["company", "Company"],
-  ["department", "Area or department"],
-  ["email", "Email"],
-  ["phone", "Phone"],
-  ["website", "Website HTTPS"],
-  ["address", "Address"],
-  ["pronouns", "Pronouns"],
-  ["legalText", "Legal note"],
+  { name: "fullName", label: ui.fields.fullName, example: ui.examples.fullName },
+  { name: "jobTitle", label: ui.fields.jobTitle, example: ui.examples.jobTitle },
+  { name: "company", label: ui.fields.company, example: ui.examples.company },
+  { name: "department", label: ui.fields.department, example: ui.examples.department },
+  { name: "email", label: ui.fields.email, example: ui.examples.email },
+  { name: "phone", label: ui.fields.phone, example: ui.examples.phone },
+  { name: "website", label: ui.fields.website, example: ui.examples.website },
+  { name: "address", label: ui.fields.address, example: ui.examples.address },
+  { name: "pronouns", label: ui.fields.pronouns, example: ui.examples.pronouns },
+  { name: "legalText", label: ui.fields.legalText, example: ui.examples.legalText },
 ] as const;
+
+const localizedDefaultConfig = {
+  fullName: ui.examples.fullName,
+  jobTitle: ui.examples.jobTitle,
+  company: ui.examples.company,
+  department: ui.examples.department,
+  email: ui.examples.email,
+  phone: ui.examples.phone,
+  website: ui.examples.website,
+  address: ui.examples.address,
+  pronouns: ui.examples.pronouns,
+  legalText: ui.examples.legalText,
+};
 ---
 
 <section
   class="editor-shell"
   data-editor
+  data-locale={locale}
   data-copied={t.copied}
   data-invalid={t.invalid}
   data-cleared={t.cleared}
@@ -54,17 +325,27 @@ const personalFields = [
   data-field-hidden={t.fieldHidden}
   data-template-fields-all={t.templateFieldSummaryAll}
   data-template-fields-hidden-prefix={t.templateFieldSummaryHidden}
+  data-social-empty={ui.socialEmpty}
+  data-social-platform-label={ui.socialPlatform}
+  data-social-url-label={ui.socialUrl}
+  data-social-icon-label={ui.socialIconColor}
+  data-social-original-label={ui.socialOriginalColor}
+  data-social-primary-label={ui.socialPrimaryColor}
+  data-social-remove-label={ui.remove}
+  data-export-title={ui.exportTitle}
+  data-export-copy={ui.exportCopy}
+  data-default-config={JSON.stringify(localizedDefaultConfig)}
 >
   <div class="workspace-top">
     <div>
-      <span class="eyebrow">Signature Workspace</span>
+      <span class="eyebrow">{ui.workspaceEyebrow}</span>
       <h2>{t.form}</h2>
       <p class="panel-copy">{t.directStart}</p>
     </div>
     <div class="workspace-meta">
       <a class="workspace-action" href={`/${locale}/saved-signatures/`}>{t.savedPageAction}</a>
       <span class="autosave">{t.saved}</span>
-      <span class="workspace-tag">Web first, mobile ready</span>
+      <span class="workspace-tag">{ui.workspaceTag}</span>
     </div>
   </div>
 
@@ -102,8 +383,8 @@ const personalFields = [
     >
       <div class="rail-heading rail-heading-with-close">
         <div class="rail-heading-copy">
-          <span class="eyebrow">Configuration</span>
-          <h3>Signature setup</h3>
+          <span class="eyebrow">{ui.configEyebrow}</span>
+          <h3>{ui.configTitle}</h3>
         </div>
         <button
           class="drawer-close"
@@ -118,13 +399,13 @@ const personalFields = [
 
       <form id="signature-form">
         <details class="config-section" open>
-          <summary><span>1</span> Signature style</summary>
+          <summary><span>1</span> {ui.styleSection}</summary>
           <div class="config-body">
             <label>
-              Choose style
+              {ui.chooseStyle}
               <select name="template">
                 {
-                  templateCatalog.map((template) => (
+                  localizedTemplates.map((template) => (
                     <option value={template.id}>{template.label}</option>
                   ))
                 }
@@ -137,31 +418,40 @@ const personalFields = [
         </details>
 
         <details class="config-section" open>
-          <summary><span>2</span> Personal and company data</summary>
+          <summary><span>2</span> {ui.personalSection}</summary>
           <div class="config-body field-grid">
             {
-              personalFields.map(([name, label]) => (
+              personalFields.map((field) => (
                 <label
-                  class:list={{ wide: name === "legalText" || name === "address" }}
+                  class:list={{
+                    wide: field.name === "legalText" || field.name === "address",
+                  }}
                   data-field-wrapper
-                  data-field-name={name}
-                  data-field-label={label}
+                  data-field-name={field.name}
+                  data-field-label={field.label}
                 >
                   <span class="field-label-row">
-                    <span class="field-label-text">{label}</span>
+                    <span class="field-label-text">{field.label}</span>
                     <small
                       class="field-support-note"
-                      data-field-support-note={name}
+                      data-field-support-note={field.name}
                       title={t.fieldHidden}
                       hidden
                     >
-                      No visible
+                      {ui.supportCompact}
                     </small>
                   </span>
                   <input
-                    name={name}
-                    type={name === "email" ? "email" : name === "website" ? "url" : "text"}
+                    name={field.name}
+                    type={
+                      field.name === "email"
+                        ? "email"
+                        : field.name === "website"
+                          ? "url"
+                          : "text"
+                    }
                     data-field-control
+                    data-example-value={field.example}
                   />
                 </label>
               ))
@@ -170,18 +460,22 @@ const personalFields = [
         </details>
 
         <details class="config-section">
-          <summary><span>3</span> Photo and logo</summary>
+          <summary><span>3</span> {ui.mediaSection}</summary>
           <div class="config-body">
-            <label data-field-wrapper data-field-name="logoUrl" data-field-label="Public logo URL HTTPS">
+            <label
+              data-field-wrapper
+              data-field-name="logoUrl"
+              data-field-label={ui.logoUrlLabel}
+            >
               <span class="field-label-row">
-                <span class="field-label-text">Public logo URL HTTPS</span>
+                <span class="field-label-text">{ui.logoUrlLabel}</span>
                 <small
                   class="field-support-note"
                   data-field-support-note="logoUrl"
                   title={t.fieldHidden}
                   hidden
                 >
-                  No visible
+                  {ui.supportCompact}
                 </small>
               </span>
               <input name="logoUrl" type="url" data-field-control />
@@ -189,23 +483,23 @@ const personalFields = [
             <label
               data-field-wrapper
               data-field-name="photoUrl"
-              data-field-label="Public photo URL HTTPS"
+              data-field-label={ui.photoUrlLabel}
             >
               <span class="field-label-row">
-                <span class="field-label-text">Public photo URL HTTPS</span>
+                <span class="field-label-text">{ui.photoUrlLabel}</span>
                 <small
                   class="field-support-note"
                   data-field-support-note="photoUrl"
                   title={t.fieldHidden}
                   hidden
                 >
-                  No visible
+                  {ui.supportCompact}
                 </small>
               </span>
               <input name="photoUrl" type="url" data-field-control />
             </label>
             <label>
-              Local logo/photo preview
+              {ui.localPreviewLabel}
               <input id="local-image" type="file" accept="image/*" />
             </label>
             <p id="local-warning" class="warning" hidden>{t.localWarning}</p>
@@ -213,28 +507,26 @@ const personalFields = [
         </details>
 
         <details class="config-section" open>
-          <summary><span>4</span> Colors and appearance</summary>
+          <summary><span>4</span> {ui.colorsSection}</summary>
           <div class="config-body appearance-grid">
             <label class="appearance-field">
-              <span class="appearance-label">Primary color</span>
+              <span class="appearance-label">{ui.primaryColor}</span>
               <input name="primaryColor" type="color" />
             </label>
             <label class="appearance-field">
-              <span class="appearance-label">Secondary color</span>
+              <span class="appearance-label">{ui.secondaryColor}</span>
               <input name="secondaryColor" type="color" />
             </label>
             <label class="appearance-field">
-              <span class="appearance-label">Size</span>
+              <span class="appearance-label">{ui.size}</span>
               <select name="size">
-                <option>compact</option>
-                <option selected>normal</option>
-                <option>wide</option>
+                <option value="compact">{ui.sizeCompact}</option>
+                <option value="normal" selected>{ui.sizeNormal}</option>
+                <option value="wide">{ui.sizeWide}</option>
               </select>
             </label>
             <div class="palette-presets">
-              <p class="section-help">
-                Quick palettes based on trust, usability, and entrepreneurial clarity.
-              </p>
+              <p class="section-help">{ui.paletteHelp}</p>
               <div class="palette-list">
                 {
                   palettePresets.map((palette) => (
@@ -261,13 +553,11 @@ const personalFields = [
         </details>
 
         <details class="config-section" open>
-          <summary><span>5</span> Social media buttons</summary>
+          <summary><span>5</span> {ui.socialSection}</summary>
           <div class="config-body">
-            <p class="section-help">
-              Add as many buttons as needed, including multiple buttons for the same platform.
-            </p>
+            <p class="section-help">{ui.socialHelp}</p>
             <div id="social-list" class="social-list"></div>
-            <button id="add-social" class="add-social" type="button">+ Add social network</button>
+            <button id="add-social" class="add-social" type="button">{ui.addSocial}</button>
           </div>
         </details>
       </form>
@@ -276,13 +566,17 @@ const personalFields = [
     <section class="preview-workspace">
       <div class="preview-heading">
         <div>
-          <span class="eyebrow">Live preview</span>
+          <span class="eyebrow">{ui.previewEyebrow}</span>
           <h3>{t.preview}</h3>
           <p class="panel-copy">{t.previewNote}</p>
         </div>
         <div class="preview-switch">
-          <button class="view-toggle active" type="button" data-preview-mode="desktop">Desktop</button>
-          <button class="view-toggle" type="button" data-preview-mode="mobile">Mobile</button>
+          <button class="view-toggle active" type="button" data-preview-mode="desktop">
+            {ui.previewDesktop}
+          </button>
+          <button class="view-toggle" type="button" data-preview-mode="mobile">
+            {ui.previewMobile}
+          </button>
         </div>
       </div>
 
@@ -325,8 +619,8 @@ const personalFields = [
     >
       <div class="rail-heading rail-heading-with-close">
         <div class="rail-heading-copy">
-          <span class="eyebrow">Templates</span>
-          <h3>Pick a direction</h3>
+          <span class="eyebrow">{ui.templatesEyebrow}</span>
+          <h3>{ui.templatesTitle}</h3>
         </div>
         <button
           class="drawer-close"
@@ -340,7 +634,7 @@ const personalFields = [
       </div>
       <div class="template-showcase">
         {
-          templateCatalog.map((template) => (
+          localizedTemplates.map((template) => (
             <button class="template-card" type="button" data-template={template.id}>
               <div class="template-thumb">
                 <div class="template-thumb-canvas" data-template-preview={template.id}></div>
@@ -358,7 +652,7 @@ const personalFields = [
     <div class="support-card support-card-wide">
       <div class="saved-library-heading">
         <div>
-          <span class="eyebrow">Library</span>
+          <span class="eyebrow">{ui.libraryEyebrow}</span>
           <h3>{t.savedLibrary}</h3>
         </div>
         <a class="library-link" href={`/${locale}/saved-signatures/`}>{t.savedLibraryHint}</a>
@@ -374,7 +668,7 @@ const personalFields = [
     <div class="support-card support-card-wide">
       <div class="saved-library-heading">
         <div>
-          <span class="eyebrow">Support</span>
+          <span class="eyebrow">{ui.supportEyebrow}</span>
           <h3>{t.supportTitle}</h3>
         </div>
         <a class="library-link" href={`/${locale}/support-open-source/`}>{t.supportLink}</a>
