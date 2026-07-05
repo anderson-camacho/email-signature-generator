@@ -4,6 +4,7 @@ import { dictionary, locales, type Locale } from "../../i18n/dictionaries";
 import {
   breadcrumbJsonLd,
   faqJsonLd,
+  siteRepository,
   type SeoPageKind,
 } from "../../seo/metadata";
 
@@ -11,12 +12,24 @@ type StaticPageKey =
   | "privacy"
   | "email-installation-guide"
   | "faq"
+  | "suggest-improvement"
   | "support-open-source"
   | "donations";
 
 type BasicContent = {
   title: string;
   paragraphs: string[];
+};
+
+type ImprovementContent = {
+  title: string;
+  intro: string;
+  emailTitle: string;
+  emailCopy: string;
+  emailAction: string;
+  issueTitle: string;
+  issueCopy: string;
+  issueAction: string;
 };
 
 type GuideSection = {
@@ -43,6 +56,7 @@ export function getStaticPaths() {
     "privacy",
     "email-installation-guide",
     "faq",
+    "suggest-improvement",
     "support-open-source",
     "donations",
   ];
@@ -59,7 +73,7 @@ const { locale, page } = Astro.props as { locale: Locale; page: StaticPageKey };
 const t = dictionary(locale);
 
 type BasicPages = Record<
-  Exclude<StaticPageKey, "email-installation-guide">,
+  Exclude<StaticPageKey, "email-installation-guide" | "suggest-improvement">,
   BasicContent
 >;
 
@@ -513,6 +527,176 @@ const basicPageCopy: Record<Locale, BasicPages> = {
 };
 
 const basicContents = basicPageCopy[locale] ?? basicPageCopy.es;
+
+const improvementEmail = "anderson.camacho.palacios@gmail.com";
+const improvementIssueUrl = `${siteRepository}/issues/new?title=${encodeURIComponent(
+  "Sugerencia de mejora",
+)}&body=${encodeURIComponent(
+  "Describe la mejora que te gustaria ver, por que seria util y cualquier detalle de contexto.",
+)}`;
+
+const improvementPageCopy: Record<Locale, ImprovementContent> = {
+  es: {
+    title: "Sugerir una mejora",
+    intro:
+      "Si necesitas una mejora, encontraste algo que puede ser mas claro o quieres pedir una nueva funcion, puedes enviar la recomendacion por correo o crear un issue en GitHub.",
+    emailTitle: "Enviar correo electronico",
+    emailCopy:
+      "Escribe tu recomendacion a este correo. Puedes incluir capturas, el navegador que usas y una explicacion corta de lo que esperas mejorar.",
+    emailAction: "Enviar correo",
+    issueTitle: "Crear issue en GitHub",
+    issueCopy:
+      "Si prefieres dejar la mejora documentada publicamente, abre un issue en el repositorio del proyecto.",
+    issueAction: "Abrir issue",
+  },
+  en: {
+    title: "Suggest an improvement",
+    intro:
+      "If you need an improvement, found something that could be clearer, or want to request a new feature, you can send the recommendation by email or create a GitHub issue.",
+    emailTitle: "Send an email",
+    emailCopy:
+      "Send your recommendation to this email. You can include screenshots, your browser, and a short explanation of what should improve.",
+    emailAction: "Send email",
+    issueTitle: "Create a GitHub issue",
+    issueCopy:
+      "If you prefer to document the improvement publicly, open an issue in the project repository.",
+    issueAction: "Open issue",
+  },
+  "pt-BR": {
+    title: "Sugerir uma melhoria",
+    intro:
+      "Se voce precisa de uma melhoria, encontrou algo que pode ficar mais claro ou quer pedir uma nova funcao, envie a recomendacao por email ou crie uma issue no GitHub.",
+    emailTitle: "Enviar email",
+    emailCopy:
+      "Envie sua recomendacao para este email. Inclua capturas, navegador e uma explicacao curta do que deveria melhorar.",
+    emailAction: "Enviar email",
+    issueTitle: "Criar issue no GitHub",
+    issueCopy:
+      "Se preferir documentar a melhoria publicamente, abra uma issue no repositorio do projeto.",
+    issueAction: "Abrir issue",
+  },
+  fr: {
+    title: "Suggerer une amelioration",
+    intro:
+      "Si vous avez besoin d'une amelioration, si quelque chose peut etre plus clair ou si vous souhaitez demander une nouvelle fonction, envoyez la recommandation par email ou creez une issue GitHub.",
+    emailTitle: "Envoyer un email",
+    emailCopy:
+      "Envoyez votre recommandation a cet email. Vous pouvez inclure des captures, votre navigateur et une courte explication.",
+    emailAction: "Envoyer un email",
+    issueTitle: "Creer une issue GitHub",
+    issueCopy:
+      "Si vous preferez documenter l'amelioration publiquement, ouvrez une issue dans le depot du projet.",
+    issueAction: "Ouvrir une issue",
+  },
+  de: {
+    title: "Verbesserung vorschlagen",
+    intro:
+      "Wenn Sie eine Verbesserung benoetigen, etwas klarer sein koennte oder Sie eine neue Funktion wuenschen, senden Sie die Empfehlung per E-Mail oder erstellen Sie ein GitHub-Issue.",
+    emailTitle: "E-Mail senden",
+    emailCopy:
+      "Senden Sie Ihre Empfehlung an diese Adresse. Screenshots, Browser und eine kurze Erklaerung helfen sehr.",
+    emailAction: "E-Mail senden",
+    issueTitle: "GitHub-Issue erstellen",
+    issueCopy:
+      "Wenn die Verbesserung oeffentlich dokumentiert werden soll, oeffnen Sie ein Issue im Projekt-Repository.",
+    issueAction: "Issue oeffnen",
+  },
+  it: {
+    title: "Suggerisci un miglioramento",
+    intro:
+      "Se serve un miglioramento, qualcosa puo essere piu chiaro o vuoi chiedere una nuova funzione, invia la raccomandazione via email o crea una issue su GitHub.",
+    emailTitle: "Invia email",
+    emailCopy:
+      "Invia la raccomandazione a questa email. Puoi includere screenshot, browser e una breve spiegazione.",
+    emailAction: "Invia email",
+    issueTitle: "Crea issue su GitHub",
+    issueCopy:
+      "Se preferisci documentare pubblicamente il miglioramento, apri una issue nel repository del progetto.",
+    issueAction: "Apri issue",
+  },
+  ja: {
+    title: "改善を提案",
+    intro:
+      "改善してほしい点、分かりにくい点、新しい機能の希望があれば、メールまたはGitHub Issueで送れます。",
+    emailTitle: "メールを送信",
+    emailCopy:
+      "このメールアドレスへ提案を送ってください。スクリーンショット、ブラウザ、改善内容の短い説明があると助かります。",
+    emailAction: "メールを送る",
+    issueTitle: "GitHub Issueを作成",
+    issueCopy:
+      "改善内容を公開で残したい場合は、プロジェクトのリポジトリでIssueを開いてください。",
+    issueAction: "Issueを開く",
+  },
+  ko: {
+    title: "개선 제안",
+    intro:
+      "개선이 필요하거나 더 명확해질 부분, 새 기능 요청이 있다면 이메일로 보내거나 GitHub issue를 만들 수 있습니다.",
+    emailTitle: "이메일 보내기",
+    emailCopy:
+      "이 이메일로 제안을 보내 주세요. 스크린샷, 브라우저, 개선이 필요한 내용을 짧게 적어 주면 좋습니다.",
+    emailAction: "이메일 보내기",
+    issueTitle: "GitHub issue 만들기",
+    issueCopy:
+      "개선 내용을 공개적으로 남기고 싶다면 프로젝트 저장소에 issue를 열어 주세요.",
+    issueAction: "Issue 열기",
+  },
+  ar: {
+    title: "اقتراح تحسين",
+    intro:
+      "إذا كنت تحتاج إلى تحسين أو وجدت شيئا يمكن توضيحه أو تريد طلب ميزة جديدة، يمكنك إرسال التوصية بالبريد الإلكتروني أو إنشاء issue في GitHub.",
+    emailTitle: "إرسال بريد إلكتروني",
+    emailCopy:
+      "أرسل توصيتك إلى هذا البريد. يمكنك إرفاق لقطات شاشة واسم المتصفح وشرح قصير للتحسين المطلوب.",
+    emailAction: "إرسال بريد",
+    issueTitle: "إنشاء issue في GitHub",
+    issueCopy: "إذا كنت تفضل توثيق التحسين علنا، افتح issue في مستودع المشروع.",
+    issueAction: "فتح issue",
+  },
+  hi: {
+    title: "सुधार सुझाएं",
+    intro:
+      "अगर आपको कोई सुधार चाहिए, कुछ और स्पष्ट होना चाहिए, या नई सुविधा का अनुरोध करना है, तो आप ईमेल भेज सकते हैं या GitHub issue बना सकते हैं।",
+    emailTitle: "ईमेल भेजें",
+    emailCopy:
+      "अपना सुझाव इस ईमेल पर भेजें। स्क्रीनशॉट, ब्राउज़र और सुधार की छोटी व्याख्या शामिल कर सकते हैं।",
+    emailAction: "ईमेल भेजें",
+    issueTitle: "GitHub issue बनाएं",
+    issueCopy:
+      "यदि आप सुधार को सार्वजनिक रूप से दर्ज करना चाहते हैं, तो प्रोजेक्ट repository में issue खोलें।",
+    issueAction: "Issue खोलें",
+  },
+  "zh-CN": {
+    title: "建议改进",
+    intro:
+      "如果你需要改进、发现某些内容可以更清楚，或想请求新功能，可以发送电子邮件或创建 GitHub issue。",
+    emailTitle: "发送电子邮件",
+    emailCopy:
+      "请把建议发送到这个邮箱。可以附上截图、浏览器信息，以及需要改进内容的简短说明。",
+    emailAction: "发送邮件",
+    issueTitle: "创建 GitHub issue",
+    issueCopy: "如果你希望公开记录这个改进，请在项目仓库中创建 issue。",
+    issueAction: "打开 issue",
+  },
+  ru: {
+    title: "Предложить улучшение",
+    intro:
+      "Если нужно улучшение, что-то можно сделать понятнее или вы хотите запросить новую функцию, отправьте рекомендацию по email или создайте issue в GitHub.",
+    emailTitle: "Отправить email",
+    emailCopy:
+      "Отправьте рекомендацию на этот адрес. Можно добавить скриншоты, браузер и короткое описание улучшения.",
+    emailAction: "Отправить email",
+    issueTitle: "Создать GitHub issue",
+    issueCopy:
+      "Если хотите публично зафиксировать улучшение, откройте issue в репозитории проекта.",
+    issueAction: "Открыть issue",
+  },
+};
+
+const improvementContent =
+  improvementPageCopy[locale] ?? improvementPageCopy.es;
+const improvementMailto = `mailto:${improvementEmail}?subject=${encodeURIComponent(
+  improvementContent.title,
+)}&body=${encodeURIComponent(`${improvementContent.intro}\n\n`)}`;
 
 type GuideBasics = {
   title: string;
@@ -1105,17 +1289,22 @@ const installationGuide: InstallationGuide =
         );
 
 const isInstallationGuide = page === "email-installation-guide";
-const basicPage = isInstallationGuide ? null : basicContents[page];
+const isImprovementPage = page === "suggest-improvement";
+const basicPage =
+  isInstallationGuide || isImprovementPage ? null : basicContents[page];
 const pageKindByStaticPage: Record<StaticPageKey, SeoPageKind> = {
   privacy: "privacy",
   "email-installation-guide": "guide",
   faq: "faq",
+  "suggest-improvement": "support",
   "support-open-source": "support",
   donations: "donations",
 };
 const pageTitle = isInstallationGuide
   ? installationGuide.title
-  : basicPage!.title;
+  : isImprovementPage
+    ? improvementContent.title
+    : basicPage!.title;
 const pageKind = pageKindByStaticPage[page];
 const structuredData = [
   breadcrumbJsonLd(locale, [
@@ -1200,6 +1389,37 @@ const structuredData = [
             <p>{paragraph}</p>
           ))}
         </section>
+      </article>
+    ) : isImprovementPage ? (
+      <article class="content-card improvement-card">
+        <h1>{improvementContent.title}</h1>
+        <p class="guide-intro">{improvementContent.intro}</p>
+
+        <div class="improvement-options">
+          <section class="improvement-option">
+            <h2>{improvementContent.emailTitle}</h2>
+            <p>{improvementContent.emailCopy}</p>
+            <p>
+              <a href={`mailto:${improvementEmail}`}>{improvementEmail}</a>
+            </p>
+            <a class="support-pill" href={improvementMailto}>
+              {improvementContent.emailAction}
+            </a>
+          </section>
+
+          <section class="improvement-option">
+            <h2>{improvementContent.issueTitle}</h2>
+            <p>{improvementContent.issueCopy}</p>
+            <a
+              class="support-pill tertiary"
+              href={improvementIssueUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {improvementContent.issueAction}
+            </a>
+          </section>
+        </div>
       </article>
     ) : (
       <article class="content-card">

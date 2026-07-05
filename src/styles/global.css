@@ -246,6 +246,32 @@ main {
 .guide-card h2 {
   margin: 0;
 }
+.improvement-card {
+  display: grid;
+  gap: 1.25rem;
+}
+.improvement-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.improvement-option {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+  padding: 1rem;
+  border: 1px solid var(--ui-line);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff, var(--ui-panel));
+}
+.improvement-option h2,
+.improvement-option p {
+  margin: 0;
+}
+.improvement-option .support-pill {
+  width: fit-content;
+  min-width: 150px;
+}
 .guide-intro,
 .guide-section-head p,
 .guide-managed p,
@@ -1340,7 +1366,8 @@ footer {
   .local-image-actions,
   .image-tools-controls,
   .mini-plan,
-  .guide-grid {
+  .guide-grid,
+  .improvement-options {
     grid-template-columns: 1fr;
   }
   .social-card-grid {
