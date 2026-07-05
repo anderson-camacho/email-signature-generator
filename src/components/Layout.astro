@@ -1,5 +1,10 @@
 ---
-import { dictionary, localeNames, locales, type Locale } from "../i18n/dictionaries";
+import {
+  dictionary,
+  localeNames,
+  locales,
+  type Locale,
+} from "../i18n/dictionaries";
 import "../styles/global.css";
 interface Props { locale: Locale; title?: string; description?: string }
 const { locale, title, description } = Astro.props;
@@ -16,27 +21,82 @@ const canonical = new URL(Astro.url.pathname, site);
     <meta name="description" content={description ?? t.promise} />
     <link rel="canonical" href={canonical} />
     {locales.map((item) => <link rel="alternate" hreflang={item} href={new URL(`/${item}${Astro.url.pathname.replace(/^\/[^/]+/, "")}`, site)} />)}
-    <link rel="alternate" hreflang="x-default" href={new URL("/es/", site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL("/en/", site)} />
     <meta property="og:title" content={title ?? t.title} /><meta property="og:description" content={description ?? t.promise} /><meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
   </head>
   <body>
     <a class="skip" href="#content">Skip to content</a>
-    <header>
-      <a class="brand" href={`/${locale}/`}>Email Signature Generator</a>
-      <nav aria-label="Main navigation">
-        <a href={`/${locale}/email-installation-guide/`}>{t.guide}</a><a href={`/${locale}/email-signature-templates/`}>{t.templates}</a><a href={`/${locale}/faq/`}>{t.faq}</a><a href={`/${locale}/saved-signatures/`}>{t.savedLibrary}</a>
-      </nav>
-      <label class="language">{t.language} <select id="language">{locales.map((item) => <option value={item} selected={item === locale}>{localeNames[item]}</option>)}</select></label>
+    <header class="site-header">
+      <div class="header-shell">
+        <a class="brand" href={`/${locale}/`}>
+          <span class="brand-mark">ES</span>
+          <span class="brand-copy">
+            <strong>Email Signature Generator</strong>
+            <small>Fast editor, local library, multilingual setup</small>
+          </span>
+        </a>
+        <div class="header-controls">
+          <nav aria-label="Main navigation" class="main-nav">
+            <a href={`/${locale}/email-installation-guide/`}>{t.guide}</a>
+            <a href={`/${locale}/email-signature-templates/`}>{t.templates}</a>
+            <a href={`/${locale}/faq/`}>{t.faq}</a>
+            <a href={`/${locale}/saved-signatures/`}>{t.savedLibrary}</a>
+          </nav>
+          <div class="header-donate-shell">
+            <span class="header-donate-copy">Donar</span>
+            <div
+              id="header-paypal-donate-button"
+              class="header-paypal-donate-button"
+            ></div>
+          </div>
+          <label class="language-picker" aria-label={t.language}>
+            <select id="language">
+              {locales.map((item) => <option value={item} selected={item === locale}>{localeNames[item]}</option>)}
+            </select>
+          </label>
+        </div>
+      </div>
     </header>
     <main id="content"><slot /></main>
     <footer><a href={`/${locale}/privacy/`}>{t.privacyPage}</a> · <a href="https://github.com/anderson-camacho/email-signature-generator">Repository</a> · <a href="/LICENSE">MPL-2.0</a></footer>
-    <script>
-      document.querySelector<HTMLSelectElement>("#language")?.addEventListener("change", (event) => {
-        const locale = (event.target as HTMLSelectElement).value;
+    <script src="https://www.paypalobjects.com/donate/sdk/donate-sdk.js" charset="UTF-8"></script>
+    <script is:inline>
+      document.querySelector("#language")?.addEventListener("change", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLSelectElement)) return;
+        const locale = target.value;
         localStorage.setItem("email-signature-generator:locale", locale);
         location.href = `/${locale}${location.pathname.replace(/^\/[^/]+/, "")}`;
       });
+
+      const renderHeaderDonateButton = () => {
+        const container = document.querySelector("#header-paypal-donate-button");
+        if (!(container instanceof HTMLElement) || container.dataset.rendered === "true") return;
+        if (!window.PayPal?.Donation?.Button) return;
+
+        container.dataset.rendered = "true";
+        window.PayPal.Donation.Button({
+          env: "production",
+          hosted_button_id: "9HLNFUZS5DJ72",
+          image: {
+            src: "https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif",
+            alt: "Donate with PayPal button",
+            title: "PayPal - The safer, easier way to pay online!",
+          },
+        }).render("#header-paypal-donate-button");
+      };
+
+      const waitForHeaderDonateButton = () => {
+        if (window.PayPal?.Donation?.Button) {
+          renderHeaderDonateButton();
+          return;
+        }
+
+        window.setTimeout(waitForHeaderDonateButton, 120);
+      };
+
+      waitForHeaderDonateButton();
     </script>
   </body>
 </html>
