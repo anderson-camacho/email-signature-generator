@@ -10,6 +10,7 @@ import {
   safeColor,
   safeHttpsUrl,
   safeImageUrl,
+  safeReadableText,
 } from "./validators";
 
 const supportedSocialPlatforms: SocialPlatform[] = [
@@ -40,7 +41,7 @@ export const escapeHtml = (value: string) =>
   );
 
 export function sanitizeConfig(config: SignatureConfig): SignatureConfig {
-  const text = (value: string) => value.slice(0, 500);
+  const text = (value: string) => safeReadableText(value, 500);
   const socials = Array.isArray(config.socials)
     ? config.socials
         .filter(
@@ -50,7 +51,7 @@ export function sanitizeConfig(config: SignatureConfig): SignatureConfig {
         )
         .slice(0, 24)
         .map((social) => ({
-          id: text(String(social.id || crypto.randomUUID())),
+          id: String(social.id || crypto.randomUUID()).slice(0, 500),
           platform: social.platform,
           url: safeHttpsUrl(String(social.url || "")),
           iconStyle:

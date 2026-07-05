@@ -18,6 +18,12 @@ import {
   saveSavedSignatures,
   type SavedSignatureRecord,
 } from "../storage/local-storage-adapter";
+import {
+  isEmail,
+  isReadableText,
+  normalizePhone,
+  safeHttpsUrl,
+} from "../core/validators";
 
 const editor = document.querySelector<HTMLElement>("[data-editor]")!;
 const locale = editor.dataset.locale ?? "en";
@@ -49,6 +55,20 @@ const localImageMessages = {
     editor.dataset.localImageReady ??
     "Image ready and saved with this signature.",
   invalid: editor.dataset.localImageInvalid ?? "Use JPG, PNG, WebP, or GIF.",
+};
+const validationMessages = {
+  email:
+    editor.dataset.validationEmail ??
+    "Enter a valid email address, for example name@example.com.",
+  phone:
+    editor.dataset.validationPhone ??
+    "Use an international phone number with 7 to 15 digits.",
+  website:
+    editor.dataset.validationWebsite ??
+    "Use a valid public HTTPS URL, for example https://example.com.",
+  text:
+    editor.dataset.validationText ??
+    "Use readable text only. Letters from any language, numbers, spaces, and normal punctuation are allowed.",
 };
 const localizedDefaults = (() => {
   try {
@@ -133,6 +153,7 @@ const control = (name: string) =>
   form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
 const dataImagePattern = /^data:image\/(png|jpe?g|webp|gif);base64,/i;
 const isDataImageUrl = (value: string) => dataImagePattern.test(value);
+type ValidationKind = "email" | "phone" | "website" | "text";
 
 const freshConfig = (): SignatureConfig => ({
   ...structuredClone(defaultConfig),
@@ -204,6 +225,7 @@ const render = () => {
   preview.innerHTML = renderSignature(config, locale);
   renderTemplatePreviews();
   updateFieldSupportState();
+  validateFormFields();
   updateLocalImageRemoveState();
 };
 
@@ -268,6 +290,47 @@ function updateFieldSupportState() {
   templateFieldSummary.textContent = `${
     editor.dataset.templateFieldsHiddenPrefix ?? "This template does not show:"
   } ${hiddenLabels.join(", ")}.`;
+}
+
+function validationMessageFor(input: HTMLInputElement) {
+  const value = input.value.trim();
+  const kind = input.dataset.validationKind as ValidationKind | undefined;
+  if (!value || input.disabled || !kind) return "";
+
+  if (kind === "email") {
+    return isEmail(value) ? "" : validationMessages.email;
+  }
+
+  if (kind === "phone") {
+    return normalizePhone(value) ? "" : validationMessages.phone;
+  }
+
+  if (kind === "website") {
+    return safeHttpsUrl(value) ? "" : validationMessages.website;
+  }
+
+  return isReadableText(value) ? "" : validationMessages.text;
+}
+
+function validateField(input: HTMLInputElement) {
+  const message = validationMessageFor(input);
+  const wrapper = input.closest<HTMLElement>("[data-field-wrapper]");
+  const error = wrapper?.querySelector<HTMLElement>("[data-field-error]");
+
+  input.setCustomValidity(message);
+  input.setAttribute("aria-invalid", String(Boolean(message)));
+  wrapper?.classList.toggle("has-field-error", Boolean(message));
+
+  if (error) {
+    error.textContent = message;
+    error.hidden = !message;
+  }
+}
+
+function validateFormFields() {
+  form
+    .querySelectorAll<HTMLInputElement>("[data-validation-kind]")
+    .forEach(validateField);
 }
 
 const download = (content: string, name: string, type: string) => {

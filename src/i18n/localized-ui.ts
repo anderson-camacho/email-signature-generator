@@ -125,6 +125,13 @@ export type SavedSignaturesUi = {
   remove: string;
 };
 
+export type FieldValidationUi = {
+  email: string;
+  phone: string;
+  website: string;
+  text: string;
+};
+
 const enEditor: EditorUi = {
   workspaceEyebrow: "Signature workspace",
   workspaceTag: "Web first, mobile ready",
@@ -1936,5 +1943,94 @@ export const savedSignaturesUiByLocale: Record<Locale, SavedSignaturesUi> = {
     duplicate: "Дублировать",
     duplicateSuffix: "копия",
     remove: "Удалить",
+  },
+};
+
+export const fieldValidationUiByLocale: Record<Locale, FieldValidationUi> = {
+  en: {
+    email: "Enter a valid email address, for example name@example.com.",
+    phone:
+      "Use an international phone number with 7 to 15 digits, for example +57 300 123 4567.",
+    website: "Use a valid public HTTPS URL, for example https://example.com.",
+    text: "Use readable text only. Letters from any language, numbers, spaces, and normal punctuation are allowed.",
+  },
+  es: {
+    email: "Escribe un correo válido, por ejemplo nombre@ejemplo.com.",
+    phone:
+      "Usa un teléfono internacional de 7 a 15 dígitos, por ejemplo +57 300 123 4567.",
+    website:
+      "Usa una URL HTTPS pública válida, por ejemplo https://ejemplo.com.",
+    text: "Usa solo texto legible. Se permiten letras de cualquier idioma, números, espacios y puntuación normal.",
+  },
+  "pt-BR": {
+    email: "Digite um email válido, por exemplo nome@exemplo.com.",
+    phone:
+      "Use um telefone internacional com 7 a 15 dígitos, por exemplo +55 11 90000 0000.",
+    website:
+      "Use uma URL HTTPS pública válida, por exemplo https://exemplo.com.",
+    text: "Use apenas texto legível. Letras de qualquer idioma, números, espaços e pontuação normal são permitidos.",
+  },
+  fr: {
+    email: "Saisissez une adresse email valide, par exemple nom@exemple.fr.",
+    phone:
+      "Utilisez un numéro international de 7 à 15 chiffres, par exemple +33 6 12 34 56 78.",
+    website:
+      "Utilisez une URL HTTPS publique valide, par exemple https://exemple.fr.",
+    text: "Utilisez uniquement du texte lisible. Les lettres de toute langue, les chiffres, les espaces et la ponctuation normale sont autorisés.",
+  },
+  de: {
+    email:
+      "Geben Sie eine gültige E-Mail-Adresse ein, zum Beispiel name@beispiel.de.",
+    phone:
+      "Verwenden Sie eine internationale Telefonnummer mit 7 bis 15 Ziffern, zum Beispiel +49 30 123456.",
+    website:
+      "Verwenden Sie eine gültige öffentliche HTTPS-URL, zum Beispiel https://beispiel.de.",
+    text: "Verwenden Sie nur lesbaren Text. Buchstaben jeder Sprache, Zahlen, Leerzeichen und normale Satzzeichen sind erlaubt.",
+  },
+  it: {
+    email: "Inserisci un indirizzo email valido, ad esempio nome@esempio.it.",
+    phone:
+      "Usa un numero internazionale da 7 a 15 cifre, ad esempio +39 02 123456.",
+    website: "Usa un URL HTTPS pubblico valido, ad esempio https://esempio.it.",
+    text: "Usa solo testo leggibile. Sono consentiti lettere di qualsiasi lingua, numeri, spazi e punteggiatura normale.",
+  },
+  ja: {
+    email: "有効なメールアドレスを入力してください。例: name@example.jp",
+    phone: "7〜15桁の国際電話番号を入力してください。例: +81 3 1234 5678",
+    website: "有効な公開HTTPS URLを入力してください。例: https://example.jp",
+    text: "読みやすい文字だけを使用してください。任意の言語の文字、数字、スペース、通常の句読点を使用できます。",
+  },
+  ko: {
+    email: "올바른 이메일 주소를 입력하세요. 예: name@example.kr",
+    phone: "7~15자리 국제 전화번호를 입력하세요. 예: +82 2 1234 5678",
+    website: "올바른 공개 HTTPS URL을 입력하세요. 예: https://example.kr",
+    text: "읽을 수 있는 텍스트만 사용하세요. 모든 언어의 문자, 숫자, 공백, 일반 문장 부호를 사용할 수 있습니다.",
+  },
+  ar: {
+    email: "أدخل بريدًا إلكترونيًا صالحًا، مثل name@example.com.",
+    phone: "استخدم رقم هاتف دوليًا من 7 إلى 15 رقمًا، مثل +971 50 123 4567.",
+    website: "استخدم رابط HTTPS عامًا وصالحًا، مثل https://example.com.",
+    text: "استخدم نصًا مقروءًا فقط. يُسمح بالحروف من أي لغة والأرقام والمسافات وعلامات الترقيم العادية.",
+  },
+  hi: {
+    email: "मान्य ईमेल पता लिखें, जैसे name@example.in.",
+    phone:
+      "7 से 15 अंकों वाला अंतरराष्ट्रीय फ़ोन नंबर लिखें, जैसे +91 98765 43210.",
+    website: "मान्य सार्वजनिक HTTPS URL लिखें, जैसे https://example.in.",
+    text: "केवल पढ़ने योग्य पाठ लिखें। किसी भी भाषा के अक्षर, अंक, स्पेस और सामान्य विराम चिह्न मान्य हैं।",
+  },
+  "zh-CN": {
+    email: "请输入有效的邮箱地址，例如 name@example.cn。",
+    phone: "请输入 7 到 15 位数字的国际电话号码，例如 +86 10 1234 5678。",
+    website: "请输入有效的公开 HTTPS URL，例如 https://example.cn。",
+    text: "请只使用可读文本。允许任何语言的文字、数字、空格和常规标点。",
+  },
+  ru: {
+    email: "Введите корректный email, например name@example.ru.",
+    phone:
+      "Используйте международный номер из 7–15 цифр, например +7 495 123 45 67.",
+    website:
+      "Используйте корректный публичный HTTPS URL, например https://example.ru.",
+    text: "Используйте только читаемый текст. Разрешены буквы любого языка, цифры, пробелы и обычная пунктуация.",
   },
 };

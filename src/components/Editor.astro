@@ -2,6 +2,7 @@
 import { dictionary, type Locale } from "../i18n/dictionaries";
 import {
   editorUiByLocale,
+  fieldValidationUiByLocale,
   palettePresetsByLocale,
   templateCardsByLocale,
 } from "../i18n/localized-ui";
@@ -392,6 +393,57 @@ const localizedDefaultConfig = {
   pronouns: ui.examples.pronouns,
   legalText: ui.examples.legalText,
 };
+
+const fieldValidationUi =
+  fieldValidationUiByLocale[locale] ?? fieldValidationUiByLocale.es;
+const fieldValidationKind = {
+  fullName: "text",
+  jobTitle: "text",
+  company: "text",
+  department: "text",
+  email: "email",
+  phone: "phone",
+  website: "website",
+  address: "text",
+  pronouns: "text",
+  legalText: "text",
+} as const;
+const fieldInputMode = {
+  fullName: "text",
+  jobTitle: "text",
+  company: "text",
+  department: "text",
+  email: "email",
+  phone: "tel",
+  website: "url",
+  address: "text",
+  pronouns: "text",
+  legalText: "text",
+} as const;
+const fieldMaxLength = {
+  fullName: 90,
+  jobTitle: 90,
+  company: 110,
+  department: 90,
+  email: 254,
+  phone: 24,
+  website: 240,
+  address: 180,
+  pronouns: 60,
+  legalText: 280,
+} as const;
+const fieldAutocomplete = {
+  fullName: "name",
+  jobTitle: "organization-title",
+  company: "organization",
+  department: undefined,
+  email: "email",
+  phone: "tel",
+  website: "url",
+  address: "street-address",
+  pronouns: undefined,
+  legalText: undefined,
+} as const;
 ---
 
 <section
@@ -419,6 +471,10 @@ const localizedDefaultConfig = {
   data-local-image-no-file={ui.localImageNoFile}
   data-local-image-ready={ui.localImageReady}
   data-local-image-invalid={ui.localImageInvalid}
+  data-validation-email={fieldValidationUi.email}
+  data-validation-phone={fieldValidationUi.phone}
+  data-validation-website={fieldValidationUi.website}
+  data-validation-text={fieldValidationUi.text}
 >
   <div class="workspace-top">
     <div>
@@ -541,8 +597,19 @@ const localizedDefaultConfig = {
                           ? "url"
                           : "text"
                     }
+                    inputmode={fieldInputMode[field.name]}
+                    maxlength={fieldMaxLength[field.name]}
+                    autocomplete={fieldAutocomplete[field.name]}
                     data-field-control
                     data-example-value={field.example}
+                    data-validation-kind={fieldValidationKind[field.name]}
+                    aria-describedby={`${field.name}-error`}
+                  />
+                  <small
+                    id={`${field.name}-error`}
+                    class="field-error"
+                    data-field-error
+                    hidden
                   />
                 </label>
               ))
