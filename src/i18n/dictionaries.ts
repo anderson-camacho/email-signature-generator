@@ -60,6 +60,9 @@ const es = {
     "Revisa mejor tus versiones guardadas, abre una, duplícala o elimina las que no sirven.",
   savedPageAction: "Abrir biblioteca",
   savedBackAction: "Volver al editor",
+  drawerConfig: "Configurar",
+  drawerTemplates: "Plantillas",
+  drawerClose: "Cerrar",
   supportTitle: "Apoya el proyecto",
   supportLink: "Ver apoyo",
   supportCopy:
@@ -117,6 +120,9 @@ const en: Dictionary = {
     "Review saved versions more clearly, reopen one, duplicate it, or remove what you no longer need.",
   savedPageAction: "Open library",
   savedBackAction: "Back to editor",
+  drawerConfig: "Setup",
+  drawerTemplates: "Templates",
+  drawerClose: "Close",
   supportTitle: "Support the project",
   supportLink: "View support",
   supportCopy:
