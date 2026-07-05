@@ -1,12 +1,17 @@
 ---
 import { dictionary, type Locale } from "../i18n/dictionaries";
+import {
+  editorUiByLocale,
+  palettePresetsByLocale,
+  templateCardsByLocale,
+} from "../i18n/localized-ui";
 import { templateCatalog } from "../templates/catalog";
 
 const { locale } = Astro.props as { locale: Locale };
 const t = dictionary(locale);
 const isSpanish = locale === "es";
 
-const ui = isSpanish
+const legacyUi = isSpanish
   ? {
       workspaceEyebrow: "Espacio de firma",
       workspaceTag: "Primero web, listo para movil",
@@ -185,7 +190,9 @@ const ui = isSpanish
         "Copy the signature below and paste it into your email client's signature settings.",
     };
 
-const palettePresets = isSpanish
+const ui = editorUiByLocale[locale] ?? editorUiByLocale.es;
+
+const legacyPalettePresets = isSpanish
   ? [
       {
         id: "executive",
@@ -233,7 +240,10 @@ const palettePresets = isSpanish
       },
     ];
 
-const localizedTemplateCopy = {
+const palettePresets =
+  palettePresetsByLocale[locale] ?? palettePresetsByLocale.es;
+
+const legacyLocalizedTemplateCopy = {
   minimal: {
     label: "Minimalista",
     cardTitle: "Ejecutiva",
@@ -316,15 +326,26 @@ const localizedTemplateCopy = {
   },
 } as const;
 
-const localizedTemplates = isSpanish
+const legacyLocalizedTemplates = isSpanish
   ? templateCatalog.map((template) => {
       const copy =
-        localizedTemplateCopy[
-          template.id as keyof typeof localizedTemplateCopy
+        legacyLocalizedTemplateCopy[
+          template.id as keyof typeof legacyLocalizedTemplateCopy
         ];
       return copy ? { ...template, ...copy } : template;
     })
   : templateCatalog;
+
+void legacyUi;
+void legacyPalettePresets;
+void legacyLocalizedTemplates;
+
+const localizedTemplateCopy =
+  templateCardsByLocale[locale] ?? templateCardsByLocale.es;
+const localizedTemplates = templateCatalog.map((template) => {
+  const copy = localizedTemplateCopy[template.id];
+  return copy ? { ...template, ...copy } : template;
+});
 
 const personalFields = [
   {

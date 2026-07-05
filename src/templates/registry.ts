@@ -5,6 +5,8 @@ import type {
   TemplateId,
 } from "../core/signature-types";
 import { escapeHtml, sanitizeConfig } from "../core/signature-sanitizer";
+import type { Locale } from "../i18n/dictionaries";
+import { signatureCopyByLocale } from "../i18n/localized-ui";
 
 const sizeScale: Record<SignatureConfig["size"], number> = {
   compact: 0.9,
@@ -12,69 +14,11 @@ const sizeScale: Record<SignatureConfig["size"], number> = {
   wide: 1.12,
 };
 
-type TemplateLocale = "es" | "en";
-
 const px = (value: number) => `${Math.round(value)}px`;
 const scaled = (config: SignatureConfig, value: number) =>
   Math.round(value * sizeScale[config.size]);
-const resolveLocale = (locale?: string): TemplateLocale =>
-  locale?.toLowerCase().startsWith("es") ? "es" : "en";
 const templateCopy = (locale?: string) =>
-  resolveLocale(locale) === "es"
-    ? {
-        bestRegards: "Saludos,",
-        sincerely: "Cordialmente,",
-        visitWebsite: "Visitar sitio",
-        promotion: "Promocion",
-        meetExperts: "Conoce a nuestro equipo",
-        joinNow: "Ver mas",
-        propertySpotlight: "Propiedad destacada",
-        perfectFit: "Encontremos tu mejor opcion",
-        viewListings: "Ver opciones",
-        followMyWork: "Ver mi trabajo",
-        bookCall: "Agendar llamada",
-        counsel: "Asesoria",
-        legalAdvisory: "Asesoria legal",
-        needLegalGuidance: "Necesitas orientacion legal?",
-        scheduleConsultation: "Agendar consulta",
-        healthcareSpecialist: "Especialista en salud",
-        happyHolidays: "Felices fiestas",
-        doingMyBest: "Dando lo mejor de mi",
-        brand: "Marca",
-        studio: "Estudio",
-        contact: "Contacto",
-        email: "correo",
-        phone: "telefono",
-        website: "sitio",
-        address: "direccion",
-      }
-    : {
-        bestRegards: "Best regards,",
-        sincerely: "Sincerely,",
-        visitWebsite: "Visit website",
-        promotion: "Promotion",
-        meetExperts: "Meet our experts",
-        joinNow: "Join now",
-        propertySpotlight: "Property spotlight",
-        perfectFit: "Let's find your perfect fit",
-        viewListings: "View listings",
-        followMyWork: "Follow my work",
-        bookCall: "Book a call",
-        counsel: "Counsel",
-        legalAdvisory: "Legal advisory",
-        needLegalGuidance: "Need legal guidance?",
-        scheduleConsultation: "Schedule consultation",
-        healthcareSpecialist: "Healthcare Specialist",
-        happyHolidays: "Happy Holidays!",
-        doingMyBest: "I'm doing my best",
-        brand: "Brand",
-        studio: "Studio",
-        contact: "Contact",
-        email: "email",
-        phone: "phone",
-        website: "website",
-        address: "address",
-      };
+  signatureCopyByLocale[locale as Locale] ?? signatureCopyByLocale.es;
 
 const websiteLabel = (value: string) => {
   try {
@@ -159,11 +103,7 @@ const pronounChip = (
   return `<div style="margin-top:${marginTop}px;display:inline-block;padding:4px 10px;border-radius:999px;background:${background};border:1px solid ${borderColor};color:${color};font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:0.03em">${safe(c.pronouns)}</div>`;
 };
 
-const contactStack = (
-  c: SignatureConfig,
-  locale = "en",
-  color = "#425466",
-) => {
+const contactStack = (c: SignatureConfig, locale = "en", color = "#425466") => {
   const copy = templateCopy(locale);
   return [
     c.email ? detailLine(copy.email, c.email, color, c.primaryColor) : "",
@@ -259,7 +199,14 @@ const websiteCta = (
   background: string,
   color = "#ffffff",
   borderColor = background,
-) => ctaLink(c.website || `mailto:${c.email}`, label, background, color, borderColor);
+) =>
+  ctaLink(
+    c.website || `mailto:${c.email}`,
+    label,
+    background,
+    color,
+    borderColor,
+  );
 
 const divider = (color: string, width = "100%") =>
   `<div style="width:${width};height:1px;background:${color};font-size:0;line-height:0"></div>`;
@@ -332,13 +279,16 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       background: "#f4f8ff",
       color: c.primaryColor,
       marginTop: 8,
-    })}<div style="margin-top:14px">${contactStack(c, locale)}</div>${socialRow(c, {
-      shape: "square",
-    })}</td></tr></table>`;
+    })}<div style="margin-top:14px">${contactStack(c, locale)}</div>${socialRow(
+      c,
+      {
+        shape: "square",
+      },
+    )}</td></tr></table>`;
   },
   "professional-photo": (raw, locale = "en") => {
     const c = sanitizeConfig(raw);
-    const isSpanish = resolveLocale(locale) === "es";
+    const copy = templateCopy(locale);
     const photo = scaled(c, 82);
     return `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;font-size:14px;max-width:${px(
       scaled(c, 560),
@@ -362,7 +312,7 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       c,
     )}</div><div style="margin-top:5px;font-size:14px;color:#7a5b73">${safe(
       c.jobTitle,
-    )}${c.company ? ` ${isSpanish ? "en" : "at"} ${safe(c.company)}` : ""}</div><div style="margin-top:12px;font-size:12px;line-height:1.7;color:#6c6170">${contactInline(
+    )}${c.company ? ` ${copy.at} ${safe(c.company)}` : ""}</div><div style="margin-top:12px;font-size:12px;line-height:1.7;color:#6c6170">${contactInline(
       c,
       c.secondaryColor,
     )}</div>${socialRow(c)}${
@@ -390,29 +340,26 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       c.company || c.fullName,
     )}</div><div style="margin-top:6px;font-size:14px;color:#5c6c7c">${safe(
       c.fullName,
-    )}${c.jobTitle ? ` &middot; ${safe(c.jobTitle)}` : ""}</div>${pronounChip(c, {
-      background: "#eef5ff",
-      color: c.primaryColor,
-      marginTop: 8,
-    })}</td><td style="vertical-align:top;width:${px(
+    )}${c.jobTitle ? ` &middot; ${safe(c.jobTitle)}` : ""}</div>${pronounChip(
+      c,
+      {
+        background: "#eef5ff",
+        color: c.primaryColor,
+        marginTop: 8,
+      },
+    )}</td><td style="vertical-align:top;width:${px(
       scaled(c, 180),
     )};border-left:1px solid #d8e3ed;padding-left:${px(
       scaled(c, 18),
-    )}"><div style="font-size:11px;font-weight:bold;text-transform:uppercase;color:#8090a0">${copy.contact}</div><div style="margin-top:8px;font-size:12px;line-height:1.8;color:#435261">${c.email ? link(
-      `mailto:${c.email}`,
-      c.email,
-      c.primaryColor,
-    ) : ""}${c.email && c.phone ? "<br>" : ""}${c.phone ? link(
-      `tel:${c.phone}`,
-      c.phone,
-      c.primaryColor,
-    ) : ""}${(c.email || c.phone) && c.website ? "<br>" : ""}${c.website ? link(
-      c.website,
-      websiteLabel(c.website),
-      c.primaryColor,
-    ) : ""}${(c.email || c.phone || c.website) && c.address ? "<br>" : ""}${c.address ? safe(
-      c.address,
-    ) : ""}</div></td></tr></table>${socialRow(c, {
+    )}"><div style="font-size:11px;font-weight:bold;text-transform:uppercase;color:#8090a0">${copy.contact}</div><div style="margin-top:8px;font-size:12px;line-height:1.8;color:#435261">${
+      c.email ? link(`mailto:${c.email}`, c.email, c.primaryColor) : ""
+    }${c.email && c.phone ? "<br>" : ""}${
+      c.phone ? link(`tel:${c.phone}`, c.phone, c.primaryColor) : ""
+    }${(c.email || c.phone) && c.website ? "<br>" : ""}${
+      c.website ? link(c.website, websiteLabel(c.website), c.primaryColor) : ""
+    }${(c.email || c.phone || c.website) && c.address ? "<br>" : ""}${
+      c.address ? safe(c.address) : ""
+    }</div></td></tr></table>${socialRow(c, {
       shape: "square",
     })}${
       c.legalText
@@ -550,10 +497,7 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
     )}${detailLine(copy.email, c.email)}${detailLine(
       copy.website,
       c.website ? websiteLabel(c.website) : "",
-    )}${detailLine(
-      copy.address,
-      c.address,
-    )}</div>${socialRow(c, {
+    )}${detailLine(copy.address, c.address)}</div>${socialRow(c, {
       shape: "circle",
       size: scaled(c, 26),
       fill: "outline",
@@ -620,13 +564,17 @@ export const templates: Record<TemplateId, TemplateRenderer> = {
       orb,
     )};height:${px(orb)};border-radius:999px;background:radial-gradient(circle at 35% 35%, ${c.secondaryColor}, ${c.primaryColor});display:grid;place-items:center;color:#ffffff;font-size:${px(
       scaled(c, 34),
-    )};font-weight:bold">${c.logoUrl || c.photoUrl ? image(
-      c.logoUrl || c.photoUrl,
-      c.logoUrl ? `${c.company} logo` : c.fullName,
-      scaled(c, 86),
-      "border-radius:50%;",
-      initials(c.company || c.fullName),
-    ) : initials(c.company || c.fullName)}</div></td><td style="padding:${px(
+    )};font-weight:bold">${
+      c.logoUrl || c.photoUrl
+        ? image(
+            c.logoUrl || c.photoUrl,
+            c.logoUrl ? `${c.company} logo` : c.fullName,
+            scaled(c, 86),
+            "border-radius:50%;",
+            initials(c.company || c.fullName),
+          )
+        : initials(c.company || c.fullName)
+    }</div></td><td style="padding:${px(
       scaled(c, 22),
     )} ${px(scaled(c, 22))} ${px(scaled(c, 22))} 0;vertical-align:middle"><div style="font-size:${px(
       scaled(c, 25),

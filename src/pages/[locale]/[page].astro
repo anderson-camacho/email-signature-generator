@@ -43,54 +43,818 @@ export function getStaticPaths() {
   ];
 
   return locales.flatMap((locale) =>
-    pages.map((page) => ({ params: { locale, page }, props: { locale, page } })),
+    pages.map((page) => ({
+      params: { locale, page },
+      props: { locale, page },
+    })),
   );
 }
 
 const { locale, page } = Astro.props as { locale: Locale; page: StaticPageKey };
 const t = dictionary(locale);
 
-const basicContents: Record<Exclude<StaticPageKey, "email-installation-guide">, BasicContent> = {
-  privacy: {
-    title: t.privacyPage,
-    paragraphs: [
-      "The application works entirely in your browser.",
-      "Drafts are stored only in localStorage on your device.",
-      "Signature data is not sent to our servers.",
-      "You can erase local data from the generator.",
-      "There is no required account, remote storage, first-party cookies, or sale of personal data.",
-      "Avoid publishing private information. Public HTTPS images depend on your chosen hosting provider.",
-      "This privacy text must be reviewed before commercial launch or adding data collection.",
+type BasicPages = Record<
+  Exclude<StaticPageKey, "email-installation-guide">,
+  BasicContent
+>;
+
+const basicPageCopy: Record<Locale, BasicPages> = {
+  es: {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "La aplicacion funciona completamente en tu navegador.",
+        "Los borradores se guardan solo en localStorage de tu dispositivo.",
+        "Los datos de la firma no se envian a nuestros servidores.",
+        "Puedes borrar los datos locales desde el generador.",
+        "No hay cuenta obligatoria, almacenamiento remoto, cookies propias ni venta de datos personales.",
+        "Evita publicar informacion privada. Las imagenes HTTPS publicas dependen del proveedor de alojamiento que elijas.",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "Es gratis y el proyecto es de codigo abierto.",
+        "Tus datos se guardan solo en el navegador.",
+        "Funciona con muchos clientes de correo, pero siempre debes enviar un mensaje de prueba.",
+        "Las imagenes locales sirven para previsualizar. Para la firma final usa URLs HTTPS publicas.",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "Este proyecto se construye como una herramienta abierta y practica para firmas profesionales.",
+        "El apoyo de la comunidad ayuda a mantener pruebas, documentacion y nuevas plantillas.",
+        "Puedes apoyar con donaciones, aportes de codigo o recomendaciones utiles.",
+      ],
+    },
+    donations: {
+      title: "Donaciones",
+      paragraphs: [
+        "La pagina de donaciones esta en preparacion.",
+        "El flujo final de PayPal se activara cuando la configuracion quede lista.",
+        "Mientras tanto, las opciones de apoyo se mantienen organizadas y visibles.",
+      ],
+    },
+  },
+  en: {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "The application works entirely in your browser.",
+        "Drafts are stored only in localStorage on your device.",
+        "Signature data is not sent to our servers.",
+        "You can erase local data from the generator.",
+        "There is no required account, remote storage, first-party cookies, or sale of personal data.",
+        "Avoid publishing private information. Public HTTPS images depend on your chosen hosting provider.",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "It is free and open source.",
+        "Your data is stored only in browser localStorage.",
+        "It is designed for many email clients, but you should always send a test message.",
+        "Local images are for preview. Final signatures require public HTTPS image URLs.",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "This project is being built as a practical open-source tool for professional signatures.",
+        "Community support can help fund maintenance, testing, documentation, and future template improvements.",
+        "You can support through donations, code contributions, or useful recommendations.",
+      ],
+    },
+    donations: {
+      title: "Donations",
+      paragraphs: [
+        "This donation page is still being prepared.",
+        "The final PayPal flow will be enabled when the setup is ready.",
+        "For now, the project support options remain organized and visible.",
+      ],
+    },
+  },
+  "pt-BR": {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "O aplicativo funciona no seu navegador.",
+        "Os rascunhos ficam apenas no localStorage do seu dispositivo.",
+        "Os dados da assinatura nao sao enviados aos nossos servidores.",
+        "Voce pode apagar os dados locais pelo gerador.",
+        "Evite publicar informacoes privadas. Imagens HTTPS publicas dependem da hospedagem escolhida.",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "E gratuito e de codigo aberto.",
+        "Seus dados ficam somente no navegador.",
+        "Funciona com muitos clientes de email, mas envie sempre uma mensagem de teste.",
+        "Imagens locais servem para previsualizacao. Na assinatura final use URLs HTTPS publicas.",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "O projeto e uma ferramenta aberta para assinaturas profissionais.",
+        "O apoio da comunidade ajuda na manutencao, testes, documentacao e novas plantillas.",
+        "Voce pode apoiar com doacoes, codigo ou recomendacoes uteis.",
+      ],
+    },
+    donations: {
+      title: "Doacoes",
+      paragraphs: [
+        "A pagina de doacoes esta em preparacao.",
+        "O fluxo final do PayPal sera ativado quando a configuracao estiver pronta.",
+        "Enquanto isso, as opcoes de apoio continuam organizadas.",
+      ],
+    },
+  },
+  fr: {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "L'application fonctionne dans votre navigateur.",
+        "Les brouillons restent uniquement dans le localStorage de votre appareil.",
+        "Les donnees de signature ne sont pas envoyees a nos serveurs.",
+        "Vous pouvez effacer les donnees locales depuis le generateur.",
+        "Evitez de publier des informations privees. Les images HTTPS publiques dependent de l'hebergement choisi.",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "C'est gratuit et open source.",
+        "Vos donnees restent seulement dans le navigateur.",
+        "L'outil vise de nombreux clients email, mais envoyez toujours un message de test.",
+        "Les images locales servent a la previsualisation. La signature finale exige des URLs HTTPS publiques.",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "Le projet est un outil ouvert pour des signatures professionnelles.",
+        "Le soutien de la communaute aide la maintenance, les tests, la documentation et les nouveaux modeles.",
+        "Vous pouvez aider par des dons, du code ou des recommandations utiles.",
+      ],
+    },
+    donations: {
+      title: "Dons",
+      paragraphs: [
+        "La page de dons est en preparation.",
+        "Le flux PayPal final sera active lorsque la configuration sera prete.",
+        "Pour l'instant, les options de soutien restent organisees.",
+      ],
+    },
+  },
+  de: {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "Die Anwendung laeuft in Ihrem Browser.",
+        "Entwuerfe bleiben nur im localStorage Ihres Geraets.",
+        "Signaturdaten werden nicht an unsere Server gesendet.",
+        "Lokale Daten koennen im Generator geloescht werden.",
+        "Veroeffentlichen Sie keine privaten Informationen. Oeffentliche HTTPS-Bilder haengen vom gewaehlten Hosting ab.",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "Es ist kostenlos und quelloffen.",
+        "Ihre Daten bleiben nur im Browser.",
+        "Es funktioniert mit vielen E-Mail-Clients, aber senden Sie immer eine Testnachricht.",
+        "Lokale Bilder dienen der Vorschau. Finale Signaturen brauchen oeffentliche HTTPS-URLs.",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "Das Projekt ist ein offenes Werkzeug fuer professionelle Signaturen.",
+        "Community-Unterstuetzung hilft bei Wartung, Tests, Dokumentation und neuen Vorlagen.",
+        "Sie koennen mit Spenden, Code oder hilfreichen Empfehlungen helfen.",
+      ],
+    },
+    donations: {
+      title: "Spenden",
+      paragraphs: [
+        "Die Spendenseite wird vorbereitet.",
+        "Der finale PayPal-Ablauf wird aktiviert, sobald die Konfiguration bereit ist.",
+        "Bis dahin bleiben die Unterstuetzungsoptionen geordnet.",
+      ],
+    },
+  },
+  it: {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "L'applicazione funziona nel browser.",
+        "Le bozze restano solo nel localStorage del dispositivo.",
+        "I dati della firma non vengono inviati ai nostri server.",
+        "Puoi cancellare i dati locali dal generatore.",
+        "Evita di pubblicare informazioni private. Le immagini HTTPS pubbliche dipendono dall'hosting scelto.",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "E gratuito e open source.",
+        "I tuoi dati restano solo nel browser.",
+        "Funziona con molti client email, ma invia sempre un messaggio di prova.",
+        "Le immagini locali servono per l'anteprima. La firma finale richiede URL HTTPS pubblici.",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "Il progetto e uno strumento aperto per firme professionali.",
+        "Il supporto della comunita aiuta manutenzione, test, documentazione e nuovi modelli.",
+        "Puoi aiutare con donazioni, codice o consigli utili.",
+      ],
+    },
+    donations: {
+      title: "Donazioni",
+      paragraphs: [
+        "La pagina delle donazioni e in preparazione.",
+        "Il flusso PayPal finale sara attivato quando la configurazione sara pronta.",
+        "Nel frattempo le opzioni di supporto restano organizzate.",
+      ],
+    },
+  },
+  ja: {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "このアプリはブラウザ内で動作します。",
+        "下書きは端末のlocalStorageにのみ保存されます。",
+        "署名データはサーバーへ送信されません。",
+        "ローカルデータは生成画面から削除できます。",
+        "個人情報の公開は避けてください。公開HTTPS画像は選択したホスティングに依存します。",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "無料でオープンソースです。",
+        "データはブラウザ内だけに保存されます。",
+        "多くのメールクライアント向けですが、必ずテスト送信してください。",
+        "ローカル画像はプレビュー用です。最終署名には公開HTTPS URLが必要です。",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "このプロジェクトはプロ向け署名のためのオープンなツールです。",
+        "コミュニティの支援は保守、テスト、文書、新しいテンプレートに役立ちます。",
+        "寄付、コード、役立つ提案で支援できます。",
+      ],
+    },
+    donations: {
+      title: "寄付",
+      paragraphs: [
+        "寄付ページは準備中です。",
+        "PayPalの最終フローは設定完了後に有効になります。",
+        "それまで支援オプションは整理して表示します。",
+      ],
+    },
+  },
+  ko: {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "이 앱은 브라우저에서 동작합니다.",
+        "초안은 기기의 localStorage에만 저장됩니다.",
+        "서명 데이터는 서버로 전송되지 않습니다.",
+        "생성기에서 로컬 데이터를 삭제할 수 있습니다.",
+        "개인 정보 공개를 피하세요. 공개 HTTPS 이미지는 선택한 호스팅에 따라 달라집니다.",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "무료이며 오픈 소스입니다.",
+        "데이터는 브라우저에만 저장됩니다.",
+        "여러 메일 클라이언트를 위해 설계되었지만 항상 테스트 메일을 보내세요.",
+        "로컬 이미지는 미리보기용입니다. 최종 서명에는 공개 HTTPS URL이 필요합니다.",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "이 프로젝트는 전문 서명을 위한 열린 도구입니다.",
+        "커뮤니티 지원은 유지보수, 테스트, 문서와 새 템플릿에 도움이 됩니다.",
+        "기부, 코드, 유용한 제안으로 도울 수 있습니다.",
+      ],
+    },
+    donations: {
+      title: "기부",
+      paragraphs: [
+        "기부 페이지를 준비 중입니다.",
+        "최종 PayPal 흐름은 설정이 준비되면 활성화됩니다.",
+        "그동안 지원 옵션은 정리된 상태로 유지됩니다.",
+      ],
+    },
+  },
+  ar: {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "يعمل التطبيق داخل المتصفح.",
+        "تبقى المسودات في localStorage على جهازك فقط.",
+        "لا يتم إرسال بيانات التوقيع إلى خوادمنا.",
+        "يمكنك حذف البيانات المحلية من المولد.",
+        "تجنب نشر المعلومات الخاصة. تعتمد صور HTTPS العامة على الاستضافة التي تختارها.",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "الأداة مجانية ومفتوحة المصدر.",
+        "تبقى بياناتك داخل المتصفح فقط.",
+        "تدعم كثيرا من عملاء البريد، لكن ارسل رسالة اختبار دائما.",
+        "الصور المحلية للمعاينة فقط. التوقيع النهائي يحتاج إلى روابط HTTPS عامة.",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "المشروع أداة مفتوحة للتواقيع المهنية.",
+        "دعم المجتمع يساعد في الصيانة والاختبار والتوثيق والقوالب الجديدة.",
+        "يمكنك الدعم بالتبرع أو الكود أو الاقتراحات المفيدة.",
+      ],
+    },
+    donations: {
+      title: "التبرعات",
+      paragraphs: [
+        "صفحة التبرعات قيد التحضير.",
+        "سيتم تفعيل مسار PayPal النهائي عندما تصبح الإعدادات جاهزة.",
+        "في الوقت الحالي تبقى خيارات الدعم منظمة.",
+      ],
+    },
+  },
+  hi: {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "ऐप आपके ब्राउज़र में चलता है।",
+        "ड्राफ्ट केवल आपके डिवाइस के localStorage में रहते हैं।",
+        "हस्ताक्षर डेटा हमारे सर्वर पर नहीं भेजा जाता।",
+        "आप जनरेटर से स्थानीय डेटा मिटा सकते हैं।",
+        "निजी जानकारी प्रकाशित न करें। सार्वजनिक HTTPS छवियां चुनी गई होस्टिंग पर निर्भर करती हैं।",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "यह मुफ्त और ओपन सोर्स है।",
+        "आपका डेटा केवल ब्राउज़र में रहता है।",
+        "यह कई ईमेल क्लाइंट के लिए बनाया गया है, लेकिन हमेशा टेस्ट संदेश भेजें।",
+        "स्थानीय छवियां केवल पूर्वावलोकन के लिए हैं। अंतिम हस्ताक्षर के लिए सार्वजनिक HTTPS URL चाहिए।",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "यह परियोजना पेशेवर हस्ताक्षरों के लिए खुला उपकरण है।",
+        "समुदाय का सहयोग रखरखाव, परीक्षण, दस्तावेज़ और नए टेम्पलेट में मदद करता है।",
+        "आप दान, कोड या उपयोगी सुझावों से मदद कर सकते हैं।",
+      ],
+    },
+    donations: {
+      title: "दान",
+      paragraphs: [
+        "दान पृष्ठ तैयार हो रहा है।",
+        "अंतिम PayPal प्रवाह सेटअप तैयार होने पर सक्रिय होगा।",
+        "तब तक समर्थन विकल्प व्यवस्थित रहेंगे।",
+      ],
+    },
+  },
+  "zh-CN": {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "应用在浏览器中运行。",
+        "草稿只保存在您设备的localStorage中。",
+        "签名数据不会发送到我们的服务器。",
+        "您可以在生成器中删除本地数据。",
+        "请避免发布私人信息。公开HTTPS图片取决于您选择的托管服务。",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "它免费并且开源。",
+        "您的数据只保存在浏览器中。",
+        "它面向多种邮件客户端，但请始终发送测试邮件。",
+        "本地图片仅用于预览。最终签名需要公开HTTPS URL。",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "该项目是用于专业签名的开放工具。",
+        "社区支持有助于维护、测试、文档和新模板。",
+        "您可以通过捐赠、代码或有用建议来支持。",
+      ],
+    },
+    donations: {
+      title: "捐赠",
+      paragraphs: [
+        "捐赠页面正在准备。",
+        "最终PayPal流程将在配置完成后启用。",
+        "目前支持选项会保持清晰整理。",
+      ],
+    },
+  },
+  ru: {
+    privacy: {
+      title: t.privacyPage,
+      paragraphs: [
+        "Приложение работает в браузере.",
+        "Черновики хранятся только в localStorage вашего устройства.",
+        "Данные подписи не отправляются на наши серверы.",
+        "Локальные данные можно удалить в генераторе.",
+        "Не публикуйте личную информацию. Публичные HTTPS-изображения зависят от выбранного хостинга.",
+      ],
+    },
+    faq: {
+      title: t.faq,
+      paragraphs: [
+        "Инструмент бесплатный и открытый.",
+        "Ваши данные остаются только в браузере.",
+        "Он рассчитан на многие почтовые клиенты, но всегда отправляйте тестовое письмо.",
+        "Локальные изображения нужны для предпросмотра. Финальной подписи нужны публичные HTTPS URL.",
+      ],
+    },
+    "support-open-source": {
+      title: t.supportTitle,
+      paragraphs: [
+        "Проект является открытым инструментом для профессиональных подписей.",
+        "Поддержка сообщества помогает сопровождению, тестам, документации и новым шаблонам.",
+        "Вы можете помочь пожертвованием, кодом или полезными рекомендациями.",
+      ],
+    },
+    donations: {
+      title: "Пожертвования",
+      paragraphs: [
+        "Страница пожертвований готовится.",
+        "Финальный поток PayPal будет включен после завершения настройки.",
+        "Пока варианты поддержки остаются упорядоченными.",
+      ],
+    },
+  },
+};
+
+const basicContents = basicPageCopy[locale] ?? basicPageCopy.es;
+
+type GuideBasics = {
+  title: string;
+  intro: string;
+  checklistTitle: string;
+  checklist: string[];
+  paste: string;
+  save: string;
+  test: string;
+  notesTitle: string;
+  notes: string[];
+  resourceLabel: string;
+  managedTitle: string;
+  managedCopy: string[];
+};
+
+const guideBasicsByLocale: Record<Locale, GuideBasics> = {
+  es: {
+    title: "Guia de instalacion",
+    intro:
+      "Elige tu cliente de correo, pega la firma generada y envia una prueba.",
+    checklistTitle: "Antes de pegar la firma",
+    checklist: [
+      "Copia la firma final desde el generador.",
+      "Confirma que las imagenes usen URLs HTTPS publicas.",
+      "Define si aplica para correos nuevos, respuestas o ambos.",
+    ],
+    paste: "Abre la configuracion de firmas y pega la firma generada.",
+    save: "Guarda los cambios en la cuenta correcta.",
+    test: "Envia un correo de prueba en escritorio y movil.",
+    notesTitle: "Notas",
+    notes: [
+      "Si una empresa administra firmas centralmente, TI o marketing puede sobrescribir los cambios.",
+      "Si el formato cambia, prueba una plantilla mas simple.",
+    ],
+    resourceLabel: "Ver guia oficial",
+    managedTitle: "Si tu empresa administra las firmas",
+    managedCopy: [
+      "Pide a TI o marketing la ruta correcta si la firma se reemplaza sola o no puedes editarla.",
     ],
   },
-  faq: {
-    title: t.faq,
-    paragraphs: [
-      "Is it free? Yes, the static MVP is free and open source.",
-      "Where is my data stored? Only in your browser localStorage.",
-      "Does it work with every email client? It is designed for many email clients, but you should always send a test message.",
-      "Can I use local images? Only for preview. Final signatures require public HTTPS image URLs.",
+  en: {
+    title: "Installation guide",
+    intro:
+      "Choose your email client, paste the generated signature, and send a test.",
+    checklistTitle: "Before you paste the signature",
+    checklist: [
+      "Copy the final signature from the generator.",
+      "Confirm images use public HTTPS URLs.",
+      "Decide whether it applies to new emails, replies, or both.",
+    ],
+    paste: "Open signature settings and paste the generated signature.",
+    save: "Save changes in the correct account.",
+    test: "Send a test email on desktop and mobile.",
+    notesTitle: "Notes",
+    notes: [
+      "If your company centrally manages signatures, IT or marketing may overwrite changes.",
+      "If the layout changes, try a simpler template.",
+    ],
+    resourceLabel: "Open official guide",
+    managedTitle: "If your company centrally manages signatures",
+    managedCopy: [
+      "Ask IT or marketing for the correct path if the signature is replaced or you cannot edit it.",
     ],
   },
-  "support-open-source": {
-    title: t.supportTitle,
-    paragraphs: [
-      "This project is being built as a practical open-source tool for professional signatures.",
-      "Community support can help fund maintenance, testing, documentation, and future template improvements.",
-      "You can support through GitHub Sponsors, Open Collective, one-time donations, or direct code contributions.",
-      "Before adding commercial flows, this support page keeps the project direction transparent and community-friendly.",
+  "pt-BR": {
+    title: "Guia de instalacao",
+    intro:
+      "Escolha seu cliente de email, cole a assinatura gerada e envie um teste.",
+    checklistTitle: "Antes de colar a assinatura",
+    checklist: [
+      "Copie a assinatura final no gerador.",
+      "Confirme que as imagens usam URLs HTTPS publicas.",
+      "Defina se vale para emails novos, respostas ou ambos.",
+    ],
+    paste: "Abra as configuracoes de assinatura e cole a assinatura gerada.",
+    save: "Salve as alteracoes na conta correta.",
+    test: "Envie um email de teste no desktop e no celular.",
+    notesTitle: "Notas",
+    notes: [
+      "Se a empresa gerencia assinaturas centralmente, TI ou marketing pode substituir as alteracoes.",
+      "Se o layout mudar, tente um modelo mais simples.",
+    ],
+    resourceLabel: "Ver guia oficial",
+    managedTitle: "Se a empresa gerencia assinaturas",
+    managedCopy: [
+      "Peca a TI ou marketing o caminho correto se a assinatura for substituida ou voce nao puder edita-la.",
     ],
   },
-  donations: {
-    title: "Donations under construction",
-    paragraphs: [
-      "This donation page is still being prepared.",
-      "The PayPal donation flow is not available yet.",
-      "For now, the project support options are being organized before enabling direct payments.",
-      "Once the donation setup is ready, this page will be updated with the final payment method.",
+  fr: {
+    title: "Guide d'installation",
+    intro:
+      "Choisissez votre client email, collez la signature generee et envoyez un test.",
+    checklistTitle: "Avant de coller la signature",
+    checklist: [
+      "Copiez la signature finale depuis le generateur.",
+      "Verifiez que les images utilisent des URLs HTTPS publiques.",
+      "Decidez si elle s'applique aux nouveaux emails, aux reponses ou aux deux.",
+    ],
+    paste: "Ouvrez les parametres de signature et collez la signature generee.",
+    save: "Enregistrez les changements dans le bon compte.",
+    test: "Envoyez un email de test sur ordinateur et mobile.",
+    notesTitle: "Notes",
+    notes: [
+      "Si l'entreprise gere les signatures centralement, l'IT ou le marketing peut remplacer vos changements.",
+      "Si la mise en page change, essayez un modele plus simple.",
+    ],
+    resourceLabel: "Voir le guide officiel",
+    managedTitle: "Si l'entreprise gere les signatures",
+    managedCopy: [
+      "Demandez le bon chemin a l'IT ou au marketing si la signature est remplacee ou non modifiable.",
+    ],
+  },
+  de: {
+    title: "Installationsanleitung",
+    intro:
+      "Waehlen Sie den E-Mail-Client, fuegen Sie die erzeugte Signatur ein und senden Sie einen Test.",
+    checklistTitle: "Vor dem Einfuegen",
+    checklist: [
+      "Kopieren Sie die finale Signatur aus dem Generator.",
+      "Pruefen Sie, dass Bilder oeffentliche HTTPS-URLs nutzen.",
+      "Legen Sie fest, ob sie fuer neue E-Mails, Antworten oder beides gilt.",
+    ],
+    paste:
+      "Oeffnen Sie die Signatureinstellungen und fuegen Sie die erzeugte Signatur ein.",
+    save: "Speichern Sie die Aenderungen im richtigen Konto.",
+    test: "Senden Sie eine Test-E-Mail auf Computer und Mobilgeraet.",
+    notesTitle: "Hinweise",
+    notes: [
+      "Wenn die Firma Signaturen zentral verwaltet, koennen IT oder Marketing Aenderungen ueberschreiben.",
+      "Wenn sich das Layout aendert, testen Sie eine einfachere Vorlage.",
+    ],
+    resourceLabel: "Offizielle Anleitung ansehen",
+    managedTitle: "Wenn die Firma Signaturen verwaltet",
+    managedCopy: [
+      "Fragen Sie IT oder Marketing nach dem richtigen Ablauf, wenn die Signatur ersetzt wird oder nicht bearbeitet werden kann.",
+    ],
+  },
+  it: {
+    title: "Guida di installazione",
+    intro:
+      "Scegli il client email, incolla la firma generata e invia una prova.",
+    checklistTitle: "Prima di incollare la firma",
+    checklist: [
+      "Copia la firma finale dal generatore.",
+      "Controlla che le immagini usino URL HTTPS pubblici.",
+      "Decidi se applicarla a nuovi messaggi, risposte o entrambi.",
+    ],
+    paste: "Apri le impostazioni della firma e incolla la firma generata.",
+    save: "Salva le modifiche nell'account corretto.",
+    test: "Invia un'email di prova da desktop e mobile.",
+    notesTitle: "Note",
+    notes: [
+      "Se l'azienda gestisce le firme centralmente, IT o marketing puo sostituire le modifiche.",
+      "Se il layout cambia, prova un modello piu semplice.",
+    ],
+    resourceLabel: "Vedi guida ufficiale",
+    managedTitle: "Se l'azienda gestisce le firme",
+    managedCopy: [
+      "Chiedi a IT o marketing il percorso corretto se la firma viene sostituita o non puoi modificarla.",
+    ],
+  },
+  ja: {
+    title: "インストールガイド",
+    intro:
+      "メールクライアントを選び、生成した署名を貼り付けてテスト送信します。",
+    checklistTitle: "貼り付け前の確認",
+    checklist: [
+      "生成画面から最終署名をコピーします。",
+      "画像が公開HTTPS URLを使っているか確認します。",
+      "新規メール、返信、または両方に適用するか決めます。",
+    ],
+    paste: "署名設定を開き、生成した署名を貼り付けます。",
+    save: "正しいアカウントで変更を保存します。",
+    test: "デスクトップとモバイルでテストメールを送信します。",
+    notesTitle: "注意",
+    notes: [
+      "会社が署名を一元管理している場合、ITまたはマーケティングが変更を上書きすることがあります。",
+      "レイアウトが崩れる場合は、よりシンプルなテンプレートを試してください。",
+    ],
+    resourceLabel: "公式ガイドを見る",
+    managedTitle: "会社が署名を管理している場合",
+    managedCopy: [
+      "署名が置き換わる、または編集できない場合は、ITまたはマーケティングに正しい手順を確認してください。",
+    ],
+  },
+  ko: {
+    title: "설치 안내",
+    intro:
+      "메일 클라이언트를 선택하고 생성된 서명을 붙여 넣은 뒤 테스트를 보냅니다.",
+    checklistTitle: "서명을 붙여 넣기 전",
+    checklist: [
+      "생성기에서 최종 서명을 복사합니다.",
+      "이미지가 공개 HTTPS URL을 사용하는지 확인합니다.",
+      "새 메일, 답장 또는 둘 다에 적용할지 정합니다.",
+    ],
+    paste: "서명 설정을 열고 생성된 서명을 붙여 넣습니다.",
+    save: "올바른 계정에 변경 사항을 저장합니다.",
+    test: "데스크톱과 모바일에서 테스트 메일을 보냅니다.",
+    notesTitle: "참고",
+    notes: [
+      "회사가 서명을 중앙 관리하면 IT 또는 마케팅이 변경 사항을 덮어쓸 수 있습니다.",
+      "레이아웃이 바뀌면 더 단순한 템플릿을 사용해 보세요.",
+    ],
+    resourceLabel: "공식 안내 보기",
+    managedTitle: "회사가 서명을 관리하는 경우",
+    managedCopy: [
+      "서명이 교체되거나 편집할 수 없다면 IT 또는 마케팅에 올바른 절차를 확인하세요.",
+    ],
+  },
+  ar: {
+    title: "دليل التثبيت",
+    intro: "اختر عميل البريد، والصق التوقيع الذي تم إنشاؤه، ثم ارسل اختبارا.",
+    checklistTitle: "قبل لصق التوقيع",
+    checklist: [
+      "انسخ التوقيع النهائي من المولد.",
+      "تأكد من أن الصور تستخدم روابط HTTPS عامة.",
+      "حدد هل يطبق على الرسائل الجديدة أو الردود أو كليهما.",
+    ],
+    paste: "افتح إعدادات التوقيع والصق التوقيع الذي تم إنشاؤه.",
+    save: "احفظ التغييرات في الحساب الصحيح.",
+    test: "ارسل رسالة اختبار على سطح المكتب والجوال.",
+    notesTitle: "ملاحظات",
+    notes: [
+      "إذا كانت الشركة تدير التواقيع مركزيا فقد يستبدل قسم التقنية أو التسويق تغييراتك.",
+      "إذا تغير التنسيق فجرب قالبا أبسط.",
+    ],
+    resourceLabel: "عرض الدليل الرسمي",
+    managedTitle: "إذا كانت الشركة تدير التواقيع",
+    managedCopy: [
+      "اطلب من التقنية أو التسويق المسار الصحيح إذا تم استبدال التوقيع أو لم تستطع تعديله.",
+    ],
+  },
+  hi: {
+    title: "स्थापना मार्गदर्शिका",
+    intro:
+      "अपना ईमेल क्लाइंट चुनें, बनाया गया हस्ताक्षर चिपकाएं और परीक्षण भेजें।",
+    checklistTitle: "हस्ताक्षर चिपकाने से पहले",
+    checklist: [
+      "जनरेटर से अंतिम हस्ताक्षर कॉपी करें।",
+      "जांचें कि छवियां सार्वजनिक HTTPS URL उपयोग करती हैं।",
+      "तय करें कि यह नए ईमेल, उत्तरों या दोनों पर लागू होगा।",
+    ],
+    paste: "हस्ताक्षर सेटिंग खोलें और बनाया गया हस्ताक्षर चिपकाएं।",
+    save: "सही खाते में बदलाव सहेजें।",
+    test: "डेस्कटॉप और मोबाइल पर परीक्षण ईमेल भेजें।",
+    notesTitle: "नोट",
+    notes: [
+      "यदि कंपनी हस्ताक्षर केंद्र से प्रबंधित करती है, तो IT या मार्केटिंग बदलावों को बदल सकती है।",
+      "यदि लेआउट बदलता है, तो सरल टेम्पलेट आजमाएं।",
+    ],
+    resourceLabel: "आधिकारिक गाइड देखें",
+    managedTitle: "यदि कंपनी हस्ताक्षर प्रबंधित करती है",
+    managedCopy: [
+      "यदि हस्ताक्षर बदल जाता है या संपादित नहीं होता, तो IT या मार्केटिंग से सही प्रक्रिया पूछें।",
+    ],
+  },
+  "zh-CN": {
+    title: "安装指南",
+    intro: "选择邮件客户端，粘贴生成的签名，然后发送测试。",
+    checklistTitle: "粘贴签名前",
+    checklist: [
+      "从生成器复制最终签名。",
+      "确认图片使用公开HTTPS URL。",
+      "决定它用于新邮件、回复或两者。",
+    ],
+    paste: "打开签名设置并粘贴生成的签名。",
+    save: "在正确账户中保存更改。",
+    test: "在桌面和移动设备上发送测试邮件。",
+    notesTitle: "备注",
+    notes: [
+      "如果公司集中管理签名，IT或市场团队可能会覆盖更改。",
+      "如果布局改变，请尝试更简单的模板。",
+    ],
+    resourceLabel: "查看官方指南",
+    managedTitle: "如果公司管理签名",
+    managedCopy: ["如果签名被替换或无法编辑，请向IT或市场团队确认正确流程。"],
+  },
+  ru: {
+    title: "Руководство по установке",
+    intro:
+      "Выберите почтовый клиент, вставьте созданную подпись и отправьте тест.",
+    checklistTitle: "Перед вставкой подписи",
+    checklist: [
+      "Скопируйте финальную подпись из генератора.",
+      "Проверьте, что изображения используют публичные HTTPS URL.",
+      "Решите, применять ее к новым письмам, ответам или обоим вариантам.",
+    ],
+    paste: "Откройте настройки подписи и вставьте созданную подпись.",
+    save: "Сохраните изменения в правильной учетной записи.",
+    test: "Отправьте тестовое письмо на компьютере и мобильном устройстве.",
+    notesTitle: "Заметки",
+    notes: [
+      "Если компания управляет подписями централизованно, IT или маркетинг могут перезаписать изменения.",
+      "Если макет меняется, попробуйте более простой шаблон.",
+    ],
+    resourceLabel: "Открыть официальное руководство",
+    managedTitle: "Если компания управляет подписями",
+    managedCopy: [
+      "Уточните правильный процесс у IT или маркетинга, если подпись заменяется или не редактируется.",
     ],
   },
 };
+
+const buildLocalizedGuide = (copy: GuideBasics): InstallationGuide => ({
+  title: copy.title,
+  intro: copy.intro,
+  checklistTitle: copy.checklistTitle,
+  checklist: copy.checklist,
+  sections: [
+    {
+      title: "Gmail / Google Workspace",
+      audience: copy.intro,
+      steps: [copy.paste, copy.save, copy.test],
+      notes: copy.notes,
+      resourceLabel: copy.resourceLabel,
+      resourceUrl: "https://support.google.com/mail/answer/8395",
+    },
+    {
+      title: "Outlook / Microsoft 365",
+      audience: copy.intro,
+      steps: [copy.paste, copy.save, copy.test],
+      notes: copy.notes,
+      resourceLabel: copy.resourceLabel,
+      resourceUrl: "https://support.microsoft.com/outlook",
+    },
+    {
+      title: "Apple Mail / iCloud Mail",
+      audience: copy.intro,
+      steps: [copy.paste, copy.save, copy.test],
+      notes: copy.notes,
+      resourceLabel: copy.resourceLabel,
+      resourceUrl:
+        "https://support.apple.com/guide/mail/edit-text-and-email-signatures-mail11943/mac",
+    },
+    {
+      title: "Thunderbird",
+      audience: copy.intro,
+      steps: [copy.paste, copy.save, copy.test],
+      notes: copy.notes,
+      resourceLabel: copy.resourceLabel,
+      resourceUrl: "https://support.mozilla.org/kb/signatures",
+    },
+  ],
+  managedTitle: copy.managedTitle,
+  managedCopy: copy.managedCopy,
+});
 
 const installationGuide: InstallationGuide =
   locale === "es"
@@ -183,7 +947,8 @@ const installationGuide: InstallationGuide =
               "Si el formato cambia en iCloud web, usa una versión más simple con menos bloques visuales.",
             ],
             resourceLabel: "Ver ayuda oficial de Apple",
-            resourceUrl: "https://support.apple.com/guide/mail/edit-text-and-email-signatures-mail11943/mac",
+            resourceUrl:
+              "https://support.apple.com/guide/mail/edit-text-and-email-signatures-mail11943/mac",
           },
           {
             title: "Thunderbird",
@@ -211,127 +976,133 @@ const installationGuide: InstallationGuide =
           "Si no ves la opción de firma, si tus cambios se borran solos o si aparece otra firma distinta al enviar, lo correcto es pedir a TI o a marketing la ruta exacta o confirmar si la firma se empuja de forma centralizada.",
         ],
       }
-    : {
-        title: "Installation guide",
-        intro:
-          "Choose the exact path that matches the email client your company or personal account uses. The goal is to generate the signature here, copy it, and paste it into the specific signature area used by each platform.",
-        checklistTitle: "Before you paste the signature",
-        checklist: [
-          "Generate the final signature here and make sure logos and photos use public HTTPS URLs.",
-          "Prefer the copy button from desktop so the formatting is preserved more reliably.",
-          "If you use multiple addresses or multiple signatures, decide which one should be used for new emails and which one should be used for replies.",
-          "After saving, send a test email to Gmail, Outlook, and a mobile device to review spacing, images, and links.",
-        ],
-        sections: [
-          {
-            title: "Gmail or Google Workspace",
-            audience:
-              "For personal Gmail accounts and businesses using Google Workspace in the browser.",
-            steps: [
-              "Open Gmail in your browser.",
-              "Click Settings and then See all settings.",
-              "In the General tab, scroll to the Signature section.",
-              "Create a new signature or edit an existing one and paste the generated signature.",
-              "If you use multiple sending addresses, choose the correct address and set the default signature for new emails and replies.",
-              "Scroll to the bottom and click Save Changes.",
-            ],
-            notes: [
-              "The Gmail mobile app usually manages a separate text-only mobile signature.",
-              "If Gmail breaks the layout, first confirm that your images are public and not local files.",
-            ],
-            resourceLabel: "Open the official Gmail guide",
-            resourceUrl:
-              "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en",
-          },
-          {
-            title: "Outlook on the web, new Outlook, and Microsoft 365",
-            audience:
-              "For business accounts using Outlook on the web, Outlook.com, or Microsoft 365 in the newer experience.",
-            steps: [
-              "Open Outlook and go to Settings.",
-              "Go to Accounts > Signatures.",
-              "If you have more than one account, select the correct account before creating the signature.",
-              "Choose Add signature, give it a name, and paste the signature into the editor.",
-              "Choose whether the signature should be applied to new emails and to replies or forwards.",
-              "Save your changes.",
-            ],
-            notes: [
-              "In Microsoft 365, one user may need different signatures per account or per message type.",
-              "If your organization uses centralized signature management, IT may overwrite the user-level signature.",
-            ],
-            resourceLabel: "Open the official Outlook web guide",
-            resourceUrl:
-              "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook",
-          },
-          {
-            title: "Classic Outlook on Windows",
-            audience:
-              "For business computers that still use the classic desktop version of Outlook on Windows.",
-            steps: [
-              "Open a new email message.",
-              "On the Message menu, go to Signature > Signatures.",
-              "Under Select signature to edit, choose New and give the signature a name.",
-              "Paste the signature into the Edit signature box.",
-              "Under Choose default signature, select the account and define whether it applies to new messages and to replies or forwards.",
-              "Choose OK to save.",
-            ],
-            notes: [
-              "The new signature may not insert itself into the message you already had open, so you may need to add it manually from Signature.",
-              "Classic Outlook usually preserves pasted signatures better than rebuilding them manually.",
-            ],
-            resourceLabel: "Open the official classic Outlook guide",
-            resourceUrl:
-              "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook",
-          },
-          {
-            title: "Apple Mail on Mac and iCloud Mail",
-            audience:
-              "For users who send email from the macOS Mail app or from iCloud Mail on the web.",
-            steps: [
-              "In Mail for Mac, open the app and go to Mail > Settings > Signatures.",
-              "Select the correct account, create a new signature with the plus button, and paste the content into the preview area.",
-              "If you created it under All Signatures, drag it to the account where you want to use it.",
-              "If you use iCloud Mail on the web, go to icloud.com/mail, open Settings, and then Composing.",
-              "Enable Add a signature and type or paste the signature there.",
-              "Send one test from Mail on Mac and another from iCloud web if you use both.",
-            ],
-            notes: [
-              "Apple Mail lets you decide whether the signature appears above or below quoted text in replies.",
-              "If iCloud web changes the appearance, use a simpler version with fewer visual blocks.",
-            ],
-            resourceLabel: "Open the official Apple guide",
-            resourceUrl: "https://support.apple.com/guide/mail/edit-text-and-email-signatures-mail11943/mac",
-          },
-          {
-            title: "Thunderbird",
-            audience:
-              "For teams or personal accounts that use Thunderbird as the desktop mail client.",
-            steps: [
-              "Open Thunderbird and go to Account Settings.",
-              "Select the mail account where you want to use the signature.",
-              "Find the signature field in that account configuration.",
-              "Paste the signature if you will use a direct text or HTML signature.",
-              "If your company manages an external HTML signature, configure Thunderbird to use an HTML signature file instead.",
-              "Save and send a test message to verify replies and forwards.",
-            ],
-            notes: [
-              "Thunderbird configures signatures per account, so repeat the process if you manage multiple mailboxes.",
-              "If you use images, confirm that they do not appear as separate attachments.",
-            ],
-            resourceLabel: "Open the official Thunderbird guide",
-            resourceUrl: "https://support.mozilla.org/en-US/kb/signatures",
-          },
-        ],
-        managedTitle: "If your company centrally manages signatures",
-        managedCopy: [
-          "Some organizations do not allow users to edit signatures freely because signatures are managed from Microsoft 365, Google Workspace, or an external branding platform.",
-          "If you cannot find the signature option, if your changes disappear, or if another signature replaces yours after sending, ask IT or marketing for the exact process or confirm whether signatures are enforced centrally.",
-        ],
-      };
+    : locale === "en"
+      ? {
+          title: "Installation guide",
+          intro:
+            "Choose the exact path that matches the email client your company or personal account uses. The goal is to generate the signature here, copy it, and paste it into the specific signature area used by each platform.",
+          checklistTitle: "Before you paste the signature",
+          checklist: [
+            "Generate the final signature here and make sure logos and photos use public HTTPS URLs.",
+            "Prefer the copy button from desktop so the formatting is preserved more reliably.",
+            "If you use multiple addresses or multiple signatures, decide which one should be used for new emails and which one should be used for replies.",
+            "After saving, send a test email to Gmail, Outlook, and a mobile device to review spacing, images, and links.",
+          ],
+          sections: [
+            {
+              title: "Gmail or Google Workspace",
+              audience:
+                "For personal Gmail accounts and businesses using Google Workspace in the browser.",
+              steps: [
+                "Open Gmail in your browser.",
+                "Click Settings and then See all settings.",
+                "In the General tab, scroll to the Signature section.",
+                "Create a new signature or edit an existing one and paste the generated signature.",
+                "If you use multiple sending addresses, choose the correct address and set the default signature for new emails and replies.",
+                "Scroll to the bottom and click Save Changes.",
+              ],
+              notes: [
+                "The Gmail mobile app usually manages a separate text-only mobile signature.",
+                "If Gmail breaks the layout, first confirm that your images are public and not local files.",
+              ],
+              resourceLabel: "Open the official Gmail guide",
+              resourceUrl:
+                "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en",
+            },
+            {
+              title: "Outlook on the web, new Outlook, and Microsoft 365",
+              audience:
+                "For business accounts using Outlook on the web, Outlook.com, or Microsoft 365 in the newer experience.",
+              steps: [
+                "Open Outlook and go to Settings.",
+                "Go to Accounts > Signatures.",
+                "If you have more than one account, select the correct account before creating the signature.",
+                "Choose Add signature, give it a name, and paste the signature into the editor.",
+                "Choose whether the signature should be applied to new emails and to replies or forwards.",
+                "Save your changes.",
+              ],
+              notes: [
+                "In Microsoft 365, one user may need different signatures per account or per message type.",
+                "If your organization uses centralized signature management, IT may overwrite the user-level signature.",
+              ],
+              resourceLabel: "Open the official Outlook web guide",
+              resourceUrl:
+                "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook",
+            },
+            {
+              title: "Classic Outlook on Windows",
+              audience:
+                "For business computers that still use the classic desktop version of Outlook on Windows.",
+              steps: [
+                "Open a new email message.",
+                "On the Message menu, go to Signature > Signatures.",
+                "Under Select signature to edit, choose New and give the signature a name.",
+                "Paste the signature into the Edit signature box.",
+                "Under Choose default signature, select the account and define whether it applies to new messages and to replies or forwards.",
+                "Choose OK to save.",
+              ],
+              notes: [
+                "The new signature may not insert itself into the message you already had open, so you may need to add it manually from Signature.",
+                "Classic Outlook usually preserves pasted signatures better than rebuilding them manually.",
+              ],
+              resourceLabel: "Open the official classic Outlook guide",
+              resourceUrl:
+                "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook",
+            },
+            {
+              title: "Apple Mail on Mac and iCloud Mail",
+              audience:
+                "For users who send email from the macOS Mail app or from iCloud Mail on the web.",
+              steps: [
+                "In Mail for Mac, open the app and go to Mail > Settings > Signatures.",
+                "Select the correct account, create a new signature with the plus button, and paste the content into the preview area.",
+                "If you created it under All Signatures, drag it to the account where you want to use it.",
+                "If you use iCloud Mail on the web, go to icloud.com/mail, open Settings, and then Composing.",
+                "Enable Add a signature and type or paste the signature there.",
+                "Send one test from Mail on Mac and another from iCloud web if you use both.",
+              ],
+              notes: [
+                "Apple Mail lets you decide whether the signature appears above or below quoted text in replies.",
+                "If iCloud web changes the appearance, use a simpler version with fewer visual blocks.",
+              ],
+              resourceLabel: "Open the official Apple guide",
+              resourceUrl:
+                "https://support.apple.com/guide/mail/edit-text-and-email-signatures-mail11943/mac",
+            },
+            {
+              title: "Thunderbird",
+              audience:
+                "For teams or personal accounts that use Thunderbird as the desktop mail client.",
+              steps: [
+                "Open Thunderbird and go to Account Settings.",
+                "Select the mail account where you want to use the signature.",
+                "Find the signature field in that account configuration.",
+                "Paste the signature if you will use a direct text or HTML signature.",
+                "If your company manages an external HTML signature, configure Thunderbird to use an HTML signature file instead.",
+                "Save and send a test message to verify replies and forwards.",
+              ],
+              notes: [
+                "Thunderbird configures signatures per account, so repeat the process if you manage multiple mailboxes.",
+                "If you use images, confirm that they do not appear as separate attachments.",
+              ],
+              resourceLabel: "Open the official Thunderbird guide",
+              resourceUrl: "https://support.mozilla.org/en-US/kb/signatures",
+            },
+          ],
+          managedTitle: "If your company centrally manages signatures",
+          managedCopy: [
+            "Some organizations do not allow users to edit signatures freely because signatures are managed from Microsoft 365, Google Workspace, or an external branding platform.",
+            "If you cannot find the signature option, if your changes disappear, or if another signature replaces yours after sending, ask IT or marketing for the exact process or confirm whether signatures are enforced centrally.",
+          ],
+        }
+      : buildLocalizedGuide(
+          guideBasicsByLocale[locale] ?? guideBasicsByLocale.es,
+        );
 
 const isInstallationGuide = page === "email-installation-guide";
 const basicPage = isInstallationGuide ? null : basicContents[page];
 ---
+
 <Layout
   {locale}
   title={isInstallationGuide ? installationGuide.title : basicPage!.title}

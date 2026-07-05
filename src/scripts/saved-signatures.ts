@@ -4,26 +4,16 @@ import {
   saveSavedSignatures,
   saveDraft,
 } from "../storage/local-storage-adapter";
+import type { Locale } from "../i18n/dictionaries";
+import { savedSignaturesUiByLocale } from "../i18n/localized-ui";
 
 const page = document.querySelector<HTMLElement>("[data-saved-page]");
 if (!page) {
   // no-op outside saved signatures page
 } else {
   const locale = page.dataset.locale ?? "es";
-  const isSpanish = locale === "es";
-  const ui = isSpanish
-    ? {
-        open: "Abrir",
-        duplicate: "Duplicar",
-        duplicateSuffix: "copia",
-        remove: "Borrar",
-      }
-    : {
-        open: "Open",
-        duplicate: "Duplicate",
-        duplicateSuffix: "copy",
-        remove: "Delete",
-      };
+  const ui =
+    savedSignaturesUiByLocale[locale as Locale] ?? savedSignaturesUiByLocale.es;
   const grid = document.querySelector<HTMLElement>("#saved-page-grid")!;
   const empty = document.querySelector<HTMLElement>("#saved-empty")!;
 
