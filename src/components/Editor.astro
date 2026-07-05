@@ -1,8 +1,10 @@
 ---
 import { dictionary, type Locale } from "../i18n/dictionaries";
 import { templateCatalog } from "../templates/catalog";
+
 const { locale } = Astro.props as { locale: Locale };
 const t = dictionary(locale);
+
 const palettePresets = [
   {
     id: "executive",
@@ -26,6 +28,7 @@ const palettePresets = [
     secondary: "#6db7c9",
   },
 ] as const;
+
 const personalFields = [
   ["fullName", "Full name"],
   ["jobTitle", "Job title"],
@@ -48,6 +51,9 @@ const personalFields = [
   data-cleared={t.cleared}
   data-saved-to-library={t.savedToLibrary}
   data-library-empty={t.libraryEmpty}
+  data-field-hidden={t.fieldHidden}
+  data-template-fields-all={t.templateFieldSummaryAll}
+  data-template-fields-hidden-prefix={t.templateFieldSummaryHidden}
 >
   <div class="workspace-top">
     <div>
@@ -62,26 +68,71 @@ const personalFields = [
     </div>
   </div>
 
-  <section class="editor">
-    <aside class="editor-rail rail-config">
-      <div class="rail-heading">
-        <span class="eyebrow">Configuration</span>
-        <h3>Signature setup</h3>
+  <section class="editor" data-editor-layout>
+    <div class="drawer-edge-controls">
+      <button
+        class="drawer-edge-toggle drawer-edge-toggle-left"
+        type="button"
+        data-drawer-toggle="config"
+        aria-controls="editor-config-panel"
+        aria-expanded="false"
+      >
+        <span class="drawer-toggle-glyph" aria-hidden="true">&lt;</span>
+        <span>{t.drawerConfig}</span>
+      </button>
+      <button
+        class="drawer-edge-toggle drawer-edge-toggle-right"
+        type="button"
+        data-drawer-toggle="templates"
+        aria-controls="editor-templates-panel"
+        aria-expanded="false"
+      >
+        <span>{t.drawerTemplates}</span>
+        <span class="drawer-toggle-glyph" aria-hidden="true">&gt;</span>
+      </button>
+    </div>
+
+    <div class="drawer-backdrop" data-drawer-backdrop hidden></div>
+
+    <aside
+      class="editor-rail rail-config"
+      id="editor-config-panel"
+      data-drawer-panel="config"
+      aria-hidden="false"
+    >
+      <div class="rail-heading rail-heading-with-close">
+        <div class="rail-heading-copy">
+          <span class="eyebrow">Configuration</span>
+          <h3>Signature setup</h3>
+        </div>
+        <button
+          class="drawer-close"
+          type="button"
+          data-drawer-close="config"
+          aria-label={t.drawerClose}
+        >
+          <span class="drawer-close-glyph" aria-hidden="true">×</span>
+          <span class="sr-only">{t.drawerClose}</span>
+        </button>
       </div>
 
       <form id="signature-form">
         <details class="config-section" open>
           <summary><span>1</span> Signature style</summary>
           <div class="config-body">
-            <label
-              >Choose style<select name="template"
-                >{
+            <label>
+              Choose style
+              <select name="template">
+                {
                   templateCatalog.map((template) => (
                     <option value={template.id}>{template.label}</option>
                   ))
-                }</select
-              ></label
-            >
+                }
+              </select>
+            </label>
+            <p id="template-field-summary" class="template-support-summary" aria-live="polite">
+              {t.templateFieldSummaryAll}
+            </p>
           </div>
         </details>
 
@@ -90,11 +141,27 @@ const personalFields = [
           <div class="config-body field-grid">
             {
               personalFields.map(([name, label]) => (
-                <label class:list={{ wide: name === "legalText" || name === "address" }}>
-                  {label}
+                <label
+                  class:list={{ wide: name === "legalText" || name === "address" }}
+                  data-field-wrapper
+                  data-field-name={name}
+                  data-field-label={label}
+                >
+                  <span class="field-label-row">
+                    <span class="field-label-text">{label}</span>
+                    <small
+                      class="field-support-note"
+                      data-field-support-note={name}
+                      title={t.fieldHidden}
+                      hidden
+                    >
+                      No visible
+                    </small>
+                  </span>
                   <input
                     name={name}
                     type={name === "email" ? "email" : name === "website" ? "url" : "text"}
+                    data-field-control
                   />
                 </label>
               ))
@@ -105,11 +172,42 @@ const personalFields = [
         <details class="config-section">
           <summary><span>3</span> Photo and logo</summary>
           <div class="config-body">
-            <label>Public logo URL HTTPS<input name="logoUrl" type="url" /></label>
-            <label>Public photo URL HTTPS<input name="photoUrl" type="url" /></label>
+            <label data-field-wrapper data-field-name="logoUrl" data-field-label="Public logo URL HTTPS">
+              <span class="field-label-row">
+                <span class="field-label-text">Public logo URL HTTPS</span>
+                <small
+                  class="field-support-note"
+                  data-field-support-note="logoUrl"
+                  title={t.fieldHidden}
+                  hidden
+                >
+                  No visible
+                </small>
+              </span>
+              <input name="logoUrl" type="url" data-field-control />
+            </label>
             <label
-              >Local logo/photo preview<input id="local-image" type="file" accept="image/*"
-            /></label>
+              data-field-wrapper
+              data-field-name="photoUrl"
+              data-field-label="Public photo URL HTTPS"
+            >
+              <span class="field-label-row">
+                <span class="field-label-text">Public photo URL HTTPS</span>
+                <small
+                  class="field-support-note"
+                  data-field-support-note="photoUrl"
+                  title={t.fieldHidden}
+                  hidden
+                >
+                  No visible
+                </small>
+              </span>
+              <input name="photoUrl" type="url" data-field-control />
+            </label>
+            <label>
+              Local logo/photo preview
+              <input id="local-image" type="file" accept="image/*" />
+            </label>
             <p id="local-warning" class="warning" hidden>{t.localWarning}</p>
           </div>
         </details>
@@ -117,14 +215,22 @@ const personalFields = [
         <details class="config-section" open>
           <summary><span>4</span> Colors and appearance</summary>
           <div class="config-body appearance-grid">
-            <label>Primary color<input name="primaryColor" type="color" /></label>
-            <label>Secondary color<input name="secondaryColor" type="color" /></label>
-            <label
-              >Size<select name="size"
-                ><option>compact</option><option selected>normal</option><option>wide</option
-                ></select
-              ></label
-            >
+            <label class="appearance-field">
+              <span class="appearance-label">Primary color</span>
+              <input name="primaryColor" type="color" />
+            </label>
+            <label class="appearance-field">
+              <span class="appearance-label">Secondary color</span>
+              <input name="secondaryColor" type="color" />
+            </label>
+            <label class="appearance-field">
+              <span class="appearance-label">Size</span>
+              <select name="size">
+                <option>compact</option>
+                <option selected>normal</option>
+                <option>wide</option>
+              </select>
+            </label>
             <div class="palette-presets">
               <p class="section-help">
                 Quick palettes based on trust, usability, and entrepreneurial clarity.
@@ -202,17 +308,35 @@ const personalFields = [
         <button id="copy">{t.copy}</button>
         <button id="download">{t.download}</button>
         <button id="export">{t.export}</button>
-        <label class="button">{t.import}<input id="import" type="file" accept=".json,application/json" /></label>
+        <label class="button"
+          >{t.import}<input id="import" type="file" accept=".json,application/json" /></label
+        >
         <button id="save-library" class="secondary">{t.saveToLibrary}</button>
         <button id="clear" class="secondary">{t.clear}</button>
       </div>
       <p id="status" role="status" aria-live="polite">{t.saved}</p>
     </section>
 
-    <aside class="editor-rail rail-library">
-      <div class="rail-heading">
-        <span class="eyebrow">Templates</span>
-        <h3>Pick a direction</h3>
+    <aside
+      class="editor-rail rail-library"
+      id="editor-templates-panel"
+      data-drawer-panel="templates"
+      aria-hidden="false"
+    >
+      <div class="rail-heading rail-heading-with-close">
+        <div class="rail-heading-copy">
+          <span class="eyebrow">Templates</span>
+          <h3>Pick a direction</h3>
+        </div>
+        <button
+          class="drawer-close"
+          type="button"
+          data-drawer-close="templates"
+          aria-label={t.drawerClose}
+        >
+          <span class="drawer-close-glyph" aria-hidden="true">×</span>
+          <span class="sr-only">{t.drawerClose}</span>
+        </button>
       </div>
       <div class="template-showcase">
         {

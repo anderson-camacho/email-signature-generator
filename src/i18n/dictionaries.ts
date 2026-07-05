@@ -1,4 +1,18 @@
-export const locales = ["es", "en", "pt-BR", "fr", "de", "zh-CN", "ru"] as const;
+export const locales = [
+  "es",
+  "en",
+  "pt-BR",
+  "fr",
+  "de",
+  "it",
+  "ja",
+  "ko",
+  "ar",
+  "hi",
+  "zh-CN",
+  "ru",
+] as const;
+
 export type Locale = (typeof locales)[number];
 
 export const localeNames: Record<Locale, string> = {
@@ -7,6 +21,11 @@ export const localeNames: Record<Locale, string> = {
   "pt-BR": "Português (Brasil)",
   fr: "Français",
   de: "Deutsch",
+  it: "Italiano",
+  ja: "日本語",
+  ko: "한국어",
+  ar: "العربية",
+  hi: "हिन्दी",
   "zh-CN": "简体中文",
   ru: "Русский",
 };
@@ -23,9 +42,9 @@ const es = {
   templates: "Plantillas",
   faq: "Preguntas frecuentes",
   privacyPage: "Privacidad",
-  donationThanksTitle: "Gracias por tu donaciÃ³n",
+  donationThanksTitle: "Gracias por tu donación",
   donationThanksCopy:
-    "La ventana de PayPal deberÃ­a cerrarse y tu sesiÃ³n seguirÃ¡ aquÃ­ en la pÃ¡gina.",
+    "La ventana de PayPal debería cerrarse y tu sesión seguirá aquí en la página.",
   form: "Personaliza tu firma",
   preview: "Vista previa",
   copy: "Copiar firma",
@@ -60,6 +79,14 @@ const es = {
     "Revisa mejor tus versiones guardadas, abre una, duplícala o elimina las que no sirven.",
   savedPageAction: "Abrir biblioteca",
   savedBackAction: "Volver al editor",
+  drawerConfig: "Configurar",
+  drawerTemplates: "Plantillas",
+  drawerClose: "Cerrar panel",
+  fieldHidden:
+    "Este template no muestra este campo aunque lo llenes.",
+  templateFieldSummaryAll:
+    "Este template aprovecha todos estos campos configurables.",
+  templateFieldSummaryHidden: "Este template no muestra:",
   supportTitle: "Apoya el proyecto",
   supportLink: "Ver apoyo",
   supportCopy:
@@ -117,6 +144,13 @@ const en: Dictionary = {
     "Review saved versions more clearly, reopen one, duplicate it, or remove what you no longer need.",
   savedPageAction: "Open library",
   savedBackAction: "Back to editor",
+  drawerConfig: "Setup",
+  drawerTemplates: "Templates",
+  drawerClose: "Close panel",
+  fieldHidden: "This template does not show this field, even if you fill it in.",
+  templateFieldSummaryAll:
+    "This template uses all of these configurable fields.",
+  templateFieldSummaryHidden: "This template does not show:",
   supportTitle: "Support the project",
   supportLink: "View support",
   supportCopy:
@@ -142,6 +176,14 @@ const ptBR: Dictionary = {
   export: "Exportar JSON",
   import: "Importar JSON",
   clear: "Apagar dados locais",
+  drawerConfig: "Configurar",
+  drawerTemplates: "Modelos",
+  drawerClose: "Fechar painel",
+  fieldHidden:
+    "Este modelo não mostra este campo, mesmo que você o preencha.",
+  templateFieldSummaryAll:
+    "Este modelo usa todos estes campos configuráveis.",
+  templateFieldSummaryHidden: "Este modelo não mostra:",
 };
 
 const fr: Dictionary = {
@@ -163,6 +205,14 @@ const fr: Dictionary = {
   export: "Exporter JSON",
   import: "Importer JSON",
   clear: "Effacer les données locales",
+  drawerConfig: "Configurer",
+  drawerTemplates: "Modèles",
+  drawerClose: "Fermer le panneau",
+  fieldHidden:
+    "Ce modèle n'affiche pas ce champ, même si vous le remplissez.",
+  templateFieldSummaryAll:
+    "Ce modèle utilise tous ces champs configurables.",
+  templateFieldSummaryHidden: "Ce modèle n'affiche pas :",
 };
 
 const de: Dictionary = {
@@ -184,6 +234,159 @@ const de: Dictionary = {
   export: "JSON exportieren",
   import: "JSON importieren",
   clear: "Lokale Daten löschen",
+  drawerConfig: "Konfigurieren",
+  drawerTemplates: "Vorlagen",
+  drawerClose: "Bereich schließen",
+  fieldHidden:
+    "Diese Vorlage zeigt dieses Feld nicht an, auch wenn Sie es ausfüllen.",
+  templateFieldSummaryAll:
+    "Diese Vorlage verwendet alle diese konfigurierbaren Felder.",
+  templateFieldSummaryHidden: "Diese Vorlage zeigt nicht an:",
+};
+
+const it: Dictionary = {
+  ...en,
+  language: "Lingua",
+  title: "Generatore gratuito di firme email",
+  promise:
+    "Crea una firma email professionale gratis, senza registrarti e direttamente dal browser.",
+  privacy: "I tuoi dati restano su questo dispositivo e non vengono inviati ai server.",
+  generator: "Generatore",
+  guide: "Guida di installazione",
+  templates: "Modelli",
+  faq: "FAQ",
+  privacyPage: "Privacy",
+  form: "Personalizza la tua firma",
+  preview: "Anteprima",
+  copy: "Copia firma",
+  download: "Scarica HTML",
+  export: "Esporta JSON",
+  import: "Importa JSON",
+  clear: "Cancella dati locali",
+  drawerConfig: "Configura",
+  drawerTemplates: "Modelli",
+  drawerClose: "Chiudi pannello",
+  fieldHidden:
+    "Questo modello non mostra questo campo, anche se lo compili.",
+  templateFieldSummaryAll:
+    "Questo modello usa tutti questi campi configurabili.",
+  templateFieldSummaryHidden: "Questo modello non mostra:",
+};
+
+const ja: Dictionary = {
+  ...en,
+  language: "言語",
+  title: "無料メール署名ジェネレーター",
+  promise:
+    "登録なしで、ブラウザーから直接プロフェッショナルなメール署名を無料で作成できます。",
+  privacy: "データはこの端末内に保持され、サーバーには送信されません。",
+  generator: "ジェネレーター",
+  guide: "導入ガイド",
+  templates: "テンプレート",
+  faq: "よくある質問",
+  privacyPage: "プライバシー",
+  form: "署名をカスタマイズ",
+  preview: "プレビュー",
+  copy: "署名をコピー",
+  download: "HTML をダウンロード",
+  export: "JSON をエクスポート",
+  import: "JSON をインポート",
+  clear: "ローカルデータを削除",
+  drawerConfig: "設定",
+  drawerTemplates: "テンプレート",
+  drawerClose: "パネルを閉じる",
+  fieldHidden:
+    "このテンプレートでは、この項目を入力しても表示されません。",
+  templateFieldSummaryAll:
+    "このテンプレートでは、これらの設定項目をすべて使用します。",
+  templateFieldSummaryHidden: "このテンプレートでは表示されません:",
+};
+
+const ko: Dictionary = {
+  ...en,
+  language: "언어",
+  title: "무료 이메일 서명 생성기",
+  promise:
+    "가입 없이 브라우저에서 바로 전문적인 이메일 서명을 무료로 만들 수 있습니다.",
+  privacy: "데이터는 이 기기에만 저장되며 서버로 전송되지 않습니다.",
+  generator: "생성기",
+  guide: "설치 가이드",
+  templates: "템플릿",
+  faq: "자주 묻는 질문",
+  privacyPage: "개인정보",
+  form: "서명 맞춤 설정",
+  preview: "미리보기",
+  copy: "서명 복사",
+  download: "HTML 다운로드",
+  export: "JSON 내보내기",
+  import: "JSON 가져오기",
+  clear: "로컬 데이터 지우기",
+  drawerConfig: "설정",
+  drawerTemplates: "템플릿",
+  drawerClose: "패널 닫기",
+  fieldHidden:
+    "이 템플릿은 이 필드를 입력해도 표시하지 않습니다.",
+  templateFieldSummaryAll:
+    "이 템플릿은 이러한 설정 필드를 모두 사용합니다.",
+  templateFieldSummaryHidden: "이 템플릿에서 표시되지 않음:",
+};
+
+const ar: Dictionary = {
+  ...en,
+  language: "اللغة",
+  title: "مولد توقيع البريد الإلكتروني المجاني",
+  promise:
+    "أنشئ توقيع بريد إلكتروني احترافيًا مجانًا ومن المتصفح مباشرة بدون تسجيل.",
+  privacy: "تبقى بياناتك على هذا الجهاز ولا يتم إرسالها إلى الخوادم.",
+  generator: "المولد",
+  guide: "دليل التثبيت",
+  templates: "القوالب",
+  faq: "الأسئلة الشائعة",
+  privacyPage: "الخصوصية",
+  form: "خصّص توقيعك",
+  preview: "المعاينة",
+  copy: "نسخ التوقيع",
+  download: "تنزيل HTML",
+  export: "تصدير JSON",
+  import: "استيراد JSON",
+  clear: "حذف البيانات المحلية",
+  drawerConfig: "الإعدادات",
+  drawerTemplates: "القوالب",
+  drawerClose: "إغلاق اللوحة",
+  fieldHidden:
+    "هذا القالب لا يعرض هذا الحقل حتى إذا قمت بتعبئته.",
+  templateFieldSummaryAll:
+    "هذا القالب يستخدم كل هذه الحقول القابلة للإعداد.",
+  templateFieldSummaryHidden: "هذا القالب لا يعرض:",
+};
+
+const hi: Dictionary = {
+  ...en,
+  language: "भाषा",
+  title: "मुफ्त ईमेल सिग्नेचर जनरेटर",
+  promise:
+    "बिना साइन अप किए, सीधे अपने ब्राउज़र में मुफ्त प्रोफेशनल ईमेल सिग्नेचर बनाइए।",
+  privacy: "आपका डेटा इसी डिवाइस पर रहता है और सर्वरों को नहीं भेजा जाता।",
+  generator: "जनरेटर",
+  guide: "इंस्टॉलेशन गाइड",
+  templates: "टेम्पलेट्स",
+  faq: "अक्सर पूछे जाने वाले सवाल",
+  privacyPage: "गोपनीयता",
+  form: "अपना सिग्नेचर कस्टमाइज़ करें",
+  preview: "प्रीव्यू",
+  copy: "सिग्नेचर कॉपी करें",
+  download: "HTML डाउनलोड करें",
+  export: "JSON एक्सपोर्ट करें",
+  import: "JSON इंपोर्ट करें",
+  clear: "लोकल डेटा साफ करें",
+  drawerConfig: "सेटअप",
+  drawerTemplates: "टेम्पलेट्स",
+  drawerClose: "पैनल बंद करें",
+  fieldHidden:
+    "यह टेम्पलेट इस फ़ील्ड को नहीं दिखाता, चाहे आप इसे भर दें।",
+  templateFieldSummaryAll:
+    "यह टेम्पलेट इन सभी कॉन्फ़िगर किए जा सकने वाले फ़ील्ड्स का उपयोग करता है।",
+  templateFieldSummaryHidden: "यह टेम्पलेट नहीं दिखाता:",
 };
 
 const zhCN: Dictionary = {
@@ -227,6 +430,12 @@ const zhCN: Dictionary = {
     "更清楚地查看已保存版本，重新打开、复制，或删除不再需要的内容。",
   savedPageAction: "打开资料库",
   savedBackAction: "返回编辑器",
+  drawerConfig: "设置",
+  drawerTemplates: "模板",
+  drawerClose: "关闭面板",
+  fieldHidden: "这个模板不会显示这个字段，即使你填写了它。",
+  templateFieldSummaryAll: "这个模板会使用这些可配置字段的全部内容。",
+  templateFieldSummaryHidden: "这个模板不会显示：",
   supportTitle: "支持这个项目",
   supportLink: "查看支持方式",
   supportCopy:
@@ -255,7 +464,8 @@ const ru: Dictionary = {
   saved: "Черновик сохранен локально.",
   localWarning:
     "Локальное изображение используется только для предпросмотра. Перед копированием итоговой подписи используйте публичный HTTPS URL.",
-  copied: "Подпись скопирована. Вставьте ее в почтовый клиент и отправьте тестовое письмо.",
+  copied:
+    "Подпись скопирована. Вставьте ее в почтовый клиент и отправьте тестовое письмо.",
   invalid: "Проверьте отмеченные поля или импортированный файл.",
   cleared: "Локальные данные очищены.",
   about:
@@ -279,6 +489,14 @@ const ru: Dictionary = {
     "Просматривайте сохраненные версии удобнее, открывайте, дублируйте или удаляйте лишнее.",
   savedPageAction: "Открыть библиотеку",
   savedBackAction: "Назад в редактор",
+  drawerConfig: "Настройка",
+  drawerTemplates: "Шаблоны",
+  drawerClose: "Закрыть панель",
+  fieldHidden:
+    "Этот шаблон не показывает это поле, даже если вы его заполните.",
+  templateFieldSummaryAll:
+    "Этот шаблон использует все эти настраиваемые поля.",
+  templateFieldSummaryHidden: "Этот шаблон не показывает:",
   supportTitle: "Поддержать проект",
   supportLink: "Посмотреть поддержку",
   supportCopy:
@@ -291,6 +509,11 @@ export const dictionaries: Record<Locale, Dictionary> = {
   "pt-BR": ptBR,
   fr,
   de,
+  it,
+  ja,
+  ko,
+  ar,
+  hi,
   "zh-CN": zhCN,
   ru,
 };
@@ -299,10 +522,12 @@ export const dictionary = (locale: string) =>
   dictionaries[locale as Locale] ?? es;
 
 const regionToLocale: Record<string, Locale> = {
+  AE: "ar",
   AR: "es",
   AT: "de",
   AU: "en",
   BE: "fr",
+  BH: "ar",
   BO: "es",
   BR: "pt-BR",
   BY: "ru",
@@ -316,7 +541,9 @@ const regionToLocale: Record<string, Locale> = {
   CU: "es",
   DE: "de",
   DO: "es",
+  DZ: "ar",
   EC: "es",
+  EG: "ar",
   ES: "es",
   FR: "fr",
   GB: "en",
@@ -324,21 +551,32 @@ const regionToLocale: Record<string, Locale> = {
   HK: "zh-CN",
   HN: "es",
   IE: "en",
+  IN: "hi",
+  IT: "it",
+  JO: "ar",
+  JP: "ja",
   KG: "ru",
+  KR: "ko",
+  KW: "ar",
   KZ: "ru",
+  LB: "ar",
   LU: "fr",
   LV: "ru",
+  MA: "ar",
   MC: "fr",
   MD: "ru",
   MO: "zh-CN",
   MX: "es",
   NI: "es",
   NZ: "en",
+  OM: "ar",
   PA: "es",
   PE: "es",
   PR: "es",
   PY: "es",
+  QA: "ar",
   RU: "ru",
+  SA: "ar",
   SG: "zh-CN",
   SN: "fr",
   SV: "es",
@@ -354,7 +592,9 @@ const regionToLocale: Record<string, Locale> = {
 
 export const localeStorageKey = "email-signature-generator:locale";
 
-export function normalizeLocaleCandidate(value: string | null | undefined): Locale | null {
+export function normalizeLocaleCandidate(
+  value: string | null | undefined,
+): Locale | null {
   if (!value) return null;
   const lower = value.toLowerCase();
   if (lower === "pt" || lower.startsWith("pt-")) return "pt-BR";
@@ -363,6 +603,11 @@ export function normalizeLocaleCandidate(value: string | null | undefined): Loca
   if (lower === "en" || lower.startsWith("en-")) return "en";
   if (lower === "fr" || lower.startsWith("fr-")) return "fr";
   if (lower === "de" || lower.startsWith("de-")) return "de";
+  if (lower === "it" || lower.startsWith("it-")) return "it";
+  if (lower === "ja" || lower.startsWith("ja-")) return "ja";
+  if (lower === "ko" || lower.startsWith("ko-")) return "ko";
+  if (lower === "ar" || lower.startsWith("ar-")) return "ar";
+  if (lower === "hi" || lower.startsWith("hi-")) return "hi";
   if (lower === "ru" || lower.startsWith("ru-")) return "ru";
   return locales.includes(value as Locale) ? (value as Locale) : null;
 }
