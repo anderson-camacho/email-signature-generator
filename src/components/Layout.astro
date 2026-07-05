@@ -50,9 +50,8 @@ const paypalDonateUrl = "https://www.paypal.com/donate/?hosted_button_id=9HLNFUZ
               href={paypalDonateUrl}
               target="_blank"
               rel="noreferrer"
-              data-paypal-donate-url={paypalDonateUrl}
+              aria-label="Donar con PayPal"
             >
-              <span class="header-donate-badge">PayPal</span>
               <span class="header-donate-copy">Donar</span>
             </a>
           </div>
@@ -73,21 +72,6 @@ const paypalDonateUrl = "https://www.paypal.com/donate/?hosted_button_id=9HLNFUZ
         const locale = target.value;
         localStorage.setItem("email-signature-generator:locale", locale);
         location.href = `/${locale}${location.pathname.replace(/^\/[^/]+/, "")}`;
-      });
-      document.querySelector(".header-donate-button")?.addEventListener("click", (event) => {
-        const link = event.currentTarget;
-        if (!(link instanceof HTMLAnchorElement)) return;
-
-        event.preventDefault();
-        const popup = window.open(
-          link.href,
-          "paypal-donate",
-          "popup=yes,width=760,height=900,noopener,noreferrer",
-        );
-
-        if (!popup) {
-          window.open(link.href, "_blank", "noopener,noreferrer");
-        }
       });
     </script>
   </body>

@@ -122,36 +122,19 @@ footer {
 .header-donate-button {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
   justify-content: center;
   min-height: 44px;
-  padding: 0.35rem 1rem 0.35rem 0.5rem;
+  min-width: 128px;
+  padding: 0.35rem 1.1rem;
   color: #1c355e;
   font-weight: 800;
   text-decoration: none;
 }
-.header-donate-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 88px;
-  min-height: 34px;
-  padding: 0 0.8rem;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #ffd85a, #ffc72f);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 6px 16px rgba(193, 143, 0, 0.22);
-  color: #003087;
-  font-size: 0.92rem;
-  font-weight: 900;
-  letter-spacing: 0.01em;
-}
 .header-donate-copy {
   color: #714e00;
-  font-size: 0.84rem;
+  font-size: 0.9rem;
   font-weight: 800;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
 }
 .header-donate-button:hover {
   transform: translateY(-1px);
