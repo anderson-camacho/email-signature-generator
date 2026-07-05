@@ -101,7 +101,23 @@ const platforms: SocialPlatform[] = [
   "tiktok",
   "whatsapp",
   "github",
+  "dribbble",
+  "behance",
+  "pinterest",
 ];
+const platformLabels: Record<SocialPlatform, string> = {
+  linkedin: "LinkedIn",
+  instagram: "Instagram",
+  facebook: "Facebook",
+  x: "X",
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  whatsapp: "WhatsApp",
+  github: "GitHub",
+  dribbble: "Dribbble",
+  behance: "Behance",
+  pinterest: "Pinterest",
+};
 
 function socialControl(
   tag: "select" | "input",
@@ -155,7 +171,7 @@ function renderSocialEditor() {
     platforms.forEach((name) => {
       const option = document.createElement("option");
       option.value = name;
-      option.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+      option.textContent = platformLabels[name];
       platform.element.append(option);
     });
     platform.element.value = social.platform;
