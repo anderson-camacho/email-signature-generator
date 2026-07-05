@@ -147,14 +147,22 @@ const personalFields = [
                   data-field-name={name}
                   data-field-label={label}
                 >
-                  {label}
+                  <span class="field-label-row">
+                    <span class="field-label-text">{label}</span>
+                    <small
+                      class="field-support-note"
+                      data-field-support-note={name}
+                      title={t.fieldHidden}
+                      hidden
+                    >
+                      No visible
+                    </small>
+                  </span>
                   <input
                     name={name}
                     type={name === "email" ? "email" : name === "website" ? "url" : "text"}
+                    data-field-control
                   />
-                  <small class="field-support-note" data-field-support-note={name} hidden>
-                    {t.fieldHidden}
-                  </small>
                 </label>
               ))
             }
@@ -165,22 +173,36 @@ const personalFields = [
           <summary><span>3</span> Photo and logo</summary>
           <div class="config-body">
             <label data-field-wrapper data-field-name="logoUrl" data-field-label="Public logo URL HTTPS">
-              Public logo URL HTTPS
-              <input name="logoUrl" type="url" />
-              <small class="field-support-note" data-field-support-note="logoUrl" hidden>
-                {t.fieldHidden}
-              </small>
+              <span class="field-label-row">
+                <span class="field-label-text">Public logo URL HTTPS</span>
+                <small
+                  class="field-support-note"
+                  data-field-support-note="logoUrl"
+                  title={t.fieldHidden}
+                  hidden
+                >
+                  No visible
+                </small>
+              </span>
+              <input name="logoUrl" type="url" data-field-control />
             </label>
             <label
               data-field-wrapper
               data-field-name="photoUrl"
               data-field-label="Public photo URL HTTPS"
             >
-              Public photo URL HTTPS
-              <input name="photoUrl" type="url" />
-              <small class="field-support-note" data-field-support-note="photoUrl" hidden>
-                {t.fieldHidden}
-              </small>
+              <span class="field-label-row">
+                <span class="field-label-text">Public photo URL HTTPS</span>
+                <small
+                  class="field-support-note"
+                  data-field-support-note="photoUrl"
+                  title={t.fieldHidden}
+                  hidden
+                >
+                  No visible
+                </small>
+              </span>
+              <input name="photoUrl" type="url" data-field-control />
             </label>
             <label>
               Local logo/photo preview

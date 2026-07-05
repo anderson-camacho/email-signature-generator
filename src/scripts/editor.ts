@@ -131,13 +131,20 @@ function updateFieldSupportState() {
     const supportNote = wrapper.querySelector<HTMLElement>(
       "[data-field-support-note]",
     );
+    const fieldControl = wrapper.querySelector<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >("[data-field-control]");
     if (!fieldName || !supportNote) return;
 
     const isSupported = supportedFields.has(fieldName);
     wrapper.classList.toggle("is-field-unused", !isSupported);
     supportNote.hidden = isSupported;
-    supportNote.style.display = isSupported ? "none" : "block";
+    supportNote.style.display = isSupported ? "none" : "inline-flex";
     supportNote.setAttribute("aria-hidden", String(isSupported));
+    if (fieldControl) {
+      fieldControl.disabled = !isSupported;
+      fieldControl.setAttribute("aria-disabled", String(!isSupported));
+    }
 
     if (!isSupported && wrapper.dataset.fieldLabel) {
       hiddenLabels.push(wrapper.dataset.fieldLabel);
