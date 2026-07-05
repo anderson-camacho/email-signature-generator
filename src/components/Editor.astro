@@ -540,31 +540,10 @@ const fieldAutocomplete = {
       </div>
 
       <form id="signature-form">
-        <details class="config-section" open>
-          <summary><span>1</span> {ui.styleSection}</summary>
-          <div class="config-body">
-            <label>
-              {ui.chooseStyle}
-              <select name="template">
-                {
-                  localizedTemplates.map((template) => (
-                    <option value={template.id}>{template.label}</option>
-                  ))
-                }
-              </select>
-            </label>
-            <p
-              id="template-field-summary"
-              class="template-support-summary"
-              aria-live="polite"
-            >
-              {t.templateFieldSummaryAll}
-            </p>
-          </div>
-        </details>
+        <input type="hidden" name="template" />
 
         <details class="config-section" open>
-          <summary><span>2</span> {ui.personalSection}</summary>
+          <summary><span>1</span> {ui.personalSection}</summary>
           <div class="config-body field-grid">
             {
               personalFields.map((field) => (
@@ -618,7 +597,7 @@ const fieldAutocomplete = {
         </details>
 
         <details class="config-section">
-          <summary><span>3</span> {ui.mediaSection}</summary>
+          <summary><span>2</span> {ui.mediaSection}</summary>
           <div class="config-body">
             <label
               data-field-wrapper
@@ -687,7 +666,7 @@ const fieldAutocomplete = {
         </details>
 
         <details class="config-section" open>
-          <summary><span>4</span> {ui.colorsSection}</summary>
+          <summary><span>3</span> {ui.colorsSection}</summary>
           <div class="config-body appearance-grid">
             <label class="appearance-field">
               <span class="appearance-label">{ui.primaryColor}</span>
@@ -733,7 +712,7 @@ const fieldAutocomplete = {
         </details>
 
         <details class="config-section" open>
-          <summary><span>5</span> {ui.socialSection}</summary>
+          <summary><span>4</span> {ui.socialSection}</summary>
           <div class="config-body">
             <p class="section-help">{ui.socialHelp}</p>
             <div id="social-list" class="social-list"></div>
