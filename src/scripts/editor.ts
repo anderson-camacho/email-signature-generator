@@ -36,8 +36,26 @@ const previewModeButtons = document.querySelectorAll<HTMLButtonElement>(
   "[data-preview-mode]",
 );
 const previewStage = document.querySelector<HTMLElement>("#preview-stage")!;
+const editorLayout = document.querySelector<HTMLElement>("[data-editor-layout]");
+const drawerBackdrop = document.querySelector<HTMLElement>(
+  "[data-drawer-backdrop]",
+);
+const drawerToggles = document.querySelectorAll<HTMLButtonElement>(
+  "[data-drawer-toggle]",
+);
+const drawerCloseButtons = document.querySelectorAll<HTMLButtonElement>(
+  "[data-drawer-close]",
+);
+const drawerPanels = {
+  config: document.querySelector<HTMLElement>('[data-drawer-panel="config"]'),
+  templates: document.querySelector<HTMLElement>(
+    '[data-drawer-panel="templates"]',
+  ),
+};
+const compactEditorMedia = window.matchMedia("(max-width: 1100px)");
 const control = (name: string) =>
   form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
+type DrawerName = keyof typeof drawerPanels;
 let config: SignatureConfig = (() => {
   try {
     return loadDraft(localStorage) ?? structuredClone(defaultConfig);
@@ -46,6 +64,7 @@ let config: SignatureConfig = (() => {
   }
 })();
 let timer: ReturnType<typeof setTimeout>;
+let activeDrawer: DrawerName | null = null;
 let savedSignatures: SavedSignatureRecord[] = (() => {
   try {
     return loadSavedSignatures(localStorage);
@@ -214,8 +233,47 @@ function scheduleSave() {
   }, 300);
 }
 
+function setDrawer(nextDrawer: DrawerName | null) {
+  const isCompact = compactEditorMedia.matches;
+  activeDrawer = isCompact ? nextDrawer : null;
+
+  if (editorLayout) {
+    if (activeDrawer) {
+      editorLayout.dataset.drawerOpen = activeDrawer;
+    } else {
+      delete editorLayout.dataset.drawerOpen;
+    }
+  }
+
+  Object.entries(drawerPanels).forEach(([name, panel]) => {
+    panel?.setAttribute(
+      "aria-hidden",
+      String(isCompact && activeDrawer !== name),
+    );
+  });
+
+  drawerToggles.forEach((button) => {
+    const isExpanded = button.dataset.drawerToggle === activeDrawer;
+    button.setAttribute("aria-expanded", String(isExpanded));
+  });
+
+  if (drawerBackdrop) {
+    drawerBackdrop.hidden = !isCompact || activeDrawer === null;
+  }
+
+  document.body.classList.toggle(
+    "drawer-lock",
+    isCompact && activeDrawer !== null,
+  );
+}
+
+function closeDrawer() {
+  setDrawer(null);
+}
+
 populate();
 render();
+setDrawer(null);
 form.addEventListener("input", () => {
   read();
   render();
@@ -320,6 +378,28 @@ document.querySelector<HTMLInputElement>("#local-image")!.onchange = (
   }
 };
 
+drawerToggles.forEach((button) => {
+  button.addEventListener("click", () => {
+    const drawer = button.dataset.drawerToggle as DrawerName | undefined;
+    if (!drawer) return;
+    setDrawer(activeDrawer === drawer ? null : drawer);
+  });
+});
+
+drawerCloseButtons.forEach((button) => {
+  button.addEventListener("click", closeDrawer);
+});
+
+drawerBackdrop?.addEventListener("click", closeDrawer);
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeDrawer();
+});
+
+compactEditorMedia.addEventListener("change", () => {
+  setDrawer(null);
+});
+
 document
   .querySelectorAll<HTMLButtonElement>("[data-palette-primary]")
   .forEach((button) => {
@@ -348,6 +428,7 @@ templateButtons.forEach((button) => {
     read();
     render();
     scheduleSave();
+    closeDrawer();
   });
 });
 

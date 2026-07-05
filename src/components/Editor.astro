@@ -67,11 +67,50 @@ const personalFields = [
     </div>
   </div>
 
-  <section class="editor">
-    <aside class="editor-rail rail-config">
-      <div class="rail-heading">
-        <span class="eyebrow">Configuration</span>
-        <h3>Signature setup</h3>
+  <section class="editor" data-editor-layout>
+    <div class="drawer-edge-controls">
+      <button
+        class="drawer-edge-toggle drawer-edge-toggle-left"
+        type="button"
+        data-drawer-toggle="config"
+        aria-controls="editor-config-panel"
+        aria-expanded="false"
+      >
+        <span class="drawer-toggle-glyph" aria-hidden="true">&lt;</span>
+        <span>{t.drawerConfig}</span>
+      </button>
+      <button
+        class="drawer-edge-toggle drawer-edge-toggle-right"
+        type="button"
+        data-drawer-toggle="templates"
+        aria-controls="editor-templates-panel"
+        aria-expanded="false"
+      >
+        <span>{t.drawerTemplates}</span>
+        <span class="drawer-toggle-glyph" aria-hidden="true">&gt;</span>
+      </button>
+    </div>
+    <div class="drawer-backdrop" data-drawer-backdrop hidden></div>
+
+    <aside
+      class="editor-rail rail-config"
+      id="editor-config-panel"
+      data-drawer-panel="config"
+      aria-hidden="false"
+    >
+      <div class="rail-heading rail-heading-with-close">
+        <div class="rail-heading-copy">
+          <span class="eyebrow">Configuration</span>
+          <h3>Signature setup</h3>
+        </div>
+        <button
+          class="drawer-close"
+          type="button"
+          data-drawer-close="config"
+          aria-label={t.drawerClose}
+        >
+          {t.drawerClose}
+        </button>
       </div>
 
       <form id="signature-form">
@@ -214,10 +253,25 @@ const personalFields = [
       <p id="status" role="status" aria-live="polite">{t.saved}</p>
     </section>
 
-    <aside class="editor-rail rail-library">
-      <div class="rail-heading">
-        <span class="eyebrow">Templates</span>
-        <h3>Pick a direction</h3>
+    <aside
+      class="editor-rail rail-library"
+      id="editor-templates-panel"
+      data-drawer-panel="templates"
+      aria-hidden="false"
+    >
+      <div class="rail-heading rail-heading-with-close">
+        <div class="rail-heading-copy">
+          <span class="eyebrow">Templates</span>
+          <h3>Pick a direction</h3>
+        </div>
+        <button
+          class="drawer-close"
+          type="button"
+          data-drawer-close="templates"
+          aria-label={t.drawerClose}
+        >
+          {t.drawerClose}
+        </button>
       </div>
       <div class="template-showcase">
         {
