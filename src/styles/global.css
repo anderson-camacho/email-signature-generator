@@ -238,17 +238,6 @@ main {
 .editor-shell {
   padding: 1rem;
 }
-.seo-intro {
-  display: grid;
-  gap: 0.75rem;
-}
-.seo-list {
-  display: grid;
-  gap: 0.55rem;
-  margin: 0;
-  padding-left: 1.2rem;
-  color: var(--ui-muted);
-}
 .guide-card {
   display: grid;
   gap: 1.25rem;
